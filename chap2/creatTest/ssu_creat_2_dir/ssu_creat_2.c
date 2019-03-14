@@ -22,7 +22,7 @@ void ssu_runtime (struct timeval* begin_t, struct timeval* end_t) {
 
 
 int main(void) {
-
+	umask(0);
 	struct timeval begin_t, end_t;
 	char *fname = "ssu_test.txt";
 	int fd;

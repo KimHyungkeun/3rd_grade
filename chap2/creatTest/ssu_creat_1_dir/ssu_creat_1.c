@@ -22,14 +22,14 @@ void ssu_runtime (struct timeval* begin_t, struct timeval* end_t) {
 
 
 int main(void) {
-
+	umask(0);
 	struct timeval begin_t, end_t;
 	char *fname = "ssu_test.txt";
 	int fd;
 
 	gettimeofday(&begin_t, NULL);
 
-	if ((fd = creat(fname,0777)) < 0){
+	if ((fd = creat(fname,0666)) < 0){
 
 		fprintf(stderr,"open error for %s\n",fname);
 		gettimeofday(&end_t,NULL);
