@@ -45,8 +45,6 @@ int main(void){
 
 	dup2(fd,1);
 	printf("Second printf is in this file.\n");
-	gettimeofday(&end_t,NULL);
-        ssu_runtime(&begin_t,&end_t);
 	exit(0);
 
 }
