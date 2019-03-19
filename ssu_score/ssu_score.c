@@ -1,17 +1,33 @@
 #include "ssu_score.h"
+#include "ssu_time.h"
 
+int main(int argc, char *argv[])
+{
+   	
+   char directory_path_ans[20] = "\0"; //ANS_DIR의 경로	   
+   char directory_path_std[20] = "\0"; //STD_DIR의 경로
+   struct timeval begin_t, end_t; //시작시간과 끝나는 시간	
+   gettimeofday(&begin_t, NULL);
 
-void ssu_runtime (struct timeval* begin_t, struct timeval* end_t) {  //프로그램 수행 시간을 측정하기 위한 함수
+   strcpy(directory_path_std, argv[1]);
+   strcpy(directory_path_ans, argv[2]); 
+   strcat(directory_path_std, "/");
+   strcat(directory_path_ans, "/");
 
-	end_t -> tv_sec -= begin_t -> tv_sec;
-
-	if(end_t -> tv_usec < begin_t -> tv_usec) {
-		end_t -> tv_sec--;
-		end_t -> tv_usec += SECOND_TO_MICRO;
+   if(argc != 3) {
+	fprintf(stderr,"Usage : %s STD_DIR ANS_DIR\n",argv[0]);
+	gettimeofday(&end_t,NULL);
+       	ssu_runtime(&begin_t, &end_t);
+	exit(1);
 	}
+	
+	blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
+	program_problem_check(directory_path_std, directory_path_ans); //프로그래밍 문제
+	score_table_create(directory_path_ans);
 
-	end_t -> tv_usec -= begin_t -> tv_usec;
-	printf("Runtime : %ld:%06ld(sec:usec)\n",end_t -> tv_sec, end_t -> tv_usec);
+	gettimeofday(&end_t,NULL);
+       	ssu_runtime(&begin_t, &end_t);
+	exit(0);
 
 }
 
@@ -179,31 +195,37 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
 
 }
 
-int main(int argc, char *argv[])
-{
-   	
-   char directory_path_ans[20] = "\0"; //ANS_DIR의 경로	   
-   char directory_path_std[20] = "\0"; //STD_DIR의 경로
-   struct timeval begin_t, end_t; //시작시간과 끝나는 시간	
-   gettimeofday(&begin_t, NULL);
+void score_table_create(char* directory_path_ans) {
 
-   strcpy(directory_path_std, argv[1]);
-   strcpy(directory_path_ans, argv[2]); 
-   strcat(directory_path_std, "/");
-   strcat(directory_path_ans, "/");
+	struct table_format tab_for; //table format
+ 	int fd_score, count=0; //fd : 파일 디스크립터, count : 읽은 buf의 갯수
+	tab_for.comma = ',';
+	tab_for.line_jump = '\n';
 
-   if(argc != 3) {
-	fprintf(stderr,"Usage : %s STD_DIR ANS_DIR\n",argv[0]);
-	gettimeofday(&end_t,NULL);
-       	ssu_runtime(&begin_t, &end_t);
-	exit(1);
-	}
-	
-	blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
-	program_problem_check(directory_path_std, directory_path_ans); //프로그래밍 문제
-	gettimeofday(&end_t,NULL);
-       	ssu_runtime(&begin_t, &end_t);
-	exit(0);
+
+
+  if((fd_score = open("score_table.csv",O_WRONLY | O_CREAT | O_TRUNC, 0640)) < 0) {
+	  fprintf(stderr,"open error for %s\n","score_table.csv");
+	  exit(1);
+  }	
+
+  while(1) {
+	  
+	  if(count == 49)
+	  break;
+
+	  printf("Input of ");
+	  printf("%s : ",filename[count]);
+	  scanf("%d",&tab_for.score);
+	  strcpy(tab_for.name, filename[count]);
+	  write(fd_score, (char *)&tab_for, sizeof(tab_for));
+
+	  count ++;
+	  
+  }
+
+  close(fd_score);
+  exit(0);
+
 }
-
 
