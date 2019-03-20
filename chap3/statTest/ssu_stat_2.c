@@ -6,12 +6,13 @@
 #include "ssu_time.h"
 
 struct stat statbuf;
+struct timeval begin_t, end_t;
 
 void ssu_checkfile(char *fname, time_t *time);
 
+
 int main(int argc, char* argv[]) {
 
-	struct timeval begin_t, end_t;
 	time_t intertime;
 	
 	gettimeofday(&begin_t, NULL);
@@ -42,6 +43,9 @@ void ssu_checkfile(char *fname, time_t *time) {
 
 	if(stat(fname, &statbuf) < 0) { //파일에 이상이있거나 할 경우 에러를 출력한다.
 		fprintf(stderr, "Warning : ssu_checkfile() error\n");
+		gettimeofday(&end_t, NULL);
+                ssu_runtime(&begin_t,&end_t);;
+		
 		exit(1);
 	}
 	
