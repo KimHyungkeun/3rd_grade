@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 int main(int argc, char* argv[]) {
 	
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}	
 	
-	length = read(fd,buf,10);
+	length = read(fd,buf,10); //문자열을 지정한 offset부터 10글자 읽는다.
 	write(1, buf, length);
 	printf("\n");
 	

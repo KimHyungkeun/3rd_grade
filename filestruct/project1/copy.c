@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 int main(int argc, char* argv[]) {
 
@@ -20,11 +20,11 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	if((copy_fd = open(argv[2],O_WRONLY | O_CREAT | O_TRUNC, 0640)) < 0) {
+	if((copy_fd = open(argv[2],O_WRONLY | O_CREAT | O_TRUNC, 0640)) < 0) { //copy파일을 생성한다
 		fprintf(stderr, "open error for %s\n",argv[2]);
 	}	
 
-	while((length = read(origin_fd, buf, 100)) > 0) {
+	while((length = read(origin_fd, buf, 100)) > 0) { //100byte씩 읽어서 복사한다.
 		printf(" %ldbytes read!\n",write(copy_fd, buf, length));
 	}
 

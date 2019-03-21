@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 int main(int argc, char* argv[]) {
 
@@ -26,10 +26,10 @@ int main(int argc, char* argv[]) {
         }
 
 
-	length = read(fd, buf, BUFFER_SIZE);
-	length_argv = strlen(argv[3]);
+	length = read(fd, buf, BUFFER_SIZE); //원본파일의 모든 글자를 읽은 크기
+	length_argv = strlen(argv[3]); // 입력한 문자열의 길이
 
-	for(i = length-1 ; i >= offset ; i--) {
+	for(i = length-1 ; i >= offset ; i--) { //지정한 offset을 기준으로, 입력한 문자열 길이만큼 뒤로 민다.
 		
 		if( length_argv < 10) {
 			buf[i+length_argv] = buf[i];
@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
 		
 	}
 
-	lseek(fd, 0, SEEK_SET);
+	lseek(fd, 0, SEEK_SET); //offset을 처음으로 지정
 
 	if( length_argv < 10 )
-		write(fd, buf, length + length_argv);
+		write(fd, buf, length + length_argv); //밀었던 만큼 공백을 발생시킴
 
 	else
 		write(fd,buf,length+10);
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	lseek(fd, offset, SEEK_SET);
 
 	if( length_argv < 10)
-        	write(fd, argv[3], length_argv);
+        	write(fd, argv[3], length_argv); //해당 공백에 새로 insert할 문자열이 써진다.
 
 	else
 		write(fd, argv[3], 10);
