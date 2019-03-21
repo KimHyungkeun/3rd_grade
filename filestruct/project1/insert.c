@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -10,6 +11,7 @@ int main(int argc, char* argv[]) {
 	char buf[BUFFER_SIZE];
         int fd;
         int length;
+	int length_argv;
 	int i;
 	off_t offset = atoi(argv[2]);
 
@@ -25,23 +27,40 @@ int main(int argc, char* argv[]) {
 
 
 	length = read(fd, buf, BUFFER_SIZE);
-	for(i = length-1 ; i >= offset ; i--) {
-		buf[i+10] = buf[i];
-		buf[i] = ' ';
-	}
-	lseek(fd, 0, SEEK_SET);
-	write(fd,buf,length+10);
+	length_argv = strlen(argv[3]);
 
-	
-	if(lseek(fd, offset, SEEK_SET) < 0) {
-		fprintf(stderr,"lseek error\n");
-		exit(1);
+	for(i = length-1 ; i >= offset ; i--) {
+		
+		if( length_argv < 10) {
+			buf[i+length_argv] = buf[i];
+			buf[i] = '\0';
+		}
+
+		else {
+			buf[i+10] = buf[i];
+			buf[i] = '\0';
+		}
+		
 	}
-        write(fd,argv[3],10);
+
+	lseek(fd, 0, SEEK_SET);
+
+	if( length_argv < 10 )
+		write(fd, buf, length + length_argv);
+
+	else
+		write(fd,buf,length+10);
+
+	lseek(fd, offset, SEEK_SET);
+
+	if( length_argv < 10)
+        	write(fd, argv[3], length_argv);
+
+	else
+		write(fd, argv[3], 10);
 
         exit(0);
 
 
 
 }
-

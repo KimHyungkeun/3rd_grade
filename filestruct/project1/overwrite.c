@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-
+#include <string.h>
 
 int main(int argc, char* argv[]) {
 
@@ -25,7 +25,11 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-        write(fd,argv[3],10);
+	if((length = strlen(argv[3])) < 10)
+		write(fd, argv[3], length);
+
+	else
+        	write(fd,argv[3],10);
 
         exit(0);
 
