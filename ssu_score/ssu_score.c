@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
 	exit(1);
 	}
 	
-	blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
+	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
 	program_problem_check(directory_path_std, directory_path_ans); //프로그래밍 문제
-	score_table_create(directory_path_ans);
+	//score_table_create(directory_path_ans);
 
 	gettimeofday(&end_t,NULL);
        	ssu_runtime(&begin_t, &end_t);
@@ -89,6 +89,7 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
 				if(strcmp(dir_entry_std -> d_name,".") == 0 || strcmp(dir_entry_std -> d_name,"..") == 0 )  {
 					//해당 디렉터리 내에 '.' 이나 '..'같은 것이 있으면 건너뛴다.	
 					strcpy(directory_path_std, directory_path_backup_std);	
+					continue;
 				}
 	
 				else {
@@ -98,10 +99,6 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
 					exit(1);
 					}
 
-					count = read(fd_std, buf_STD, BUFFER_SIZE); //처음부터 시작하여 1024byte 만큼을 읽는다.
-					buf_STD[count] = 0;
-					printf("fd's printf : \n%s\n",buf_STD); //읽은 문자열을 출력
-					
 					strcpy(directory_path_std, directory_path_backup_std);	
 					close(fd_std);
 				}	
@@ -171,9 +168,9 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
 					exit(1);
 					}
 
-					count = read(fd_ans, buf_ANS, BUFFER_SIZE); //처음부터 시작하여 1024byte 만큼을 읽는다.
-					buf_ANS[count] = 0;
-					printf("fd's printf : \n%s\n",buf_ANS); //읽은 문자열을 출력
+					//count = read(fd_ans, buf_ANS, BUFFER_SIZE); //처음부터 시작하여 1024byte 만큼을 읽는다.
+					//buf_ANS[count] = 0;
+					//printf("fd's printf : \n%s\n",buf_ANS); //읽은 문자열을 출력
 					
 					strcpy(directory_path_ans, directory_path_backup_ans);	
 					close(fd_ans);

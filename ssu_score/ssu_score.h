@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
+#include <errno.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -13,12 +15,12 @@
 #define ERROR 0
 #define LONG PROCESS 0
 
-struct table_format {
+struct table_format{
     char name[10];
     char comma;
-    int score;
-    char line_jump;
-};
+    double score;
+    char linejump;
+} ;
 
 char* filename[] = {"1-1.txt","1-2.txt","1-3.txt","1-4.txt","1-5.txt",
 "2-1.txt","2-2.txt","2-3.txt","2-4.txt","3-1.txt","3-2.txt","3-3.txt","4-1.txt","4-2.txt","4-3.txt","4-4.txt",
