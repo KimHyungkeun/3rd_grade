@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 #define WARNING 0.1
 #define ERROR 0
 #define LONG_PROCESS 0
@@ -42,7 +42,8 @@ struct ssu_score_table_format{
 
 
 void blank_problem_check(char *, char *);
-void program_problem_check(char*, char*);
+void program_autocompile(char*, char*);
+void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
 void score_table_create(char *);
 

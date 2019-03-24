@@ -22,9 +22,10 @@ int main(int argc, char *argv[])
 	}
 	
 	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
-	program_problem_check(directory_path_std, directory_path_ans); //프로그래밍 문제
     ssu_score_table_create(directory_path_ans);
-    score_table_create(directory_path_std);
+	program_autocompile(directory_path_std, directory_path_ans); //program autu complile
+    //program_problem_check(directory_path_std, directory_path_ans); //program problem compare
+    //score_table_create(directory_path_std);
 	
 
 	gettimeofday(&end_t,NULL);
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 
 }
 
-void program_problem_check(char* directory_path_std, char* directory_path_ans){
+void program_autocompile(char* directory_path_std, char* directory_path_ans){
     struct  dirent **namelist;
     int     count, except = 0;
     int     idx;
@@ -46,7 +47,6 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
     char gcc_syntax[30] = "\0";
     char run_syntax[30] = "\0";
     char stdoutfile_name[30] = "\0";
-    char buf[BUFFER_SIZE];
     int compile_count = 0;
     
     // ANS_DIR auto compile part
@@ -160,7 +160,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
 
         sub_std = opendir(directory_path_std);
         while( entry_sub_std = readdir(sub_std)){
-            printf("%s\n",entry_sub_std -> d_name);
+            //printf("%s\n",entry_sub_std -> d_name);
             //compile_count++;
             //printf("complie count : %d\n", compile_count);
             //printf("%s\n", entry_sub_ans -> d_name);
@@ -255,8 +255,140 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
     
 }
 
-void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
+void program_problem_check(char* directory_path_std, char* directory_path_ans) {
+    struct  dirent **namelist;
+    int ans_count, std_count ,except = 0;
+    int ans_idx, std_idx;
+    int ans_length, std_length;
+    int ans_fd, std_fd;
+    int ans_not_c, std_not_c;
+    char exe_filename[30] = "\0";
+    char stdout_filename[30] = "\0";
+    char txt_filename[30] = "\0";
+    char exe_syntax[30] = "\0";
+    char gcc_syntax[30] = "\0";
+    char run_syntax[30] = "\0";
+    char stdoutfile_name[30] = "\0";
+    int compile_count = 0;
 
+    if((ans_count = scandir(directory_path_ans, &namelist, NULL, alphasort)) == -1) {
+        fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_ans, strerror(errno));
+        exit(1);
+        } 
+    printf("%d\n", 12345);
+    for(ans_idx = 0; ans_idx < ans_count; ans_idx++) {
+        if(strcmp(namelist[ans_idx] -> d_name,".") == 0 || strcmp(namelist[ans_idx] -> d_name,"..") == 0)
+        continue;
+
+        if(strcmp(namelist[ans_idx] -> d_name,"score_table.csv") == 0 || strpbrk(namelist[ans_idx] -> d_name, "-") != NULL) 
+        continue;
+        
+        else {
+        strcpy(dir_path_backup_ans, directory_path_ans);
+        strcat(directory_path_ans, namelist[ans_idx] -> d_name);
+        strcat(directory_path_ans, "/"); // ANS_DIR/SUBDIR
+        strcpy(sub_path_ans_backup, directory_path_ans); // ANS_DIR/SUBDIR
+
+        sub_ans = opendir(directory_path_ans);
+        while ( entry_sub_ans = readdir(sub_ans) ) {
+            strcat(directory_path_ans, entry_sub_ans -> d_name); 
+            for(int i = 0; i < strlen(entry_sub_ans -> d_name); i++){
+                    if( entry_sub_ans -> d_name[i] == 's' ) {
+                        ans_not_c = 1;
+                        break;
+                    }
+
+                    else
+                        ans_not_c = 0;
+            }
+
+            if(ans_not_c == 1) {
+
+               if((fd_ans = open(directory_path_ans, O_RDONLY)) < 0 ) {
+                   fprintf(stderr, "open error for %s\n", directory_path_ans);
+                   exit(1);
+               }
+               ans_length = read(fd_ans, buf_ANS, BUFFER_SIZE);
+
+                    /*if((std_count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
+                    fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
+                    exit(1);
+                    }
+
+                    for(std_idx = 0; std_idx < std_count; std_idx++) {
+                        if(strcmp(namelist[std_idx] -> d_name,".") == 0 || strcmp(namelist[std_idx] -> d_name,"..") == 0)
+                            continue;
+
+                        else {
+                            strcpy(dir_path_backup_std, directory_path_std);
+                            strcat(directory_path_std, namelist[std_idx] -> d_name);
+                            strcat(directory_path_std, "/");
+                            strcpy(sub_path_std_backup, directory_path_std); // STD_DIR/SUBDIR
+
+                            sub_std = opendir(directory_path_std);
+                            while( entry_sub_std = readdir(sub_std)){
+                                    if(strcmp(entry_sub_std -> d_name,".") == 0 || strcmp(entry_sub_std-> d_name,"..") == 0)
+                                         continue;
+
+            
+                                    if(strpbrk(entry_sub_std -> d_name, "-") != NULL)
+                                            continue;
+
+                                    for(int i=0 ; i < strlen(entry_sub_std -> d_name) ; i++) {
+                
+                                        if(entry_sub_std -> d_name [i]== 's') {
+                                            std_not_c = 1;
+                                            break;
+                                        }
+
+                                        else
+                                            std_not_c = 0;
+                                    }
+            
+                                    if(std_not_c == 1) {
+                                        if((fd_std = open(directory_path_std, O_RDONLY)) < 0 ) {
+                                        fprintf(stderr, "open error for %s\n", directory_path_std);
+                                        exit(1);
+                                        }
+                                        std_length = read(fd_std, buf_STD, BUFFER_SIZE);
+
+                                        if(strcmp(buf_ANS, buf_STD) == 0) {
+                                            printf("Correct!\n"); 
+                                            lseek(fd_ans, 0 , SEEK_SET);
+                                        }
+
+                                        else {
+                                            printf("Wrong!\n");
+                                            lseek(fd_std, 0 ,SEEK_SET);
+                                        }
+                                    strcpy(dir_path_backup_std, directory_path_std);    
+                                    } 
+
+                            closedir(sub_std);
+                            strcpy(directory_path_std,dir_path_backup_std);
+                        }
+                    } 
+            
+            }*/
+
+            //strcpy(dir_path_backup_ans, directory_path_ans);
+        }
+
+            closedir(sub_ans);
+            strcpy(directory_path_ans,dir_path_backup_ans);
+        }
+    }
+    
+        for(ans_idx = 0; ans_idx < ans_count; ans_idx++) {
+        free(namelist[ans_idx]);
+        }
+        free(namelist);
+
+    }
+}
+
+void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
+        
 }
 
 void ssu_score_table_create(char* directory_path_ans) {
@@ -302,8 +434,8 @@ void ssu_score_table_create(char* directory_path_ans) {
         }
     }
     except_sum = except_dot + except_csv;
-    printf("except dot: %d\n", except_dot);
-    printf("except csv: %d\n", except_csv);
+    //printf("except dot: %d\n", except_dot);
+    //printf("except csv: %d\n", except_csv);
     if((fd_score = open("ANS_DIR/score_table.csv",O_WRONLY | O_CREAT | O_TRUNC, 0640)) < 0) {
 	    fprintf(stderr,"open error for %s\n","ANS_DIR/score_table.csv");
 	    exit(1);
