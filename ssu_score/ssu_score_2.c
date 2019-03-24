@@ -1,24 +1,7 @@
 #include "ssu_score.h"
 #include "ssu_time.h"
 
-   DIR *dir__ans, *sub_ans, *dir_std, *sub_std; //dir_info : 처음 부모디렉터리, dir_* : DIR_* 내부의 디렉터리
-   struct dirent  *entry_ans, *entry_sub_ans, *entry_std, *entry_sub_std; // dir_info_*를 readdir 하기 위한 변수, dir_*를 readdir 하기 위한 변수
-   char dir_root_ans[30] = "ANS_DIR/"; //ANS_DIR  
-   char dir_root_std[30] = "STD_DIR/"; //STD_DIR
-   char dir_path_ans[30] = "\0"; //ANS_DIR  
-   char dir_path_std[30] = "\0"; //STD_DIR
-   char dir_path_backup_ans[30] = "\0"; // ANS_DIR/SUBDIR/로 돌아감
-   char dir_path_backup_std[30] = "\0"; // STD_DIR/SUBDIR/로 돌아감
-   char sub_path_ans_backup[30] = "\0";
-   char sub_path_std_backup[30] = "\0";
-   char buf_ANS[BUFFER_SIZE]; // ANS 의 파일내용을 담기 위한 변수
-   char buf_STD[BUFFER_SIZE]; // STD의 파일내용을 담기 위한 변수
-   int fd_ans, fd_std, count; //fd : 파일 디스크립터, count : 읽은 buf의 갯수
-   struct timeval begin_t, end_t; //시작시간과 끝나는 시간	
-   time_t first, second;
-   
-
-
+  
 int main(int argc, char *argv[])
 {
    	
@@ -55,6 +38,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
     int     count, except = 0;
     int     idx;
     int     stdoutfile_fd, fd_backup, fd_backup2;
+    int not_c;
     char exe_filename[30] = "\0";
     char stdout_filename[30] = "\0";
     char txt_filename[30] = "\0";
@@ -65,6 +49,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
     char buf[BUFFER_SIZE];
     int compile_count = 0;
     
+    // ANS_DIR auto compile part
     if((count = scandir(directory_path_ans, &namelist, NULL, alphasort)) == -1) {
         fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_ans, strerror(errno));
         exit(1);
@@ -156,7 +141,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
 
     free(namelist);
 
-    // STD_DIR auto compile
+    // STD_DIR auto compile part
     
     if((count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
         fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
@@ -191,7 +176,21 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
         
             if(strpbrk(entry_sub_std -> d_name, "-") != NULL)
                 continue;
+
+            for(int i=0 ; i < strlen(entry_sub_std -> d_name) ; i++) {
+                
+                if(entry_sub_std -> d_name [i] == 'e' || entry_sub_std -> d_name [i]== 's') {
+                    not_c = 1;
+                }
+
+            }
             
+            if(not_c == 1) {
+                not_c = 0;
+                continue;
+            } 
+                
+
             else {
             strcat(directory_path_std, entry_sub_std -> d_name); //STD_DIR/SUBDIR/*.txt or .c
             
@@ -207,6 +206,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
                     directory_path_std[i] = '\0';
             }
 
+          
             printf("directory_path_std : %s\n", directory_path_std);
             sprintf(exe_syntax, "%s" , directory_path_std);
             printf("exe_syntax %s\n", exe_syntax);
@@ -227,8 +227,9 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
                 dup2(stdoutfile_fd, 1);
 
                 
-                first = time(NULL);
+               
                 sprintf(run_syntax, "%s%s%s", "./",exe_syntax, ".exe");
+                first = time(NULL);
                 system(run_syntax);
                 second = time(NULL);
 
@@ -254,6 +255,10 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans){
     
 }
 
+void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
+
+}
+
 void ssu_score_table_create(char* directory_path_ans) {
 
 	
@@ -269,7 +274,7 @@ void ssu_score_table_create(char* directory_path_ans) {
         exit(1);
         } 
 
-    if((fd_score = open("score_table.csv", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
+    if((fd_score = open("ANS_DIR/score_table.csv", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "creat error for %s\n","score_table.csv");
         exit(1);
     }
@@ -353,13 +358,3 @@ void score_table_create(char *directory_path_std) {
 
 }
 
-void eliminate(char* str, char ch) {
-    for(; *str != '\0'; str++) //until null character
-    {
-        if(*str = ch) //if the same with ch
-        {
-            strcpy(str, str+1);
-            str --;
-        }
-    }
-}
