@@ -15,12 +15,14 @@
 #define ERROR 0
 #define LONG PROCESS 0
 
-struct table_format{
-    char name[10];
+struct ssu_score_table_format{
+    char name[20];
     char comma;
     double score;
     char linejump;
 } ;
+
+
 
 char* filename[] = {"1-1.txt","1-2.txt","1-3.txt","1-4.txt","1-5.txt",
 "2-1.txt","2-2.txt","2-3.txt","2-4.txt","3-1.txt","3-2.txt","3-3.txt","4-1.txt","4-2.txt","4-3.txt","4-4.txt",
@@ -29,7 +31,8 @@ char* filename[] = {"1-1.txt","1-2.txt","1-3.txt","1-4.txt","1-5.txt",
 "9-5.txt","9-6.txt","10-1.txt","10-2.txt","10-3.txt","10-4.txt","10-5.txt","11.c","12.c","13.c","14.c"};
 
 void blank_problem_check(char *, char *);
-void program_problem_check(char *, char *);
+void program_problem_check(char*, char*);
+void ssu_score_table_create(char *);
 void score_table_create(char *);
-char* txt_search(char *);
-char* c_search(char *);
+void eliminate(char*, char);
+
