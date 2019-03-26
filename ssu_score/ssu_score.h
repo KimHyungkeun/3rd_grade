@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -46,5 +47,6 @@ void program_autocompile(char*, char*);
 void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
 void score_table_create(char *);
+void *ssu_thread(void *arg);
 
 

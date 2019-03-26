@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
 	}
 	
 	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
-    ssu_score_table_create(directory_path_ans);
-	program_autocompile(directory_path_std, directory_path_ans); //program autu complile
+    //ssu_score_table_create(directory_path_ans);
+	program_autocompile(directory_path_std, directory_path_ans); //program auto complile
     //program_problem_check(directory_path_std, directory_path_ans); //program problem compare
     //score_table_create(directory_path_std);
 	
@@ -38,7 +38,7 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans){
     struct  dirent **namelist;
     int     count, except = 0;
     int     idx;
-    int     stdoutfile_fd, fd_backup, fd_backup2;
+    int     stdoutfile_fd, error_fd, fd_backup, fd_backup2;
     int not_c;
     char exe_filename[30] = "\0";
     char stdout_filename[30] = "\0";
@@ -47,6 +47,8 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans){
     char gcc_syntax[30] = "\0";
     char run_syntax[30] = "\0";
     char stdoutfile_name[30] = "\0";
+    char errorfile_name[30] = "\0";
+    char killall_command[30] = "\0";
     int compile_count = 0;
     
     // ANS_DIR auto compile part
@@ -213,29 +215,44 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans){
 
             sprintf(stdoutfile_name, "%s%s", exe_syntax, ".stdout");
             printf("stdoutfile_name %s\n", stdoutfile_name);
+
+            sprintf(errorfile_name, "%s%s", exe_syntax, ".error");
+            printf("errorfile_name %s\n", errorfile_name);
             
             
-            if( (stdoutfile_fd = open(stdoutfile_name, O_RDWR | O_CREAT | O_TRUNC, 0640)) < 0) {
+            if( (stdoutfile_fd = open(stdoutfile_name, O_RDWR | O_CREAT | O_TRUNC, 0640)) < 0 ) {
                     fprintf(stderr, "open error for %s\n", stdoutfile_name);
                     exit(1);
             }
+
+            if( (error_fd = open(errorfile_name, O_RDWR | O_CREAT | O_TRUNC, 0640)) < 0 ) {
+                    fprintf(stderr, "open error for %s\n", errorfile_name);
+                    exit(1);
+            }
+
                 fd_backup = dup(1);
+                fd_backup2 = dup(2);
+                dup2(stdoutfile_fd, 1);
+                dup2(error_fd,2);
+
                 sprintf(gcc_syntax, "%s %s%s %s %s %s%s", "gcc" , directory_path_std,".c", "-lpthread","-o", exe_syntax,".exe");
                 system(gcc_syntax);
 
                 
-                dup2(stdoutfile_fd, 1);
+                sprintf(killall_command,"%s %s%s", "killall", exe_syntax,"*");
+                sprintf(run_syntax, "%s%s%s %s", "./",exe_syntax, ".exe","&");
 
-                
-               
-                sprintf(run_syntax, "%s%s%s", "./",exe_syntax, ".exe");
+
                 first = time(NULL);
                 system(run_syntax);
                 second = time(NULL);
-
+                
+                
                 dup2(fd_backup, 1);
+                dup2(fd_backup2,2);
                 printf("wait time is %f seconds\n\n", difftime(second, first));
                 close(stdoutfile_fd); 
+                close(error_fd);
 
              strcpy(directory_path_std, sub_path_std_backup );
             }
@@ -309,69 +326,6 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
                    exit(1);
                }
                ans_length = read(fd_ans, buf_ANS, BUFFER_SIZE);
-
-                    /*if((std_count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
-                    fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
-                    exit(1);
-                    }
-
-                    for(std_idx = 0; std_idx < std_count; std_idx++) {
-                        if(strcmp(namelist[std_idx] -> d_name,".") == 0 || strcmp(namelist[std_idx] -> d_name,"..") == 0)
-                            continue;
-
-                        else {
-                            strcpy(dir_path_backup_std, directory_path_std);
-                            strcat(directory_path_std, namelist[std_idx] -> d_name);
-                            strcat(directory_path_std, "/");
-                            strcpy(sub_path_std_backup, directory_path_std); // STD_DIR/SUBDIR
-
-                            sub_std = opendir(directory_path_std);
-                            while( entry_sub_std = readdir(sub_std)){
-                                    if(strcmp(entry_sub_std -> d_name,".") == 0 || strcmp(entry_sub_std-> d_name,"..") == 0)
-                                         continue;
-
-            
-                                    if(strpbrk(entry_sub_std -> d_name, "-") != NULL)
-                                            continue;
-
-                                    for(int i=0 ; i < strlen(entry_sub_std -> d_name) ; i++) {
-                
-                                        if(entry_sub_std -> d_name [i]== 's') {
-                                            std_not_c = 1;
-                                            break;
-                                        }
-
-                                        else
-                                            std_not_c = 0;
-                                    }
-            
-                                    if(std_not_c == 1) {
-                                        if((fd_std = open(directory_path_std, O_RDONLY)) < 0 ) {
-                                        fprintf(stderr, "open error for %s\n", directory_path_std);
-                                        exit(1);
-                                        }
-                                        std_length = read(fd_std, buf_STD, BUFFER_SIZE);
-
-                                        if(strcmp(buf_ANS, buf_STD) == 0) {
-                                            printf("Correct!\n"); 
-                                            lseek(fd_ans, 0 , SEEK_SET);
-                                        }
-
-                                        else {
-                                            printf("Wrong!\n");
-                                            lseek(fd_std, 0 ,SEEK_SET);
-                                        }
-                                    strcpy(dir_path_backup_std, directory_path_std);    
-                                    } 
-
-                            closedir(sub_std);
-                            strcpy(directory_path_std,dir_path_backup_std);
-                        }
-                    } 
-            
-            }*/
-
-            //strcpy(dir_path_backup_ans, directory_path_ans);
         }
 
             closedir(sub_ans);
@@ -382,9 +336,9 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
         for(ans_idx = 0; ans_idx < ans_count; ans_idx++) {
         free(namelist[ans_idx]);
         }
-        free(namelist);
 
     }
+        free(namelist);
 }
 
 void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
