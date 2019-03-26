@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 	}	
 
 	while((length = read(origin_fd, buf, 100)) > 0) { //100byte씩 읽어서 복사한다.
-		printf(" %ldbytes read!\n",write(copy_fd, buf, length));
+		write(copy_fd, buf, length);
 	}
 
 	exit(1);
