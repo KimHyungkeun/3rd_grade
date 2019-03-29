@@ -5,49 +5,34 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-void *ssu_thread(void *arg) {
-    
-    pthread_t tid;
-    pid_t pid;
+/*int main (void) {
 
-
-    pid = getpid();
-    tid = pthread_self();
-    printf("New Thread : pid %d tid %u \n",(int)pid, (unsigned int)tid);
-    return NULL;
-
-}
-
-int main (void) {
-
-    time_t first, second;
-    pthread_t tid;
-    pid_t pid;
-
-    
-    while(1) {
-     if(pthread_create(&tid, NULL, ssu_thread, NULL) != 0) {
-        fprintf(stderr, "pthread_creat error\n");
-        exit(1);
-    }
-
-    
-
-    pid = getpid();
-    tid = pthread_self();
-    
-    printf("Main Thread : pid %d tid %u \n",(int)pid, (unsigned int)tid);
-    sleep(1);
-
-    
-    if( (second = time(NULL)) > 0 ) {
-        printf("%ld sec\n", second);
-        break;
-    }
-    }
-    
-
+    system("ls -v ANS_DIR > score.csv");
     exit(0);
     
+}*/
+
+int convert_string(const void *a, const void *b)
+{
+    return strcmp((char *)a, (char *)b);
 }
 
+int main()
+{
+   char s[10][8];
+    
+    for(int i=0;i<10;i++){
+       scanf("%s",s[i]);
+   }
+
+    qsort(s, sizeof(s) / sizeof(s[0]), sizeof(s[0]), convert_string);
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("%s ", s[i]);
+    }
+
+    printf("\n");
+
+    return 0;
+}

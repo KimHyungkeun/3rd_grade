@@ -23,6 +23,12 @@ struct ssu_score_table_format{
     char linejump;
 } ;
 
+struct total_score_table_format{
+    char student[20];
+    double score;
+    double sum;
+} ;
+
  DIR *dir__ans, *sub_ans, *dir_std, *sub_std; //dir_info : 처음 부모디렉터리, dir_* : DIR_* 내부의 디렉터리
    struct dirent  *entry_ans, *entry_sub_ans, *entry_std, *entry_sub_std; // dir_info_*를 readdir 하기 위한 변수, dir_*를 readdir 하기 위한 변수
    char dir_root_ans[30] = "ANS_DIR/"; //ANS_DIR  
@@ -36,17 +42,21 @@ struct ssu_score_table_format{
    char child_filename[30] = "\0";
    char buf_ANS[BUFFER_SIZE]; // ANS 의 파일내용을 담기 위한 변수
    char buf_STD[BUFFER_SIZE]; // STD의 파일내용을 담기 위한 변수
+   char buf_dirname[BUFFER_SIZE]; //bufarray for save directory_name
    int fd_ans, fd_std, count; //fd : 파일 디스크립터, count : 읽은 buf의 갯수
+   int pro_count = 0;
    struct timeval begin_t, end_t; //시작시간과 끝나는 시간	
+   struct ssu_score_table_format ssu_score_tab_for[49]; //ssu_score_table format
+   struct total_score_table_format total_score_tab_for[20]; //total_score_table format
    time_t first, second;
 
 
 
 void blank_problem_check(char *, char *);
-void program_autocompile(char*, char*);
+void program_autocompile(char*, char*, int);
 void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
-void score_table_create(char *);
+void score_table_create(char *, char *);
 void *ssu_thread(void *arg);
 
 
