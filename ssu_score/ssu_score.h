@@ -56,7 +56,7 @@ void blank_problem_check(char *, char *);
 void program_autocompile(char*, char*, int);
 void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
-void score_table_create(char *, char *);
+void score_table_create(char *, char *, int);
 void *ssu_thread(void *arg);
 
 
