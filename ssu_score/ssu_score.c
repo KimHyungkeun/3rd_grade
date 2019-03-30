@@ -45,11 +45,12 @@ int main(int argc, char *argv[])
 	exit(1);
 	}
 	
-	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
+	
     ssu_score_table_create(directory_path_ans);
     score_table_create_proto(directory_path_std, directory_path_ans);
-	//program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
+	program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
     program_problem_check(directory_path_std, directory_path_ans); //program problem compare
+    blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
     score_table_create(directory_path_std, directory_path_ans, print_flag);
     
 
@@ -401,8 +402,8 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
             std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
             ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE);
             std_length = read(std_fd, buf_STD, BUFFER_SIZE);
-                //printf("ANS : %s\n", buf_ANS);
-                //printf("STD : %s\n", buf_STD);
+                printf("ANS : %s\n", buf_ANS);
+                printf("STD : %s\n", buf_STD);
             
                 if(strcmp(buf_ANS, buf_STD) == 0)
                     continue;
@@ -429,6 +430,121 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
 
 void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
         
+    struct  dirent **namelist;
+    int ans_count, std_count;
+    int cfile_index = 0;
+    int txtfile_index = 0;
+    int txt_count; // count of txt file
+    int ans_idx, std_idx;
+    int ans_length, std_length;
+    int ans_fd, std_fd;
+    char ls_syntax[50] = "\0"; // ls syntax
+    char ans_filepathbuf[BUFFER_SIZE] = "\0"; //ANS_DIR buf of filepath
+    char std_filepathbuf[BUFFER_SIZE] = "\0"; //STD_DIR buf of filepath
+    char *txt_filename[45]; // only *.txt
+    char *ans_filepathname[45]; // ANS_DIR/*/*.txt
+    char std_filepathname[45][20][30]; // STD_DIR/*/*.txt
+    char *ptr; //location pointer
+
+    if((ans_fd = open("ans_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
+        fprintf(stderr, "creat error for %s\n", "ans_file.txt");
+        exit(1);
+    }
+
+    system("ls -vd ANS_DIR/*/*.txt > ans_file.txt");
+    read(ans_fd, ans_filepathbuf, BUFFER_SIZE);
+
+    ptr = strtok(ans_filepathbuf, "\n");
+    ans_idx = 0;
+    while(ptr != NULL) {
+        ans_filepathname[ans_idx] = ptr;
+        ptr = strtok(NULL,"\n");
+        //printf("%s\n",ans_filepathname[ans_idx]);
+        ans_idx++;
+    }
+    close(ans_fd);
+    system("rm ans_file.txt");
+
+    for(ans_idx = 0 ; ans_idx < 45 ; ans_idx++) { //only extract file named " *.stdout " 
+         ptr = strtok(ans_filepathname[ans_idx], "/");
+         ans_count = 0;
+        while(ptr != NULL) {
+            if(ans_count == 2){
+            txt_filename[ans_idx] = ptr;
+            //printf("%s\n",stdout_filename[ans_idx]); 
+            }
+            ans_count++;
+            ptr = strtok(NULL,"/");
+            
+        }
+    }
+
+    // STD_DIR part 
+    
+
+    for(std_idx = 0 ; std_idx < 45 ; std_idx++) { 
+        if((std_fd = open("std_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
+            fprintf(stderr, "creat error for %s\n", "std_file.txt");
+            exit(1);
+        }    
+        sprintf(ls_syntax, "%s %s %s%s %s %s", "ls", "-vd", "STD_DIR/*/" ,txt_filename[std_idx],">","std_file.txt");
+        //printf("%s\n", ls_syntax);
+        system(ls_syntax);
+
+        txt_count = 0;
+        read(std_fd, std_filepathbuf, BUFFER_SIZE);
+        ptr = strtok(std_filepathbuf, "\n");
+    
+            while(ptr != NULL) {
+                strcpy(std_filepathname[std_idx][txt_count], ptr);
+                //printf("%s\n",std_filepathname[std_idx][stdout_count]);
+                txt_count++;
+                ptr = strtok(NULL,"\n");
+            
+            }
+        lseek(std_fd, 0 ,SEEK_SET);
+        close(std_fd);
+    }
+    
+    system("rm std_file.txt");
+
+    /*for(int i = 0 ; i<45; i++) {
+        for(int j=0; j<20; j++) {
+            printf("Result : %s\n", std_filepathname[i][j]);
+        }
+    }*/
+
+    //Checking the Answer
+   
+    for(ans_idx = 0 ; ans_idx < 45 ; ans_idx ++) {
+        ans_fd = open(ans_filepathname[ans_idx], O_RDONLY);
+        
+        for(std_idx = 0 ;std_idx < 20 ; std_idx ++) {
+            std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
+            ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE);
+            std_length = read(std_fd, buf_STD, BUFFER_SIZE);
+                printf("ANS : %s\n", buf_ANS);
+                printf("STD : %s\n", buf_STD);
+            
+                if(strcmp(buf_ANS, buf_STD) == 0)
+                    continue;
+
+                else    
+                    total_score_tab_for[std_idx].score[ans_idx] = ERROR;
+
+                //printf("%s :", std_filepathname[ans_idx][std_idx]);
+                //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+
+            for(int i=0 ; i< ans_length;i++)
+                buf_ANS[i] = '\0';   
+            for(int i=0 ; i< ans_length;i++)
+                buf_STD[i] = '\0';      
+            
+            close(ans_fd);
+            close(std_fd);
+        }
+        
+    }
 }
 
 void ssu_score_table_create(char* directory_path_ans) {
