@@ -1,4 +1,4 @@
-/tmp/ccn7rM6s.o: In function `main':
+/tmp/ccoKAhTC.o: In function `main':
 12.c:(.text+0xe8): undefined reference to `pthread_create'
 12.c:(.text+0x103): undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status

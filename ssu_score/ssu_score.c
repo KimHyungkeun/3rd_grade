@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
     ssu_score_table_create(directory_path_ans);
     score_table_create_proto(directory_path_std, directory_path_ans);
-	program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
+	//program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
     program_problem_check(directory_path_std, directory_path_ans); //program problem compare
     score_table_create(directory_path_std, directory_path_ans, print_flag);
     
@@ -385,7 +385,6 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     }
     
     system("rm std_file.txt");
-    printf("MiddlePoint\n");
 
     /*for(int i = 0 ; i<4; i++) {
         for(int j=0; j<20; j++) {
@@ -397,22 +396,32 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     cfile_index = 45;
     for(ans_idx = 0 ; ans_idx < 4 ; ans_idx ++) {
         ans_fd = open(ans_filepathname[ans_idx], O_RDONLY);
-        read(ans_fd, buf_ANS, BUFFER_SIZE);
         
         for(std_idx = 0 ;std_idx < 20 ; std_idx ++) {
             std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
-            read(std_fd, buf_STD, BUFFER_SIZE);
+            ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE);
+            std_length = read(std_fd, buf_STD, BUFFER_SIZE);
+                //printf("ANS : %s\n", buf_ANS);
+                //printf("STD : %s\n", buf_STD);
             
-                if(strcmp(buf_ANS, buf_STD) != 0)
+                if(strcmp(buf_ANS, buf_STD) == 0)
+                    continue;
+
+                else    
                     total_score_tab_for[std_idx].score[cfile_index] = ERROR;
 
-                printf("%s :", std_filepathname[ans_idx][std_idx]);
-                printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+                //printf("%s :", std_filepathname[ans_idx][std_idx]);
+                //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+
+            for(int i=0 ; i< ans_length;i++)
+                buf_ANS[i] = '\0';   
+            for(int i=0 ; i< ans_length;i++)
+                buf_STD[i] = '\0';      
+            
+            close(ans_fd);
             close(std_fd);
         }
         
-        
-        close(ans_fd);
         cfile_index ++;
     }
 }
@@ -678,7 +687,7 @@ void score_table_create(char *directory_path_std, char *directory_path_ans, int 
     if(print_flag == 1) {
         for(idx = 0 ; idx < std_count - except_dot ;idx++) {
     
-        printf("%s : %.2lf\n", namelist[idx] -> d_name, print_sum_count[idx]);
+        printf("%s : %.2lf\n", total_score_tab_for[idx].student, print_sum_count[idx]);
         print_sum_count_total += print_sum_count[idx];
 
         }
