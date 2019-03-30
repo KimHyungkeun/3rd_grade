@@ -25,7 +25,7 @@ struct ssu_score_table_format{
 
 struct total_score_table_format{
     char student[20];
-    double score;
+    double score[49];
     double sum;
 } ;
 
@@ -53,10 +53,11 @@ struct total_score_table_format{
 
 
 void blank_problem_check(char *, char *);
-void program_autocompile(char*, char*, int);
+void program_autocompile(char*, char*, int, int);
 void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
+void score_table_create_proto(char *, char *);
 void score_table_create(char *, char *, int);
-void *ssu_thread(void *arg);
+
 
 

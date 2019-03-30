@@ -1,4 +1,4 @@
-/tmp/ccY1H77K.o: In function `main':
+/tmp/ccCdG3o3.o: In function `main':
 12.c:(.text+0x13e): undefined reference to `pthread_create'
 12.c:(.text+0x159): undefined reference to `pthread_create'
 12.c:(.text+0x16a): undefined reference to `pthread_join'

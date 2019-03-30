@@ -12,27 +12,17 @@
     
 }*/
 
-int convert_string(const void *a, const void *b)
-{
-    return strcmp((char *)a, (char *)b);
-}
-
 int main()
 {
-   char s[10][8];
-    
-    for(int i=0;i<10;i++){
-       scanf("%s",s[i]);
-   }
+   char *str = "This is has error: find somethng";
+   char *ptr;
+   ptr = strstr(str, "warning");
 
-    qsort(s, sizeof(s) / sizeof(s[0]), sizeof(s[0]), convert_string);
-
-    for (int i = 0; i < 10; i++)
-    {
-        printf("%s ", s[i]);
-    }
-
-    printf("\n");
+   if(ptr == NULL)
+   printf("Nothing here\n");
+   
+   else
+   printf("%s\n", ptr);
 
     return 0;
 }

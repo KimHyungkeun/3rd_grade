@@ -16,13 +16,19 @@ int main(int argc, char *argv[])
    switch(opt) {
        case 't' :
         qname_flag = 1;
+        error_flag = 0;
+        print_flag = 0;	
         break;
 
        case 'e' :
+        qname_flag = 0;
         error_flag = 1;
+        print_flag = 0;	
         break;
 
        case 'p' :
+        qname_flag = 0;
+        error_flag = 0;
         print_flag = 1;
         break;
    }
@@ -41,10 +47,11 @@ int main(int argc, char *argv[])
 	
 	//blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
     ssu_score_table_create(directory_path_ans);
-	//program_autocompile(directory_path_std, directory_path_ans, qname_flag); //program auto complile
-    //program_problem_check(directory_path_std, directory_path_ans); //program problem compare
+    score_table_create_proto(directory_path_std, directory_path_ans);
+	program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
+    program_problem_check(directory_path_std, directory_path_ans); //program problem compare
     score_table_create(directory_path_std, directory_path_ans, print_flag);
-	
+    
 
 	gettimeofday(&end_t,NULL);
     ssu_runtime(&begin_t, &end_t);
@@ -52,7 +59,7 @@ int main(int argc, char *argv[])
 
 }
 
-void program_autocompile(char* directory_path_std, char* directory_path_ans, int flag){
+void program_autocompile(char* directory_path_std, char* directory_path_ans, int qname_flag, int error_flag){
     struct  dirent **namelist;
     int     count, except = 0;
     int     idx;
@@ -74,17 +81,6 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
         fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_ans, strerror(errno));
         exit(1);
     }
-
-    /*for(idx = 0; idx < count; idx++) {
-        if(strcmp(namelist[idx] -> d_name,".") == 0 || strcmp(namelist[idx] -> d_name,"..") == 0)
-            continue;
-        
-        if(strcmp(namelist[idx] -> d_name, "score_table.csv") == 0 || strpbrk(namelist[idx] -> d_name,"-") != NULL)
-            continue;
-
-        printf("%s\n", namelist[idx] -> d_name);
-    }*/
-
     
     for(idx = 0; idx < count; idx++) {
         if(strcmp(namelist[idx] -> d_name,".") == 0 || strcmp(namelist[idx] -> d_name,"..") == 0)
@@ -244,38 +240,44 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
                     exit(1);
             }
 
-            if( (error_fd = open(errorfile_name, O_RDWR | O_CREAT | O_TRUNC, 0640)) < 0 ) {
+
+        
+                if( (error_fd = open(errorfile_name, O_RDWR | O_CREAT | O_TRUNC, 0640)) < 0 ) {
                     fprintf(stderr, "open error for %s\n", errorfile_name);
                     exit(1);
-            }
+                 }
 
-                fd_backup = dup(1);
-                fd_backup2 = dup(2);
-                dup2(stdoutfile_fd, 1);
-                dup2(error_fd,2);
+                    fd_backup = dup(1);
+                    fd_backup2 = dup(2);
+                    dup2(stdoutfile_fd, 1);
+                    dup2(error_fd,2);
 
-                if(flag == 1)
-                    sprintf(gcc_syntax, "%s %s%s %s %s %s%s", "gcc" , directory_path_std,".c", "-lpthread","-o", exe_syntax,".exe");
-                else 
-                    sprintf(gcc_syntax, "%s %s%s %s %s%s", "gcc" , directory_path_std,".c", "-o", exe_syntax,".exe");
+                    if(qname_flag == 1) {
+                        sprintf(gcc_syntax, "%s %s%s %s %s %s%s", "gcc" , directory_path_std,".c", "-lpthread","-o", exe_syntax,".exe");
+                    }
+                    else {
+                        sprintf(gcc_syntax, "%s %s%s %s %s%s", "gcc" , directory_path_std,".c", "-o", exe_syntax,".exe");
+                    }
 
-                system(gcc_syntax);
+                    system(gcc_syntax);
 
                 
-                sprintf(killall_command,"%s %s%s", "killall", exe_syntax,"*");
-                sprintf(run_syntax, "%s%s%s %s", "./",exe_syntax, ".exe","&");
+                    sprintf(killall_command,"%s %s%s", "killall", exe_syntax,"*");
+                    sprintf(run_syntax, "%s%s%s %s", "./",exe_syntax, ".exe","&");
 
 
-                first = time(NULL);
-                system(run_syntax);
-                second = time(NULL);
+                    first = time(NULL);
+                    system(run_syntax);
+                    second = time(NULL);
                 
                 
-                dup2(fd_backup, 1);
-                dup2(fd_backup2,2);
-                printf("wait time is %f seconds\n\n", difftime(second, first));
-                close(stdoutfile_fd); 
-                close(error_fd);
+                    dup2(fd_backup, 1);
+                    dup2(fd_backup2,2);
+                    printf("wait time is %f seconds\n\n", difftime(second, first));
+                    close(stdoutfile_fd); 
+                    close(error_fd);
+            
+
 
              strcpy(directory_path_std, sub_path_std_backup );
             }
@@ -295,10 +297,9 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
     free(namelist);
 
   
-    system("ps -ef | grep STD_DIR/");
-    printf("Please wait 10 seconds...\n");
+    printf("Please wait...\n");
     sleep(10);
-    printf("kill process when proceed time limits 5 sec or stop\n");
+    printf("kill process when proceed time limits 5 sec or stoppd\n");
     system("killall 12.exe");
     system("killall 13.exe");
     system("ps -ef | grep STD_DIR/");
@@ -308,72 +309,114 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
 
 void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     struct  dirent **namelist;
-    int ans_count, std_count ,except = 0;
+    int ans_count, std_count;
+    int cfile_index = 0;
+    int stdout_count;
     int ans_idx, std_idx;
     int ans_length, std_length;
     int ans_fd, std_fd;
-    int ans_not_c, std_not_c;
-    char exe_filename[30] = "\0";
-    char stdout_filename[30] = "\0";
+    char ls_syntax[50] = "\0"; // ls syntax
     char txt_filename[30] = "\0";
-    char exe_syntax[30] = "\0";
-    char gcc_syntax[30] = "\0";
-    char run_syntax[30] = "\0";
-    char stdoutfile_name[30] = "\0";
-    int compile_count = 0;
+    char ans_filepathbuf[BUFFER_SIZE] = "\0"; //ANS_DIR buf of filepath
+    char std_filepathbuf[BUFFER_SIZE] = "\0"; //STD_DIR buf of filepath
+    char *stdout_filename[4]; // only *.stdout 
+    char *ans_filepathname[4]; // ANS_DIR/*/*.stdout
+    char std_filepathname[4][20][30]; // STD_DIR/*/*.stdout
+    char *ptr; //location pointer
 
-    if((ans_count = scandir(directory_path_ans, &namelist, NULL, alphasort)) == -1) {
-        fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_ans, strerror(errno));
+    if((ans_fd = open("ans_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
+        fprintf(stderr, "creat error for %s\n", "ans_file.txt");
         exit(1);
-        } 
-   
-    for(ans_idx = 0; ans_idx < ans_count; ans_idx++) {
-        if(strcmp(namelist[ans_idx] -> d_name,".") == 0 || strcmp(namelist[ans_idx] -> d_name,"..") == 0)
-        continue;
+    }
 
-        if(strcmp(namelist[ans_idx] -> d_name,"score_table.csv") == 0 || strpbrk(namelist[ans_idx] -> d_name, "-") != NULL) 
-        continue;
-        
-        else {
-        strcpy(dir_path_backup_ans, directory_path_ans);
-        strcat(directory_path_ans, namelist[ans_idx] -> d_name);
-        strcat(directory_path_ans, "/"); // ANS_DIR/SUBDIR
-        strcpy(sub_path_ans_backup, directory_path_ans); // ANS_DIR/SUBDIR
+    system("ls -vd ANS_DIR/*/*.stdout > ans_file.txt");
+    read(ans_fd, ans_filepathbuf, BUFFER_SIZE);
 
-        sub_ans = opendir(directory_path_ans);
-        while ( entry_sub_ans = readdir(sub_ans) ) {
-            strcat(directory_path_ans, entry_sub_ans -> d_name); 
-            for(int i = 0; i < strlen(entry_sub_ans -> d_name); i++){
-                    if( entry_sub_ans -> d_name[i] == 's' ) {
-                        ans_not_c = 1;
-                        break;
-                    }
+    ptr = strtok(ans_filepathbuf, "\n");
+    ans_idx = 0;
+    while(ptr != NULL) {
+        ans_filepathname[ans_idx] = ptr;
+        ptr = strtok(NULL,"\n");
+        //printf("%s\n",ans_filepathname[ans_idx]);
+        ans_idx++;
+    }
+    close(ans_fd);
+    system("rm ans_file.txt");
 
-                    else
-                        ans_not_c = 0;
+    for(ans_idx = 0 ; ans_idx < 4 ; ans_idx++) { //only extract file named " *.stdout " 
+         ptr = strtok(ans_filepathname[ans_idx], "/");
+         ans_count = 0;
+        while(ptr != NULL) {
+            if(ans_count == 2){
+            stdout_filename[ans_idx] = ptr;
+            //printf("%s\n",stdout_filename[ans_idx]); 
             }
-
-            if(ans_not_c == 1) {
-
-               if((fd_ans = open(directory_path_ans, O_RDONLY)) < 0 ) {
-                   fprintf(stderr, "open error for %s\n", directory_path_ans);
-                   exit(1);
-               }
-               ans_length = read(fd_ans, buf_ANS, BUFFER_SIZE);
+            ans_count++;
+            ptr = strtok(NULL,"/");
+            
         }
+    }
 
-            closedir(sub_ans);
-            strcpy(directory_path_ans,dir_path_backup_ans);
-        }
+    // STD_DIR part 
+    
+
+    for(std_idx = 0 ; std_idx < 4 ; std_idx++) { 
+        if((std_fd = open("std_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
+            fprintf(stderr, "creat error for %s\n", "std_file.txt");
+            exit(1);
+        }    
+        sprintf(ls_syntax, "%s %s %s%s %s %s", "ls", "-vd", "STD_DIR/*/" ,stdout_filename[std_idx],">","std_file.txt");
+        //printf("%s\n", ls_syntax);
+        system(ls_syntax);
+
+        stdout_count = 0;
+        read(std_fd, std_filepathbuf, BUFFER_SIZE);
+        ptr = strtok(std_filepathbuf, "\n");
+    
+            while(ptr != NULL) {
+                strcpy(std_filepathname[std_idx][stdout_count], ptr);
+                //printf("%s\n",std_filepathname[std_idx][stdout_count]);
+                stdout_count++;
+                ptr = strtok(NULL,"\n");
+            
+            }
+        lseek(std_fd, 0 ,SEEK_SET);
+        close(std_fd);
     }
     
-        for(ans_idx = 0; ans_idx < ans_count; ans_idx++) {
-        free(namelist[ans_idx]);
-        }
+    system("rm std_file.txt");
+    printf("MiddlePoint\n");
 
+    /*for(int i = 0 ; i<4; i++) {
+        for(int j=0; j<20; j++) {
+            printf("Result : %s\n", std_filepathname[i][j]);
+        }
+    }*/
+
+    //Checking the Answer
+    cfile_index = 45;
+    for(ans_idx = 0 ; ans_idx < 4 ; ans_idx ++) {
+        ans_fd = open(ans_filepathname[ans_idx], O_RDONLY);
+        read(ans_fd, buf_ANS, BUFFER_SIZE);
+        
+        for(std_idx = 0 ;std_idx < 20 ; std_idx ++) {
+            std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
+            read(std_fd, buf_STD, BUFFER_SIZE);
+            
+                if(strcmp(buf_ANS, buf_STD) != 0)
+                    total_score_tab_for[std_idx].score[cfile_index] = ERROR;
+
+                printf("%s :", std_filepathname[ans_idx][std_idx]);
+                printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+            close(std_fd);
+        }
+        
+        
+        close(ans_fd);
+        cfile_index ++;
     }
-        free(namelist);
 }
+       
 
 void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
         
@@ -495,7 +538,7 @@ void ssu_score_table_create(char* directory_path_ans) {
        close(fd_score);
 }
 
-void score_table_create(char *directory_path_std, char *directory_path_ans, int print_flag) {
+void score_table_create_proto(char *directory_path_std, char *directory_path_ans) {
 
     struct dirent **namelist;
     int std_count, except_dot = 0;
@@ -522,6 +565,19 @@ void score_table_create(char *directory_path_std, char *directory_path_ans, int 
         exit(1);
     }
         
+     for(idx = 0; idx < std_count; idx++) {
+        if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
+            except_dot++ ;
+            continue;
+        }
+        strcpy(total_score_tab_for[idx].student, namelist[idx] -> d_name);
+        printf("%s,",total_score_tab_for[idx].student);
+        
+    }
+
+    for(idx = except_dot; idx < std_count; idx++) {
+            strcpy(total_score_tab_for [idx - except_dot].student, total_score_tab_for[idx].student);
+    }
 
     fd_backup = dup(1);
     dup2(fd_total , 1);
@@ -531,38 +587,97 @@ void score_table_create(char *directory_path_std, char *directory_path_ans, int 
         printf("%s,", ssu_score_tab_for[idx].name);
     }
     printf("Sum\n");
-    for(idx = 0; idx < std_count; idx++) {
-        if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
-            except_dot++ ;
-            continue;
-        }
-
+    for(idx = 0; idx < std_count-except_dot; idx++) {
+        
         total_sum = 0;
-        strcpy(total_score_tab_for[idx].student, namelist[idx] -> d_name);
         printf("%s,",total_score_tab_for[idx].student);
 
         for(jdx = 0; jdx < pro_count ; jdx++){
-        total_score_tab_for[jdx].score = ssu_score_tab_for[jdx].score;
-        printf("%.2lf", total_score_tab_for[jdx].score);
+        total_score_tab_for[idx].score[jdx] = ssu_score_tab_for[jdx].score;
+        printf("%.2lf", total_score_tab_for[idx].score[jdx]);
         printf(",");
-        total_sum += total_score_tab_for[jdx].score;
+        total_sum += total_score_tab_for[idx].score[jdx];
         }
         print_sum_count[idx] = total_sum;
         printf("%.2lf\n", total_sum);
         
     }
 
+   
+    
     dup2(fd_backup, 1);
     close(fd_total);
 
+}
+
+void score_table_create(char *directory_path_std, char *directory_path_ans, int print_flag) {
+
+    struct dirent **namelist;
+    int std_count, except_dot = 0;
+    int idx, jdx;
+    int fd_total, fd_backup, fd_backup2;
+    double  total_sum, avg = 0;
+    double  print_sum_count[20];
+    double  print_sum_count_total = 0;
+    char exe_syntax[30] = "\0";
+    char gcc_syntax[30] = "\0";
+    char run_syntax[30] = "\0";
+    char stdoutfile_name[30] = "\0";
+    char buf[BUFFER_SIZE];
+
+    
+
+    if((std_count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
+        fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
+        exit(1);
+        } 
+
+    if((fd_total = open("score.csv", O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0) {
+        fprintf(stderr, "creat error for %s\n","score.csv");
+        exit(1);
+    }
+
+     for(idx = 0; idx < std_count; idx++) {
+        if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
+            except_dot++ ;
+            continue;
+        }
+        
+    }
+        
+
+    fd_backup = dup(1);
+    dup2(fd_total , 1);
+
+    printf(",");
+    for(idx = 0; idx < pro_count; idx++) {
+        printf("%s,", ssu_score_tab_for[idx].name);
+    }
+    printf("Sum\n");
+
+    for(idx = 0; idx < std_count-except_dot; idx++) {
+        
+        total_sum = 0;
+        printf("%s,",total_score_tab_for[idx].student);
+
+        for(jdx = 0; jdx < pro_count ; jdx++){
+        printf("%.2lf", total_score_tab_for[idx].score[jdx]);
+        printf(",");
+        total_sum += total_score_tab_for[idx].score[jdx];
+        }
+        print_sum_count[idx] = total_sum;
+        printf("%.2lf\n", total_sum);
+        
+    }
+    
+    dup2(fd_backup, 1);
+    close(fd_total);
+    
+    //printf("%s | %.2lf\n", total_score_tab_for[0].student, total_score_tab_for[0].score[0]);
 
     if(print_flag == 1) {
-        for(idx = except_dot ; idx < std_count ;idx++) {
+        for(idx = 0 ; idx < std_count - except_dot ;idx++) {
     
-        if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
-            continue;
-        }   
-
         printf("%s : %.2lf\n", namelist[idx] -> d_name, print_sum_count[idx]);
         print_sum_count_total += print_sum_count[idx];
 
