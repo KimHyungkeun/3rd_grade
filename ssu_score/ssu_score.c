@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
 	
 	
     ssu_score_table_create(directory_path_ans);
-    score_table_create_proto(directory_path_std, directory_path_ans);
-	program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
+    score_table_create_proto(directory_path_std, directory_path_ans); //make prototpye of scoretable
+	//program_autocompile(directory_path_std, directory_path_ans, qname_flag, error_flag); //program auto complile
     program_problem_check(directory_path_std, directory_path_ans); //program problem compare
     blank_problem_check(directory_path_std, directory_path_ans); //빈칸 채우기 문제 	
     score_table_create(directory_path_std, directory_path_ans, print_flag);
@@ -532,8 +532,8 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
                 else    
                     total_score_tab_for[std_idx].score[ans_idx] = ERROR;
 
-                //printf("%s :", std_filepathname[ans_idx][std_idx]);
-                //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+                printf("%s :", std_filepathname[ans_idx][std_idx]);
+                printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
 
             for(int i=0 ; i< ans_length;i++)
                 buf_ANS[i] = '\0';   
