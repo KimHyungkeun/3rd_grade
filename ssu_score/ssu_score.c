@@ -14,6 +14,13 @@ int main(int argc, char *argv[])
    char directory_path_std[20] = "\0"; //STD_DIR의 경로
    gettimeofday(&begin_t, NULL);
 
+   if(strcmp(argv[1],"-h") == 0) { //help 옵션을 작동시키면 사용법을 보여주고 프로그램을 종료시킨다.
+	fprintf(stderr,"Usage : %s STD_DIR ANS_DIR [option]\n-e <DIRNAME>   print error on 'DIRNAME/ID/qname_error.txt' file\n-t <QNAME>   compile QNAME.c with -lpthread option\n-h  print usage\n-p  print student's score and total average\n",argv[0]);
+	gettimeofday(&end_t,NULL);
+    ssu_runtime(&begin_t, &end_t);
+	exit(1);
+	}
+
    if(argc < 3) { //인자가 3개 미만이면 종료
 	fprintf(stderr,"Usage : %s STD_DIR ANS_DIR [option]\n",argv[0]);
 	gettimeofday(&end_t,NULL);
