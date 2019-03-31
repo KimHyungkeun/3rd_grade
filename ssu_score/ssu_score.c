@@ -283,46 +283,46 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
             
             
             if( (stdoutfile_fd = open(stdoutfile_name, O_RDWR | O_CREAT | O_TRUNC, 0755)) < 0 ) {
-                    fprintf(stderr, "open error for %s\n", stdoutfile_name);
+                    fprintf(stderr, "open error for %s\n", stdoutfile_name); //stdout 파일 생성
                     exit(1);
             }
 
             if( (error_fd = open(errorfile_name, O_RDWR | O_CREAT | O_TRUNC, 0755)) < 0 ) {
-                    fprintf(stderr, "open error for %s\n", errorfile_name);
+                    fprintf(stderr, "open error for %s\n", errorfile_name); //error 파일 생성
                     exit(1);
                  }
 
-                    fd_backup = dup(1);
-                    fd_backup2 = dup(2);
-                    dup2(stdoutfile_fd, 1);
+                    fd_backup = dup(1); //표준출력 디스크립터 백업
+                    fd_backup2 = dup(2); //표준에러 디스크립터 백업
+                    dup2(stdoutfile_fd, 1); 
                     dup2(error_fd,2);
                     
 
-                    if(qname_flag == 1 && strcmp(root_add_filename, ptr) == 0) {
+                    if(qname_flag == 1 && strcmp(root_add_filename, ptr) == 0) { //t 옵션에 의해 lpthread 옵션이 들어간 컴파일 수행
                         sprintf(gcc_syntax, "%s %s%s %s %s %s%s", "gcc" , directory_path_std,".c", "-lpthread","-o", exe_syntax,".exe");
                     }
-                    else {
+                    else { //만약 아니면 lpthread 옵션 없이 수행
                         sprintf(gcc_syntax, "%s %s%s %s %s%s", "gcc" , directory_path_std,".c", "-o", exe_syntax,".exe");
                     }
 
-                    system(gcc_syntax);
+                    system(gcc_syntax); //gcc 수행
 
                 
-                    sprintf(killall_command,"%s %s%s", "killall", exe_syntax,"*");
-                    sprintf(run_syntax, "%s%s%s %s", "./",exe_syntax, ".exe","&");
+                    sprintf(killall_command,"%s %s%s", "killall", exe_syntax,"*"); //kill 명령어 수행을 휘한 구문
+                    sprintf(run_syntax, "%s%s%s %s", "./",exe_syntax, ".exe","&"); //exe를 실행을 위한 구문
 
 
-                    system(run_syntax);
+                    system(run_syntax); //프로그램 실행
                 
                 
-                    dup2(fd_backup, 1);
-                    dup2(fd_backup2,2);
+                    dup2(fd_backup, 1); // 표준출력 디스크립터 복원
+                    dup2(fd_backup2,2); // 표준에러 디스크립터 복원
                     close(stdoutfile_fd); 
                     close(error_fd);
             
 
 
-             strcpy(directory_path_std, sub_path_std_backup );
+             strcpy(directory_path_std, sub_path_std_backup ); // STD_DIR/SUBDIR/ 형태로 되돌아감
             }
             
         }
@@ -334,18 +334,18 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
         
 
     for(idx = 0; idx < count; idx++) {
-        free(namelist[idx]);
+        free(namelist[idx]); //scandir 사용 후 할당한 메모리를 반환한다
     }
 
     free(namelist);
 
   
-    system("ps -ef | grep STD_DIR/");
-    printf("Please wait... 10 secs \n");
+    system("ps -ef | grep STD_DIR/"); //끝나지않고 돌고있는 프로세스들을 보여줌
+    printf("Please wait... 10 secs \n"); //10초 대기
     sleep(10);
-    printf("kill process when proceed time limits 5 sec or stoppd\n");
-    system("killall 12.exe");
-    system("killall 13.exe");
+    printf("kill process when proceed time limits 5 sec or stoppd\n"); 
+    system("killall 12.exe"); //12.exe 파일 죽이기
+    system("killall 13.exe"); //13.exe 파일 죽이기
 
     
      //error 옵션 작동 과정
@@ -363,12 +363,12 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
                 system(remove_error_directory); // 만약 존재하는 디렉터리면 지우고 다시 만들기 위함
         }
 
-        if((std_count = scandir("STD_DIR/", &stdnamelist, NULL, alphasort)) == -1) {
+        if((std_count = scandir("STD_DIR/", &stdnamelist, NULL, alphasort)) == -1) { //STD_DIR 내부 디렉터리 확인
         fprintf(stderr, "%s Directory Scan Error: %s\n","STD_DIR", strerror(errno));
         exit(1);
         }
 
-        mkdir(e_filename, 0775);
+        mkdir(e_filename, 0775); //사용자가 지정한 이름으로 에러 디렉터리 생성
 
         for(int i = 2; i < std_count; i++) { // move all error file to "error" directory from 20190001 ~ 20190020
                 sprintf(make_error_directory , "%s%s%s", e_filename,"/",stdnamelist[i] -> d_name);
@@ -378,20 +378,19 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
         for(int i = 2; i < std_count; i++) {
                 sprintf(directory_path_std, "%s%s%s%s%s", "STD_DIR","/",stdnamelist[i] -> d_name,"/", "*_error.txt");
                 sprintf(make_error_directory , "%s%s%s%s", e_filename,"/",stdnamelist[i] -> d_name,"/");
-                sprintf(move_error_file_syntax, "%s %s %s", "mv", directory_path_std, make_error_directory);
-                //printf("%s\n", move_error_file_syntax);
-                system(move_error_file_syntax);
+                sprintf(move_error_file_syntax, "%s %s %s", "mv", directory_path_std, make_error_directory); //mv STD_DIR/SUBDIR/*.error DIRNAME/SUBDIR/
+                system(move_error_file_syntax); //각 STD_DIR에 있는 error파일들을 새로 생성한 error 파일들에 다 넣는다
         }
 
-        strcpy(directory_path_std,dir_path_backup_std); //backup STD_DIR/
+        strcpy(directory_path_std,dir_path_backup_std); // "STD_DIR/" 형태로 되돌려 놓는다
 
          for(idx = 0; idx < std_count; idx++) {
-            free(stdnamelist[idx]);
+            free(stdnamelist[idx]); //scandir 사용 후 할당한 메세지를 다시 반환
         }
             free(stdnamelist);
 
          for(idx = 0; idx < count; idx++) {
-            free(namelist[idx]);
+            free(namelist[idx]); //scandir 사용 후 할당한 메세지를 다시 반환
         }
         free(namelist);
     
@@ -401,16 +400,16 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
     
 }
 
-void program_problem_check(char* directory_path_std, char* directory_path_ans) {
+void program_problem_check(char* directory_path_std, char* directory_path_ans) { 
     struct  dirent **namelist;
-    int ans_count, std_count;
-    int cfile_index = 0;
+    int ans_count, std_count; 
+    int cfile_index = 0; //c파일을 세기위한 인덱스
     int stdout_count;
-    int ans_idx, std_idx;
+    int ans_idx, std_idx; //ans 디렉터리 전용 인덱스, std 디렉터리 전용 인덱스
     int ans_length, std_length;
-    int ans_fd, std_fd;
+    int ans_fd, std_fd; //ans_fd : ans 디렉터리에 대한 파일디스크립터, std_fd : std 디렉터리에 대한 파일 디스크립터 
     char ls_syntax[50] = "\0"; // ls syntax
-    char txt_filename[30] = "\0";
+    char txt_filename[30] = "\0"; // txt 파일이름
     char ans_filepathbuf[BUFFER_SIZE] = "\0"; //ANS_DIR buf of filepath
     char std_filepathbuf[BUFFER_SIZE] = "\0"; //STD_DIR buf of filepath
     char *stdout_filename[4]; // only *.stdout 
@@ -433,7 +432,6 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     while(ptr != NULL) {
         ans_filepathname[ans_idx] = ptr;
         ptr = strtok(NULL,"\n");
-        //printf("%s\n",ans_filepathname[ans_idx]);
         ans_idx++;
     }
     close(ans_fd);
@@ -445,7 +443,6 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
         while(ptr != NULL) {
             if(ans_count == 2){
             stdout_filename[ans_idx] = ptr;
-            //printf("%s\n",stdout_filename[ans_idx]); 
             }
             ans_count++;
             ptr = strtok(NULL,"/");
