@@ -1,0 +1,7 @@
+/tmp/ccJOKla4.o: In function `main':
+12.c:(.text+0x13e): undefined reference to `pthread_create'
+12.c:(.text+0x159): undefined reference to `pthread_create'
+12.c:(.text+0x16a): undefined reference to `pthread_join'
+12.c:(.text+0x17b): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+sh: 1: ./STD_DIR/20190017/12.exe: not found

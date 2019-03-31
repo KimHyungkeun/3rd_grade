@@ -43,7 +43,7 @@ struct total_score_table_format{
    char buf_ANS[BUFFER_SIZE]; // ANS 의 파일내용을 담기 위한 변수
    char buf_STD[BUFFER_SIZE]; // STD의 파일내용을 담기 위한 변수
    char buf_dirname[BUFFER_SIZE]; //bufarray for save directory_name
-   int fd_ans, fd_std, count; //fd : 파일 디스크립터, count : 읽은 buf의 갯수
+   int fd_ans, fd_std; //fd : 파일 디스크립터, count : 읽은 buf의 갯수
    int pro_count = 0;
    struct timeval begin_t, end_t; //시작시간과 끝나는 시간	
    struct ssu_score_table_format ssu_score_tab_for[49]; //ssu_score_table format
@@ -53,7 +53,7 @@ struct total_score_table_format{
 
 
 void blank_problem_check(char *, char *);
-void program_autocompile(char*, char*, int, int);
+void program_autocompile(char*, char*, int, int, char*, char*);
 void program_problem_check(char *, char *);
 void ssu_score_table_create(char *);
 void score_table_create_proto(char *, char *);
