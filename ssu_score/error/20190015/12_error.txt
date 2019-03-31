@@ -1,7 +1,0 @@
-/tmp/ccBWhEdm.o: In function `main':
-12.c:(.text+0x146): undefined reference to `pthread_create'
-12.c:(.text+0x161): undefined reference to `pthread_create'
-12.c:(.text+0x172): undefined reference to `pthread_join'
-12.c:(.text+0x183): undefined reference to `pthread_join'
-collect2: error: ld returned 1 exit status
-sh: 1: ./STD_DIR/20190015/12.exe: not found

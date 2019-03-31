@@ -343,7 +343,7 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
     system("ps -ef | grep STD_DIR/"); //끝나지않고 돌고있는 프로세스들을 보여줌
     printf("Please wait... 10 secs \n"); //10초 대기
     sleep(10);
-    printf("kill process when proceed time limits 5 sec or stoppd\n"); 
+    printf("kill process when proceed time limits 5 sec or stopped\n"); 
     system("killall 12.exe"); //12.exe 파일 죽이기
     system("killall 13.exe"); //13.exe 파일 죽이기
 
@@ -406,7 +406,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     int cfile_index = 0; //c파일을 세기위한 인덱스
     int stdout_count;
     int ans_idx, std_idx; //ans 디렉터리 전용 인덱스, std 디렉터리 전용 인덱스
-    int ans_length, std_length;
+    int ans_length, std_length; //ans내의 파일의 총 길이, std내의 파일의 총 길이
     int ans_fd, std_fd; //ans_fd : ans 디렉터리에 대한 파일디스크립터, std_fd : std 디렉터리에 대한 파일 디스크립터 
     char ls_syntax[50] = "\0"; // ls syntax
     char txt_filename[30] = "\0"; // txt 파일이름
@@ -421,28 +421,28 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
 
     if((ans_fd = open("ans_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "creat error for %s\n", "ans_file.txt");
-        exit(1);
+        exit(1); //임시 txt파일 생성
     }
 
     system("ls -vd ANS_DIR/*/*.stdout > ans_file.txt");
     read(ans_fd, ans_filepathbuf, BUFFER_SIZE);
 
-    ptr = strtok(ans_filepathbuf, "\n");
+    ptr = strtok(ans_filepathbuf, "\n"); //개행문자에 따라 각 pathname들을 나눈다
     ans_idx = 0;
     while(ptr != NULL) {
-        ans_filepathname[ans_idx] = ptr;
+        ans_filepathname[ans_idx] = ptr; //얻은 pathname을 저장
         ptr = strtok(NULL,"\n");
         ans_idx++;
     }
     close(ans_fd);
-    system("rm ans_file.txt");
+    system("rm ans_file.txt"); //임시 txt파일 삭제
 
-    for(ans_idx = 0 ; ans_idx < 4 ; ans_idx++) { //only extract file named " *.stdout " 
+    for(ans_idx = 0 ; ans_idx < 4 ; ans_idx++) { // " *.stdout " 이름을 가진 파일만 추출하도록 한다
          ptr = strtok(ans_filepathname[ans_idx], "/");
          ans_count = 0;
         while(ptr != NULL) {
             if(ans_count == 2){
-            stdout_filename[ans_idx] = ptr;
+            stdout_filename[ans_idx] = ptr; // *.stdout으로 된 파일들의 항목이 생성된다
             }
             ans_count++;
             ptr = strtok(NULL,"/");
@@ -453,22 +453,20 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     // STD_DIR part 
     
 
-    for(std_idx = 0 ; std_idx < 4 ; std_idx++) { 
+    for(std_idx = 0 ; std_idx < 4 ; std_idx++) { //c파일 문제가 4개이므로 
         if((std_fd = open("std_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
             fprintf(stderr, "creat error for %s\n", "std_file.txt");
             exit(1);
         }    
         sprintf(ls_syntax, "%s %s %s%s %s %s", "ls", "-vd", "STD_DIR/*/" ,stdout_filename[std_idx],">","std_file.txt");
-        //printf("%s\n", ls_syntax);
-        system(ls_syntax);
+        system(ls_syntax); //디렉터리 항목들을 순서대로 받아온다
 
         stdout_count = 0;
         read(std_fd, std_filepathbuf, BUFFER_SIZE);
-        ptr = strtok(std_filepathbuf, "\n");
+        ptr = strtok(std_filepathbuf, "\n"); //개행문자에 따라 pathname을 구별한다
     
             while(ptr != NULL) {
-                strcpy(std_filepathname[std_idx][stdout_count], ptr);
-                //printf("%s\n",std_filepathname[std_idx][stdout_count]);
+                strcpy(std_filepathname[std_idx][stdout_count], ptr); //각 학번별의 stdout을 정답 stdout과 비교하기 위한 형태
                 stdout_count++;
                 ptr = strtok(NULL,"\n");
             
@@ -479,14 +477,9 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
     
     system("rm std_file.txt");
 
-    /*for(int i = 0 ; i<4; i++) {
-        for(int j=0; j<20; j++) {
-            printf("Result : %s\n", std_filepathname[i][j]);
-        }
-    }*/
 
     //Checking the Answer
-    cfile_index = 45;
+    cfile_index = 45; //scoretable내에서 프로그래밍 문제는 index 45 ~ 48 까지
     for(ans_idx = 0 ; ans_idx < 4 ; ans_idx ++) {
         ans_fd = open(ans_filepathname[ans_idx], O_RDONLY);
         
@@ -501,22 +494,25 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
                     continue;
 
                 else    
-                    total_score_tab_for[std_idx].score[cfile_index] = ERROR;
+                    total_score_tab_for[std_idx].score[cfile_index] = ERROR; //값이 다르므로 오답처리
 
                 //printf("%s :", std_filepathname[ans_idx][std_idx]);
                 //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
 
             for(int i=0 ; i< ans_length;i++)
-                buf_ANS[i] = '\0';   
+                buf_ANS[i] = '\0';   //다쓴 버퍼는 다시 null문자로 초기화
             for(int i=0 ; i< ans_length;i++)
-                buf_STD[i] = '\0';      
+                buf_STD[i] = '\0';   //다쓴 버퍼는 다시 null문자로 초기화   
             
             close(ans_fd);
             close(std_fd);
         }
         
-        cfile_index ++;
+        cfile_index ++; //scoretable내에서 프로그래밍 문제는 index 45 ~ 48 까지 
     }
+
+
+
 }
        
 
@@ -528,15 +524,15 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
     int txtfile_index = 0;
     int txt_count; // count of txt file
     int ans_idx, std_idx;
-    int ans_length, std_length;
-    int ans_fd, std_fd;
+    int ans_length, std_length; //buffer내에 담긴 내용의 길이, ans와 std 각각 디렉터리에 대해 다룬다
+    int ans_fd, std_fd; //파일 디스크립터, ans와 std 각각 디렉터리에 대해 다룬다
     char ls_syntax[50] = "\0"; // ls syntax
     char ans_filepathbuf[BUFFER_SIZE] = "\0"; //ANS_DIR buf of filepath
     char std_filepathbuf[BUFFER_SIZE] = "\0"; //STD_DIR buf of filepath
     char *txt_filename[45]; // only *.txt
-    char *ans_filepathname[45]; // ANS_DIR/*/*.txt
-    char std_filepathname[45][20][30]; // STD_DIR/*/*.txt
-    char *ptr; //location pointer
+    char *ans_filepathname[45]; // ANS_DIR/SUBDIR/*.txt
+    char std_filepathname[45][20][30]; // STD_DIR/SUBDIR/*.txt
+    char *ptr; // strtok함수에 쓰일 임시 포인터 변수
 
     if((ans_fd = open("ans_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "creat error for %s\n", "ans_file.txt");
@@ -544,14 +540,13 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
     }
 
     system("ls -vd ANS_DIR/*/*.txt > ans_file.txt");
-    read(ans_fd, ans_filepathbuf, BUFFER_SIZE);
+    read(ans_fd, ans_filepathbuf, BUFFER_SIZE); 
 
-    ptr = strtok(ans_filepathbuf, "\n");
+    ptr = strtok(ans_filepathbuf, "\n"); //개행문자에 따라 pathname을 나눈다
     ans_idx = 0;
     while(ptr != NULL) {
-        ans_filepathname[ans_idx] = ptr;
+        ans_filepathname[ans_idx] = ptr; //pathname들을 배열에 저장해둔다. 
         ptr = strtok(NULL,"\n");
-        //printf("%s\n",ans_filepathname[ans_idx]);
         ans_idx++;
     }
     close(ans_fd);
@@ -562,8 +557,7 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
          ans_count = 0;
         while(ptr != NULL) {
             if(ans_count == 2){
-            txt_filename[ans_idx] = ptr;
-            //printf("%s\n",stdout_filename[ans_idx]); 
+            txt_filename[ans_idx] = ptr; //.txt 파일만 있는 쪽만 골라낸다
             }
             ans_count++;
             ptr = strtok(NULL,"/");
@@ -574,22 +568,20 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
     // STD_DIR part 
     
 
-    for(std_idx = 0 ; std_idx < 45 ; std_idx++) { 
+    for(std_idx = 0 ; std_idx < 45 ; std_idx++) { //txt 비교문서는 scoretable에서 0 ~ 44까지
         if((std_fd = open("std_file.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
             fprintf(stderr, "creat error for %s\n", "std_file.txt");
-            exit(1);
+            exit(1); //임시 txt 파일 생성
         }    
         sprintf(ls_syntax, "%s %s %s%s %s %s", "ls", "-vd", "STD_DIR/*/" ,txt_filename[std_idx],">","std_file.txt");
-        //printf("%s\n", ls_syntax);
-        system(ls_syntax);
+        system(ls_syntax); //STD내의 txt파일 항목들을 순서대로 불러옴
 
         txt_count = 0;
         read(std_fd, std_filepathbuf, BUFFER_SIZE);
-        ptr = strtok(std_filepathbuf, "\n");
+        ptr = strtok(std_filepathbuf, "\n"); //개행문자에 따라 pathname을 나눈다
     
             while(ptr != NULL) {
-                strcpy(std_filepathname[std_idx][txt_count], ptr);
-                //printf("%s\n",std_filepathname[std_idx][stdout_count]);
+                strcpy(std_filepathname[std_idx][txt_count], ptr); //각 학번별로 가지고있는 txt파일들을 배열에 저장
                 txt_count++;
                 ptr = strtok(NULL,"\n");
             
@@ -598,13 +590,8 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
         close(std_fd);
     }
     
-    system("rm std_file.txt");
+    system("rm std_file.txt"); //임시 txt 파일 제거
 
-    /*for(int i = 0 ; i<45; i++) {
-        for(int j=0; j<20; j++) {
-            printf("Result : %s\n", std_filepathname[i][j]);
-        }
-    }*/
 
     //Checking the Answer
    
@@ -613,8 +600,8 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
         
         for(std_idx = 0 ;std_idx < 20 ; std_idx ++) {
             std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
-            ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE);
-            std_length = read(std_fd, buf_STD, BUFFER_SIZE);
+            ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE); //정답지의 내용
+            std_length = read(std_fd, buf_STD, BUFFER_SIZE); //학생이 제출한 내용
                 //printf("ANS : %s\n", buf_ANS);
                 //printf("STD : %s\n", buf_STD);
             
@@ -622,16 +609,16 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
                     continue;
 
                 else {   
-                    total_score_tab_for[std_idx].score[ans_idx] = ERROR;
+                    total_score_tab_for[std_idx].score[ans_idx] = ERROR; //답이 아니므로 오답처리
                 }
 
                 //printf("%s :", std_filepathname[ans_idx][std_idx]);
                 //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
 
             for(int i=0 ; i< ans_length;i++)
-                buf_ANS[i] = '\0';   
+                buf_ANS[i] = '\0';   //끝난 buf에 대해서는 null문자로 초기화
             for(int i=0 ; i< ans_length;i++)
-                buf_STD[i] = '\0';      
+                buf_STD[i] = '\0';   //끝난 buf에 대해서는 null문자로 초기화
             
             close(ans_fd);
             close(std_fd);
@@ -640,56 +627,49 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
     }
 }
 
-void ssu_score_table_create(char* directory_path_ans) {
+void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 만들기
 
 	
     struct  dirent **namelist;
-    int select_mode;
- 	int fd_score;//fd : 파일 디스크립터, count : 읽은 buf의 갯수
-    int fd_tmp;
-    int idx, nameptr_count;
-    int fd_backup, fd_backup2;
-    int except_dot=0, except_csv=0, except_sum = 0;
-    double txt_score, c_score;
+    int select_mode; //score table 생성시 모드를 선택
+    int fd_score;//fd : 파일 디스크립터, count : 읽은 buf의 갯수
+    int fd_tmp; //임시로 디스크립터를 담기 위한 변수
+    int idx, nameptr_count; 
+    int fd_backup, fd_backup2; //파일디스크립터 백업을 위한 변수
+    int except_dot=0, except_csv=0, except_sum = 0; // ".", "csv" 를 제외하고 카운팅 하기  위한 변수
+    double txt_score, c_score; //txt에 대한 점수, c파일에 대한 점수
     char *ptr, *name_ptr;
 	
-   /*if((count = scandir(directory_path_ans, &namelist, NULL, alphasort)) == -1) {
-        fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_ans, strerror(errno));
-        exit(1);
-        }*/ 
    
     if((fd_score = open("ANS_DIR/score_table.csv", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "creat error for %s\n","score_table.csv");
-        exit(1);
+        exit(1); //csv 파일 생성
     }
 
     if((fd_tmp = open("dir.txt", O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "creat error for %s\n","dir.txt");
-        exit(1);
+        exit(1); //임시 txt 파일 생성
     }
     
     system("ls -vd ANS_DIR/*/ > dir.txt");
-    read(fd_tmp, buf_dirname, BUFFER_SIZE);
+    read(fd_tmp, buf_dirname, BUFFER_SIZE); //ANS_DIR 내의 파일들을 정렬된 순서대로 읽어들인다
     close(fd_tmp);
-    system("rm dir.txt");
+    system("rm dir.txt"); //임시 txt 파일 삭제
 
     ptr = strtok(buf_dirname, "\n");
     while(ptr != NULL) {
-        strcpy(ssu_score_tab_for[pro_count].name, ptr);
-        //printf("%s\n", ssu_score_tab_for[pro_count].name);
+        strcpy(ssu_score_tab_for[pro_count].name, ptr); //받은 항목들을순서대로 배열에 저장한다 
         pro_count++;
         ptr = strtok(NULL,"\n");
     }
-    //printf("%d\n", pro_count);
 
     for(idx = 0 ; idx < pro_count; idx++) {
-        name_ptr = strtok(ssu_score_tab_for[idx].name, "/");
+        name_ptr = strtok(ssu_score_tab_for[idx].name, "/"); // "/" 기준으로 pathname 구별
         nameptr_count = 0;
             while(name_ptr != NULL) {
             
-            if(nameptr_count == 1) {
+            if(nameptr_count == 1) { 
                 strcpy(ssu_score_tab_for[idx].name, name_ptr);
-                //printf("%s\n", ssu_score_tab_for[idx].name);
                 break;
             }
             nameptr_count ++;
@@ -698,40 +678,40 @@ void ssu_score_table_create(char* directory_path_ans) {
     }
 
         
-    printf("Select Mode(1 or 2) : ");
+    printf("Select Mode(1 or 2) : "); //사용자가 점수를 어떻게 입력할 것인지 
     scanf("%d", &select_mode);
 
     while(1) {
-    if(select_mode == 1){
+    if(select_mode == 1){ //1번 모드 지정
 
         printf("Input score for txt_file : ");
-        scanf("%lf",&txt_score);
+        scanf("%lf",&txt_score); // txt 문제 점수 지정
         printf("Input score for c_file : ");
-        scanf("%lf",&c_score);
+        scanf("%lf",&c_score); // c 문제 점수  지정
         for(idx = 0; idx< pro_count ; idx++) {
            
             
             if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
-            ssu_score_tab_for[idx].score = txt_score;
+            ssu_score_tab_for[idx].score = txt_score;  //모든 txt문제에 점수 지정
 
             else
-            ssu_score_tab_for[idx].score = c_score;
+            ssu_score_tab_for[idx].score = c_score; //모든 c문제에 점수 지정
         
-            ssu_score_tab_for[idx].comma = ',';
-            ssu_score_tab_for[idx].linejump = '\n';
+            ssu_score_tab_for[idx].comma = ','; //구분자는 ","
+            ssu_score_tab_for[idx].linejump = '\n'; //라인 구분자는 "\n"
         }
         break;
     }
 
-    else if(select_mode == 2) {
+    else if(select_mode == 2) { //2번 모드 발동
      for(idx = 0; idx< pro_count ; idx++) {
             printf("Input of ");
 	        printf("%s",ssu_score_tab_for[idx].name);
         
             if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
-            printf("%s :",".txt");
+            printf("%s :",".txt"); // txt문제는 *.txt 형식으로 이름지어짐
             else
-            printf("%s :",".c");
+            printf("%s :",".c"); // c문제는 *.c 형식으로 이름지어짐
             
             scanf("%lf",&ssu_score_tab_for[idx].score);
             ssu_score_tab_for[idx].comma = ',';
@@ -741,7 +721,7 @@ void ssu_score_table_create(char* directory_path_ans) {
     }
 
         else {
-        printf("Select Mode(1 or 2) Retry : ");
+        printf("Select Mode(1 or 2) Retry : "); //다른 값 입력시 재 입력
         scanf("%d", &select_mode);
         }
 
@@ -750,7 +730,7 @@ void ssu_score_table_create(char* directory_path_ans) {
        fd_backup = dup(1);
        dup2(fd_score,1);
        for(idx = 0 ; idx < pro_count; idx++) {
-           printf("%s%c%.2lf%c", ssu_score_tab_for[idx].name,ssu_score_tab_for[idx].comma,ssu_score_tab_for[idx].score,ssu_score_tab_for[idx].linejump);
+           printf("%s%c%.2lf%c", ssu_score_tab_for[idx].name,ssu_score_tab_for[idx].comma,ssu_score_tab_for[idx].score,ssu_score_tab_for[idx].linejump); //입력한 모든값들을 ssu_score.csv에 출력한다.
        }
        dup2(fd_backup,1);
        close(fd_score);
@@ -761,15 +741,15 @@ void score_table_create_proto(char *directory_path_std, char *directory_path_ans
     struct dirent **namelist;
     int std_count, except_dot = 0;
     int idx, jdx;
-    int fd_total, fd_backup, fd_backup2;
-    double  total_sum, avg = 0;
+    int fd_total, fd_backup, fd_backup2; //
+    double  total_sum, avg = 0; //전체점수, 평균
     double  print_sum_count[20];
     double  print_sum_count_total = 0;
-    char exe_syntax[30] = "\0";
-    char gcc_syntax[30] = "\0";
-    char run_syntax[30] = "\0";
-    char stdoutfile_name[30] = "\0";
-    char buf[BUFFER_SIZE];
+    char exe_syntax[30] = "\0"; //exe 구문
+    char gcc_syntax[30] = "\0"; //gcc 실행 구문
+    char run_syntax[30] = "\0"; //exe 실행 구문
+    char stdoutfile_name[30] = "\0"; //stdout 파일 이름
+    char buf[BUFFER_SIZE]; 
 
     
     printf("%s\n", directory_path_std);
@@ -785,38 +765,38 @@ void score_table_create_proto(char *directory_path_std, char *directory_path_ans
         
      for(idx = 0; idx < std_count; idx++) {
         if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
-            except_dot++ ;
+            except_dot++ ; // .이나 ..은 생략한다
             continue;
         }
         strcpy(total_score_tab_for[idx].student, namelist[idx] -> d_name);
-        printf("%s,",total_score_tab_for[idx].student);
+        printf("%s,",total_score_tab_for[idx].student); //학생들의 총 점수를 출력해준다.
         
     }
 
     for(idx = except_dot; idx < std_count; idx++) {
-            strcpy(total_score_tab_for [idx - except_dot].student, total_score_tab_for[idx].student);
+            strcpy(total_score_tab_for [idx - except_dot].student, total_score_tab_for[idx].student); //index 2부터 시작하므로 2칸씩 땡겨온다.
     }
 
     fd_backup = dup(1);
     dup2(fd_total , 1);
 
-    printf(",");
+    printf(","); // 테이블 처음 칸은 빈칸
     for(idx = 0; idx < pro_count; idx++) {
-        printf("%s,", ssu_score_tab_for[idx].name);
+        printf("%s,", ssu_score_tab_for[idx].name); //문제번호 컬럼
     }
-    printf("Sum\n");
+    printf("Sum\n"); //총점수 컬럼
     for(idx = 0; idx < std_count-except_dot; idx++) {
         
         total_sum = 0;
-        printf("%s,",total_score_tab_for[idx].student);
+        printf("%s,",total_score_tab_for[idx].student); // 학번 row
 
         for(jdx = 0; jdx < pro_count ; jdx++){
-        total_score_tab_for[idx].score[jdx] = ssu_score_tab_for[jdx].score;
+        total_score_tab_for[idx].score[jdx] = ssu_score_tab_for[jdx].score; //점수 row
         printf("%.2lf", total_score_tab_for[idx].score[jdx]);
         printf(",");
-        total_sum += total_score_tab_for[idx].score[jdx];
+        total_sum += total_score_tab_for[idx].score[jdx]; //항목들을 더해가는 중
         }
-        print_sum_count[idx] = total_sum;
+        print_sum_count[idx] = total_sum; //총점수 row
         printf("%.2lf\n", total_sum);
         
     }
@@ -831,20 +811,19 @@ void score_table_create_proto(char *directory_path_std, char *directory_path_ans
 void score_table_create(char *directory_path_std, char *directory_path_ans, int print_flag) {
 
     struct dirent **namelist;
-    int std_count, except_dot = 0;
+    int std_count, except_dot = 0; //except_dot : .이나 ..이 나오면 생략을 위한 카운팅 변수
     int idx, jdx;
     int fd_total, fd_backup, fd_backup2;
-    double  total_sum, avg = 0;
+    double  total_sum, avg = 0; //총점, 평균점수
     double  print_sum_count[20];
     double  print_sum_count_total = 0;
-    char exe_syntax[30] = "\0";
-    char gcc_syntax[30] = "\0";
-    char run_syntax[30] = "\0";
-    char stdoutfile_name[30] = "\0";
+    char exe_syntax[30] = "\0"; //exe 구문
+    char gcc_syntax[30] = "\0"; //gcc 구문
+    char run_syntax[30] = "\0"; //exe 실행 구문
+    char stdoutfile_name[30] = "\0"; //stdout 이름용 배열
     char buf[BUFFER_SIZE];
 
     
-    //printf("Checkpoint\n");
     if((std_count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
         fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
         exit(1);
@@ -857,7 +836,7 @@ void score_table_create(char *directory_path_std, char *directory_path_ans, int 
 
      for(idx = 0; idx < std_count; idx++) {
         if(strcmp(namelist[idx] -> d_name, ".") == 0 || strcmp(namelist[idx] -> d_name, "..") == 0) {
-            except_dot++ ;
+            except_dot++ ; // .이나 ..이 나오면 생략시킨다
             continue;
         }
         
@@ -867,42 +846,41 @@ void score_table_create(char *directory_path_std, char *directory_path_ans, int 
     fd_backup = dup(1);
     dup2(fd_total , 1);
 
-    printf(",");
+    printf(","); //처음 칸은 빈칸으로 놔둔다
     for(idx = 0; idx < pro_count; idx++) {
-        printf("%s,", ssu_score_tab_for[idx].name);
+        printf("%s,", ssu_score_tab_for[idx].name); //문제 번호 컬럼
     }
-    printf("Sum\n");
+    printf("Sum\n"); //sum 컬럼
 
     for(idx = 0; idx < std_count-except_dot; idx++) {
         
         total_sum = 0;
-        printf("%s,",total_score_tab_for[idx].student);
+        printf("%s,",total_score_tab_for[idx].student); //학번 칸
 
         for(jdx = 0; jdx < pro_count ; jdx++){
-        printf("%.2lf", total_score_tab_for[idx].score[jdx]);
+        printf("%.2lf", total_score_tab_for[idx].score[jdx]); //score row
         printf(",");
         total_sum += total_score_tab_for[idx].score[jdx];
         }
         print_sum_count[idx] = total_sum;
-        printf("%.2lf\n", total_sum);
+        printf("%.2lf\n", total_sum); //총합 점수
         
     }
     
     dup2(fd_backup, 1);
     close(fd_total);
     
-    //printf("%s | %.2lf\n", total_score_tab_for[0].student, total_score_tab_for[0].score[0]);
 
-    if(print_flag == 1) {
+    if(print_flag == 1) { //p 옵션 사용시
         for(idx = 0 ; idx < std_count - except_dot ;idx++) {
     
         printf("%s score : %.2lf\n", total_score_tab_for[idx].student, print_sum_count[idx]);
-        print_sum_count_total += print_sum_count[idx];
+        print_sum_count_total += print_sum_count[idx]; //각 학생들의 총합을 화면으로 출력
 
         }
 
         avg = print_sum_count_total / (std_count - except_dot);
-        printf("Total Average : %.2lf\n", avg);
+        printf("Total Average : %.2lf\n", avg); //총 평균점수도 화면으로 출력
     }
 
 }
