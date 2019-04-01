@@ -153,6 +153,7 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
         strcat(directory_path_ans, "/");
         strcpy(sub_path_ans_backup, directory_path_ans); // "ANS_DIR/SUBDIR"형태로 돌아옴
 
+    
         sub_ans = opendir(directory_path_ans);
         while( entry_sub_ans = readdir(sub_ans)){
 
@@ -231,6 +232,8 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
         strcat(directory_path_std, "/");
         strcpy(sub_path_std_backup, directory_path_std); // STD_DIR/SUBDIR 형태
 
+        printf("%s is compiling...\n", directory_path_std);
+
         sub_std = opendir(directory_path_std);
         while( entry_sub_std = readdir(sub_std)){
             
@@ -257,6 +260,8 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
 
             else {
             strcat(directory_path_std, entry_sub_std -> d_name); //STD_DIR/SUBDIR/*.txt or .c
+
+            
             
             for(int i=0;i<strlen(directory_path_std);i++)
             {
@@ -271,16 +276,15 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
             }
 
           
-            printf("directory_path_std : %s\n", directory_path_std);
+            
 
             sprintf(exe_syntax, "%s" , directory_path_std);
-            printf("exe_syntax %s\n", exe_syntax);
-
+            
             sprintf(stdoutfile_name, "%s%s", exe_syntax, ".stdout"); // *.exe 형태
-            printf("stdoutfile_name %s\n", stdoutfile_name);
+            
 
             sprintf(errorfile_name, "%s%s", exe_syntax, "_error.txt"); // *.stdout 형태
-            printf("errorfile_name %s\n\n", errorfile_name);
+            
 
             
             ptr = strstr(directory_path_std,"/12"); // "/12"라는 패턴을 문자열에서 찾는다.
@@ -327,8 +331,7 @@ void program_autocompile(char* directory_path_std, char* directory_path_ans, int
                     close(stdoutfile_fd); 
                     close(error_fd);
             
-
-
+             
              strcpy(directory_path_std, sub_path_std_backup ); // STD_DIR/SUBDIR/ 형태로 되돌아감
             }
             
@@ -638,7 +641,7 @@ void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 �
 
 	
     struct  dirent **namelist;
-    int select_mode; //score table 생성시 모드를 선택
+    double select_mode; //score table 생성시 모드를 선택
     int fd_score;//fd : 파일 디스크립터, count : 읽은 buf의 갯수
     int fd_tmp; //임시로 디스크립터를 담기 위한 변수
     int idx, nameptr_count; 
@@ -686,7 +689,8 @@ void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 �
 
         
     printf("Select Mode(1 or 2) : "); //사용자가 점수를 어떻게 입력할 것인지 
-    scanf("%d", &select_mode);
+    scanf("%lf", &select_mode);
+    fflush(stdin);
 
     while(1) {
     if(select_mode == 1){ //1번 모드 지정
@@ -729,7 +733,8 @@ void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 �
 
         else {
         printf("Select Mode(1 or 2) Retry : "); //다른 값 입력시 재 입력
-        scanf("%d", &select_mode);
+        scanf("%lf", &select_mode);
+        fflush(stdin);
         }
 
     }
@@ -759,7 +764,6 @@ void score_table_create_proto(char *directory_path_std, char *directory_path_ans
     char buf[BUFFER_SIZE]; 
 
     
-    printf("%s\n", directory_path_std);
     if((std_count = scandir(directory_path_std, &namelist, NULL, alphasort)) == -1) {
         fprintf(stderr, "%s Directory Scan Error: %s\n", directory_path_std, strerror(errno));
         exit(1);

@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
-#define BUFFER_SIZE 2048 //버퍼 사이즈
+#define BUFFER_SIZE 4096 //버퍼 사이즈
 #define WARNING 0.1 // WARNING 발생시 0.1점 감점
 #define ERROR 0 //ERROR 발견시 0점 부여성
 #define LONG_PROCESS 0 //프로그램 수행시간 5초 초과 시 0점 부여 
