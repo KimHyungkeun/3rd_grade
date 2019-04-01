@@ -497,8 +497,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
             std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
             ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE);
             std_length = read(std_fd, buf_STD, BUFFER_SIZE);
-                //printf("ANS : %s\n", buf_ANS);
-                //printf("STD : %s\n", buf_STD);
+                
             
                 if(strcmp(buf_ANS, buf_STD) == 0)
                     continue;
@@ -506,8 +505,7 @@ void program_problem_check(char* directory_path_std, char* directory_path_ans) {
                 else    
                     total_score_tab_for[std_idx].score[cfile_index] = ERROR; //값이 다르므로 오답처리
 
-                //printf("%s :", std_filepathname[ans_idx][std_idx]);
-                //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+                
 
             for(int i=0 ; i< ans_length;i++)
                 buf_ANS[i] = '\0';   //다쓴 버퍼는 다시 null문자로 초기화
@@ -612,8 +610,7 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
             std_fd = open(std_filepathname[ans_idx][std_idx], O_RDONLY);
             ans_length = read(ans_fd, buf_ANS, BUFFER_SIZE); //정답지의 내용
             std_length = read(std_fd, buf_STD, BUFFER_SIZE); //학생이 제출한 내용
-                //printf("ANS : %s\n", buf_ANS);
-                //printf("STD : %s\n", buf_STD);
+                
             
                 if(strcmp(buf_ANS, buf_STD) == 0)
                     continue;
@@ -622,8 +619,7 @@ void blank_problem_check(char* directory_path_std, char* directory_path_ans) {
                     total_score_tab_for[std_idx].score[ans_idx] = ERROR; //답이 아니므로 오답처리
                 }
 
-                //printf("%s :", std_filepathname[ans_idx][std_idx]);
-                //printf("%.2lf\n",total_score_tab_for[std_idx].score[cfile_index]);
+                
 
             for(int i=0 ; i< ans_length;i++)
                 buf_ANS[i] = '\0';   //끝난 buf에 대해서는 null문자로 초기화
@@ -641,7 +637,7 @@ void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 �
 
 	
     struct  dirent **namelist;
-    double select_mode; //score table 생성시 모드를 선택
+    char select_mode; //score table 생성시 모드를 선택
     int fd_score;//fd : 파일 디스크립터, count : 읽은 buf의 갯수
     int fd_tmp; //임시로 디스크립터를 담기 위한 변수
     int idx, nameptr_count; 
@@ -687,55 +683,57 @@ void ssu_score_table_create(char* directory_path_ans) { //ssu_score.csv 파일 �
         }
     }
 
-        
+    printf("Mode 1 : Input blank question and program question's score. ex) 0.5 1\n");  
+    printf("Mode 2 : Input all question's score. ex) Input value of 1-1 : 0.1\n");  
     printf("Select Mode(1 or 2) : "); //사용자가 점수를 어떻게 입력할 것인지 
-    scanf("%lf", &select_mode);
-    fflush(stdin);
+    scanf("%c", &select_mode);
+
 
     while(1) {
-    if(select_mode == 1){ //1번 모드 지정
+        
+            if(select_mode == '1'){ //1번 모드 지정
 
-        printf("Input score for txt_file : ");
-        scanf("%lf",&txt_score); // txt 문제 점수 지정
-        printf("Input score for c_file : ");
-        scanf("%lf",&c_score); // c 문제 점수  지정
-        for(idx = 0; idx< pro_count ; idx++) {
+            printf("Input score for txt_file : ");
+            scanf("%lf",&txt_score); // txt 문제 점수 지정
+            printf("Input score for c_file : ");
+            scanf("%lf",&c_score); // c 문제 점수  지정
+            for(idx = 0; idx< pro_count ; idx++) {
            
             
-            if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
-            ssu_score_tab_for[idx].score = txt_score;  //모든 txt문제에 점수 지정
+                if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
+                ssu_score_tab_for[idx].score = txt_score;  //모든 txt문제에 점수 지정
 
-            else
-            ssu_score_tab_for[idx].score = c_score; //모든 c문제에 점수 지정
+                else
+                ssu_score_tab_for[idx].score = c_score; //모든 c문제에 점수 지정
         
-            ssu_score_tab_for[idx].comma = ','; //구분자는 ","
-            ssu_score_tab_for[idx].linejump = '\n'; //라인 구분자는 "\n"
+                ssu_score_tab_for[idx].comma = ','; //구분자는 ","
+                ssu_score_tab_for[idx].linejump = '\n'; //라인 구분자는 "\n"
+            }
+            break;
         }
-        break;
-    }
 
-    else if(select_mode == 2) { //2번 모드 발동
-     for(idx = 0; idx< pro_count ; idx++) {
-            printf("Input of ");
-	        printf("%s",ssu_score_tab_for[idx].name);
+        else if(select_mode == '2') { //2번 모드 발동
+            for(idx = 0; idx< pro_count ; idx++) {
+                printf("Input of ");
+	            printf("%s",ssu_score_tab_for[idx].name);
         
-            if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
-            printf("%s :",".txt"); // txt문제는 *.txt 형식으로 이름지어짐
-            else
-            printf("%s :",".c"); // c문제는 *.c 형식으로 이름지어짐
+                if(strpbrk(ssu_score_tab_for[idx].name, "-") != NULL)
+                printf("%s :",".txt"); // txt문제는 *.txt 형식으로 이름지어짐
+                else
+                printf("%s :",".c"); // c문제는 *.c 형식으로 이름지어짐
             
-            scanf("%lf",&ssu_score_tab_for[idx].score);
-            ssu_score_tab_for[idx].comma = ',';
-            ssu_score_tab_for[idx].linejump = '\n';
+                scanf("%lf",&ssu_score_tab_for[idx].score);
+                ssu_score_tab_for[idx].comma = ',';
+                ssu_score_tab_for[idx].linejump = '\n';
+            }
+            break;
         }
-        break;
-    }
 
         else {
-        printf("Select Mode(1 or 2) Retry : "); //다른 값 입력시 재 입력
-        scanf("%lf", &select_mode);
-        fflush(stdin);
+        printf("Try again : ");
+        scanf("%c", &select_mode);
         }
+
 
     }
 

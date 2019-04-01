@@ -14,17 +14,20 @@
 
 int main()
 {
-   char *str = "/20190001/12";
-   char *ptr;
-   ptr = strstr(str, "/12");
+   int num;
+   printf("Select mode : ");
+   scanf("%d\n", &num);
 
-   if(ptr == NULL)
-   printf("Nothing here\n");
-   
-   else {
-   printf("%s\n", ptr);
-   printf("%d\n", strcmp(ptr, "/12"));
+   while(1) {
+       
+       if(num != 4) {
+       printf("Retry : ");
+       scanf("%d", &num);
+       }
+       
+       else
+           break;
+       
+       
    }
-
-    return 0;
 }

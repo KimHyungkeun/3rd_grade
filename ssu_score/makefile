@@ -1,7 +1,7 @@
 normal_gcc : ssu_score.c
 	gcc ssu_score.c -o ssu_score
 
-execute_gcc : 
+execute_file : 
 	./ssu_score STD_DIR ANS_DIR
 
 all_option :

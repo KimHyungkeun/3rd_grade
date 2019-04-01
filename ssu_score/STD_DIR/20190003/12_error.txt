@@ -1,0 +1,7 @@
+/tmp/ccWL4yHq.o: In function `main':
+12.c:(.text+0x150): undefined reference to `pthread_create'
+12.c:(.text+0x16b): undefined reference to `pthread_create'
+12.c:(.text+0x17c): undefined reference to `pthread_join'
+12.c:(.text+0x18d): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+sh: 1: ./STD_DIR/20190003/12.exe: not found
