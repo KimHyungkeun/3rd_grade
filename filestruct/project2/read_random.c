@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -22,54 +21,52 @@ void swap(int *a, int *b);
 //
 int main(int argc, char **argv)
 {
-	struct stat statbuf;
+	
 	struct timeval begin_t, end_t;
+	char *buf;
 	int fd;
 	int length;
-	ssize_t size;
 	int *read_order_list;
 	int num_of_records;
+	long long size;
 
-	gettimeofday(&begin_t, NULL);
+	
 
 	 if(argc < 3) {
         fprintf(stderr, "Usage : %s filename records\n", argv[0]);
-		gettimeofday(&end_t, NULL);
-		ssu_runtime(&begin_t, &end_t);
         exit(1);
     }
 
     if((fd = open(argv[1], O_RDONLY)) < 0) {
         fprintf(stderr, "open error for %s\n", argv[1]);
-		gettimeofday(&end_t, NULL);
-		ssu_runtime(&begin_t, &end_t);
         exit(1);
     }
 
 
 	num_of_records = atoi(argv[2]);
-	read_order_list = (int*)malloc(num_of_records);
-
-	stat(argv[1], &statbuf);
- 	char buf[statbuf.st_size];
+	read_order_list = (int*)malloc(num_of_records * sizeof(int));
+	
+	size = num_of_records * RECORD_SIZE;
+ 	buf = (char*)malloc(size);
 	
 	// 이 함수를 실행하면 'read_order_list' 배열에 읽어야 할 레코드 번호들이 순서대로 나열되어 저장됨
     //'num_of_records'는 레코드 파일에 저장되어 있는 전체 레코드의 수를 의미함
 	GenRecordSequence(read_order_list, num_of_records);
-	
 	// 'read_order_list'를 이용하여 표준 입력으로 받은 레코드 파일로부터 레코드를 random 하게 읽어들이고,
     // 이때 걸리는 시간을 측정하는 코드 구현함
 
-	
+	gettimeofday(&begin_t, NULL);
 	for(int i=0; i < num_of_records ; i++) {
 			
-			read(fd ,buf, RECORD_SIZE);
-			lseek(fd, read_order_list[i] * RECORD_SIZE, SEEK_SET);		
+			lseek(fd, read_order_list[i] * RECORD_SIZE, SEEK_SET);
+			read(fd ,buf, RECORD_SIZE);	
+			
 	}
 
 	close(fd);
 	gettimeofday(&end_t, NULL);
-	ssu_runtime(&begin_t, &end_t);	
+	ssu_runtime(&begin_t, &end_t);
+	free(buf);
 	free(read_order_list);
 	return 0;
 }
