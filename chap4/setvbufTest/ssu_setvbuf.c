@@ -11,7 +11,7 @@ int main(void) {
 
 	struct timeval begin_t, end_t;
 	char buf[BUFFER_SIZE];
-	char *fname = "/dev/pts/11"; // /dev/pts/19 파일
+	char *fname = "/dev/pts/1"; // /dev/pts/1 파일
 	FILE *fp;
 
 	gettimeofday(&begin_t, NULL);
