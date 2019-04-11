@@ -1,0 +1,6 @@
+STD_DIR/20190003/11.c: In function ‘main’:
+STD_DIR/20190003/11.c:15:18: error: ‘ssu_signal’ undeclared (first use in this function)
+  signal(SIGUSR1, ssu_signal);
+                  ^
+STD_DIR/20190003/11.c:15:18: note: each undeclared identifier is reported only once for each function it appears in
+sh: 1: ./STD_DIR/20190003/11.exe: not found
