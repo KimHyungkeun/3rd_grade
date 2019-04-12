@@ -17,22 +17,22 @@ int dd_erase(int);
 extern FILE *devicefp;
 
 
-int sparebuf[PAGES_PER_BLOCK * BLOCKS_PER_DEVICE]; //4 * 4 
-char freeblock = DATABLKS_PER_DEVICE;
+int sparebuf[PAGES_PER_BLOCK * BLOCKS_PER_DEVICE]; //스페어를 관리하는 배열 
+char freeblock = DATABLKS_PER_DEVICE; //freeblock으로 둘 위치를 지정한다
 
 
-const int lsn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //4 * 3 
-const int psn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //4 * 3 
-const int lbn_count = DATABLKS_PER_DEVICE; //3 
-const int pbn_count = BLOCKS_PER_DEVICE; //4 
+const int lsn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //lsn 갯수 
+const int psn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //psn 갯수 
+const int lbn_count = DATABLKS_PER_DEVICE; //lbn의 갯수
+const int pbn_count = BLOCKS_PER_DEVICE; //pbn의 갯수
 
-int lbn_table[DATABLKS_PER_DEVICE];
+int lbn_table[DATABLKS_PER_DEVICE]; //lbn 테이블, 초기에 pbn 또한 똑같이 맵핑
 
-int lbn;
+int lbn; 
 int pbn;
 int ppn;
 int offset;
-int tmp;
+
 
 
 //
@@ -60,7 +60,7 @@ void ftl_open()
 
 	
 	for(int ppn = 0 ; ppn < (PAGES_PER_BLOCK * BLOCKS_PER_DEVICE) ; ppn++) {
-		sparebuf[ppn] = -1;
+		sparebuf[ppn] = -1; //초기 spare들은 -1로 변환한다.
 	}
 
 
@@ -75,14 +75,14 @@ void ftl_open()
 //
 void ftl_read(int lsn, char *sectorbuf)
 {
-	char pagebuf[PAGE_SIZE];
-	lbn = lsn / PAGES_PER_BLOCK;
-	pbn = lbn_table[lbn];
-	offset = (lsn % PAGES_PER_BLOCK);
+	char pagebuf[PAGE_SIZE]; //한 페이지의 내용을 담을것이다
+	lbn = lsn / PAGES_PER_BLOCK; 
+	pbn = lbn_table[lbn]; //해당 lbn에 대응되는 pbn 값
+	offset = (lsn % PAGES_PER_BLOCK); //offset
 	ppn = offset + (PAGES_PER_BLOCK * pbn) ; //pure offset
 	
-	dd_read(ppn, pagebuf);
-	strncpy(sectorbuf, pagebuf, SECTOR_SIZE);
+	dd_read(ppn, pagebuf); //flash memory로부터 데이터를 읽어들인다
+	strncpy(sectorbuf, pagebuf, SECTOR_SIZE); //pagebuf로부터 sector크기만큼 읽어들인다.
 
 	printf("%s, spare : %d, ppn : %d\n",sectorbuf,pagebuf[SECTOR_SIZE],ppn);	
 	return;
@@ -97,54 +97,52 @@ void ftl_read(int lsn, char *sectorbuf)
 
 void ftl_write(int lsn, char *sectorbuf)
 {
-	char pagebuf[PAGE_SIZE];
-	lbn = lsn / PAGES_PER_BLOCK;
-	pbn = lbn_table[lbn];
-	offset = (lsn % PAGES_PER_BLOCK);
-	ppn = offset + (PAGES_PER_BLOCK * pbn) ; //pure offset
+	char pagebuf[PAGE_SIZE];//페이지의 내용을 담을배열
+	lbn = lsn / PAGES_PER_BLOCK; 
+	pbn = lbn_table[lbn]; //lbn table을 읽어서, pbn과 대응되는 값을 찾음
+	offset = (lsn % PAGES_PER_BLOCK); //offset
+	ppn = offset + (PAGES_PER_BLOCK * pbn) ; //ppn
 
 	
 	
-	dd_read(ppn, pagebuf);
+	dd_read(ppn, pagebuf); //flashmemory로부터 값을 읽어들인다.
 
 
-			if(pagebuf[SECTOR_SIZE] == -1) { //if user input data new
-				//printf("SECTOR SIZE BUFFER : %d\n", pagebuf[SECTOR_SIZE]);	
+			if(pagebuf[SECTOR_SIZE] == -1) { //유저가 데이터를 새로 넣는 경우
+				
 				strncpy(pagebuf,sectorbuf, SECTOR_SIZE);		
 				pagebuf[SECTOR_SIZE] = 0; //input spare area
-				sparebuf[ppn] = 0;
+				sparebuf[ppn] = 0; //데이터가 들어갔으므로 spare는 0이다
 				dd_write(ppn, pagebuf);
-				memset(pagebuf,0,PAGE_SIZE);
+				memset(pagebuf,0,PAGE_SIZE); //해당 버퍼를 다시 깨끗이 비운다
 			}
 
 			else if(pagebuf[SECTOR_SIZE] == 0){ //if user overwrite data	
 			//printf("Check\n");
 			
-				for(int i=0; i < PAGES_PER_BLOCK; i++) {
-					if(i == offset){
-						strncpy(pagebuf,sectorbuf, SECTOR_SIZE);
-						pagebuf[SECTOR_SIZE] = 0;
-						sparebuf[PAGES_PER_BLOCK * freeblock + i] = 0;
-						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf);
-						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1;
+				for(int i=0; i < PAGES_PER_BLOCK; i++) { //유저가 기존 데이터를 업데이트 하는 경우
+					if(i == offset){ 
+						strncpy(pagebuf,sectorbuf, SECTOR_SIZE); 
+						pagebuf[SECTOR_SIZE] = 0; 
+						sparebuf[PAGES_PER_BLOCK * freeblock + i] = 0; //freeblock쪽의 ppn의 spare을 0으로 
+						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf);//해당하는 freeblock에 데이터넣음
+						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1; //기존 블록의 spare는 -1로 초기화
 						
 					}
 					
 					else {					
-						dd_read(pbn * PAGES_PER_BLOCK + i, pagebuf);
-						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf);
-						sparebuf[PAGES_PER_BLOCK * freeblock + i] = sparebuf[pbn * PAGES_PER_BLOCK + i];
-						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1;
+						dd_read(pbn * PAGES_PER_BLOCK + i, pagebuf); //업데이트하려는 offset을 제외한 나머지를 읽어들인다.
+						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf); //대응하는 offset에 맞게 데이터를 넣는다
+						sparebuf[PAGES_PER_BLOCK * freeblock + i] = sparebuf[pbn * PAGES_PER_BLOCK + i]; //기존 위치의 spare를 새 freeblock쪽의 spare에 그대로 넣는다.(복사한다)
+						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1; //이전 블록의 spare는 -1로 초기화
 						
 					}
 
 				}
 
-				dd_erase(lbn_table[lbn]);
-				lbn_table[lbn] = freeblock;
-				//printf("lbn_table[%d] : %d\n", lbn, lbn_table[lbn]);
-				freeblock = pbn;
-				//printf("Changed freeblock : %d\n", freeblock);
+				dd_erase(lbn_table[lbn]); //이전의 block의 데이터들을 전부 clear 시킨다
+				lbn_table[lbn] = freeblock; 
+				freeblock = pbn; //이전의 block 위치가 freeblock 위치로  변경된다.
 				
 			}
 	

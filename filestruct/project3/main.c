@@ -44,14 +44,7 @@ int main(int argc, char *argv[])
 
 	ftl_open();    // ftl_read(), ftl_write() 호출하기 전에 이 함수를 반드시 호출해야 함
 
-	/*lsn = 1;
-	strcpy(sectorbuf, "I'm busy now!");
-	printf("%s\n", sectorbuf);
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-	*/
-
-	lsn = 0;
+	/*lsn = 0;
 	strcpy(sectorbuf, "First Sentence");
 	ftl_write(lsn,sectorbuf);
 	//ftl_read(lsn,sectorbuf);
@@ -77,63 +70,27 @@ int main(int argc, char *argv[])
 
 	lsn = 26;
 	strcpy(sectorbuf, "26 Sentence");
-	ftl_write(lsn,sectorbuf);
+	ftl_write(lsn,sectorbuf);*/
 
-	lsn = 26;
-	strcpy(sectorbuf, "26 New Sentence");
-	ftl_write(lsn,sectorbuf);
+	for (int lsn = 0; lsn < PAGES_PER_BLOCK * DATABLKS_PER_DEVICE ; lsn++){
+		strcpy(sectorbuf,"Sentence");
+		ftl_write(lsn,sectorbuf);
+	}
 
-	lsn = 26;
-	strcpy(sectorbuf, "26 Second New Sentence");
-	ftl_write(lsn,sectorbuf);
+	strcpy(sectorbuf,"Yeah!!!!");
+	ftl_write(6,sectorbuf);
 
-
+	strcpy(sectorbuf,"OHNOYeah!!!!");
+	ftl_write(6,sectorbuf);
 
 	ftl_read(0,sectorbuf);
 	ftl_read(1,sectorbuf);
 	ftl_read(2,sectorbuf);
 	ftl_read(26,sectorbuf);
+	ftl_read(6,sectorbuf);
 	//ftl_read(lsn,sectorbuf);
 
-	/*lsn = 3;
-	strcpy(sectorbuf, "Forth Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 4;
-	strcpy(sectorbuf, "10th Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 5;
-	strcpy(sectorbuf, "new Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 6;
-	strcpy(sectorbuf, "11 new Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 7;
-	strcpy(sectorbuf, "12 new Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 4;
-	strcpy(sectorbuf, "OOH new Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
-
-	lsn = 8;
-	strcpy(sectorbuf, "8OOH new Sentence");
-	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);*/
-
 	
-
-	
-
 	//
 	// ftl_write() 및 ftl_read() 테스트를 위한 코드를 자유자재로 만드세요
 	//
