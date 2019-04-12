@@ -146,11 +146,6 @@ void ftl_write(int lsn, char *sectorbuf)
 				
 			}
 	
-	printf("freeblock : %d\n", freeblock);
-	for(int idx = 0 ; idx < (PAGES_PER_BLOCK * BLOCKS_PER_DEVICE) ; idx++) {
-		printf("%d ", sparebuf[idx]);
-	}
-	printf("\n\n");
 	
 	return;
 }

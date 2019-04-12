@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 	ftl_read(0,sectorbuf);
 	ftl_read(1,sectorbuf);
 	ftl_read(2,sectorbuf);
-	ftl_read(26,sectorbuf);
+	//ftl_read(26,sectorbuf);
 	ftl_read(6,sectorbuf);
 	//ftl_read(lsn,sectorbuf);
 
