@@ -49,32 +49,58 @@ int main(int argc, char *argv[])
 	printf("%s\n", sectorbuf);
 	ftl_write(lsn,sectorbuf);
 	ftl_read(lsn,sectorbuf);
-
-	
-
 	*/
 
 	lsn = 0;
 	strcpy(sectorbuf, "First Sentence");
 	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
+	//ftl_read(lsn,sectorbuf);
 
 	lsn = 1;
 	strcpy(sectorbuf, "Second Sentence");
 	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
+	//ftl_read(lsn,sectorbuf);
 
 	lsn = 2;
 	strcpy(sectorbuf, "Third Sentence");
 	ftl_write(lsn,sectorbuf);
-	ftl_read(lsn,sectorbuf);
+	//ftl_read(lsn,sectorbuf);
 
-	lsn = 3;
+	lsn = 2;
+	strcpy(sectorbuf, "New Third Sentence");
+	ftl_write(lsn,sectorbuf);
+	//ftl_read(lsn,sectorbuf);
+
+	lsn = 2;
+	strcpy(sectorbuf, "SecondNew Third Sentence");
+	ftl_write(lsn,sectorbuf);
+
+	lsn = 26;
+	strcpy(sectorbuf, "26 Sentence");
+	ftl_write(lsn,sectorbuf);
+
+	lsn = 26;
+	strcpy(sectorbuf, "26 New Sentence");
+	ftl_write(lsn,sectorbuf);
+
+	lsn = 26;
+	strcpy(sectorbuf, "26 Second New Sentence");
+	ftl_write(lsn,sectorbuf);
+
+
+
+	ftl_read(0,sectorbuf);
+	ftl_read(1,sectorbuf);
+	ftl_read(2,sectorbuf);
+	ftl_read(26,sectorbuf);
+	//ftl_read(lsn,sectorbuf);
+
+	/*lsn = 3;
 	strcpy(sectorbuf, "Forth Sentence");
 	ftl_write(lsn,sectorbuf);
 	ftl_read(lsn,sectorbuf);
 
-	/*lsn = 4;
+	lsn = 4;
 	strcpy(sectorbuf, "10th Sentence");
 	ftl_write(lsn,sectorbuf);
 	ftl_read(lsn,sectorbuf);
@@ -94,8 +120,13 @@ int main(int argc, char *argv[])
 	ftl_write(lsn,sectorbuf);
 	ftl_read(lsn,sectorbuf);
 
-	lsn = 7;
+	lsn = 4;
 	strcpy(sectorbuf, "OOH new Sentence");
+	ftl_write(lsn,sectorbuf);
+	ftl_read(lsn,sectorbuf);
+
+	lsn = 8;
+	strcpy(sectorbuf, "8OOH new Sentence");
 	ftl_write(lsn,sectorbuf);
 	ftl_read(lsn,sectorbuf);*/
 

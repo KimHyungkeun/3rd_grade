@@ -17,9 +17,8 @@ int dd_erase(int);
 extern FILE *devicefp;
 
 
-int sparebuf[PAGES_PER_BLOCK * DATABLKS_PER_DEVICE]; //4 * 3 
-char freeblock = DATABLKS_PER_DEVICE; ; 
-char freeblock_backup;
+int sparebuf[PAGES_PER_BLOCK * BLOCKS_PER_DEVICE]; //4 * 4 
+char freeblock = DATABLKS_PER_DEVICE;
 
 
 const int lsn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //4 * 3 
@@ -27,16 +26,14 @@ const int psn_count = PAGES_PER_BLOCK * DATABLKS_PER_DEVICE; //4 * 3
 const int lbn_count = DATABLKS_PER_DEVICE; //3 
 const int pbn_count = BLOCKS_PER_DEVICE; //4 
 
-int lsn_table[PAGES_PER_BLOCK * DATABLKS_PER_DEVICE];
-int psn_table[PAGES_PER_BLOCK * DATABLKS_PER_DEVICE];
 int lbn_table[DATABLKS_PER_DEVICE];
-int pbn_table[BLOCKS_PER_DEVICE];
 
 int lbn;
 int pbn;
 int ppn;
 int offset;
-int offset_backup;
+int tmp;
+
 
 //
 // flash memory를 처음 사용할 때 필요한 초기화 작업, 예를 들면 address mapping table에 대한
@@ -56,18 +53,14 @@ void ftl_open()
 {
 	
 
-	for(int idx = 0 ; idx < lbn_count ; idx++){
-		lbn_table[idx] = idx; //number of lbn
+	for(int pbn = 0 ; pbn < lbn_count ; pbn++){
+		lbn_table[pbn] = pbn; //number of lbn
 		
 	}
 
-	for(int idx = 0 ; idx < pbn_count ; idx++){
-		pbn_table[idx] = idx; //number of pbn  
-	}
-
 	
-	for(int idx = 0 ; idx < (PAGES_PER_BLOCK * BLOCKS_PER_DEVICE) ; idx++) {
-		sparebuf[idx] = -1;
+	for(int ppn = 0 ; ppn < (PAGES_PER_BLOCK * BLOCKS_PER_DEVICE) ; ppn++) {
+		sparebuf[ppn] = -1;
 	}
 
 
@@ -84,12 +77,14 @@ void ftl_read(int lsn, char *sectorbuf)
 {
 	char pagebuf[PAGE_SIZE];
 	lbn = lsn / PAGES_PER_BLOCK;
-	//pbn = lbn;
+	pbn = lbn_table[lbn];
 	offset = (lsn % PAGES_PER_BLOCK);
-	ppn = offset + (PAGES_PER_BLOCK * pbn_table[lbn]) ; //pure offset
+	ppn = offset + (PAGES_PER_BLOCK * pbn) ; //pure offset
 	
-			dd_read(offset, pagebuf);
-			printf("%s, spare : %d, offset : %d\n",sectorbuf,pagebuf[SECTOR_SIZE],offset);	
+	dd_read(ppn, pagebuf);
+	strncpy(sectorbuf, pagebuf, SECTOR_SIZE);
+
+	printf("%s, spare : %d, ppn : %d\n",sectorbuf,pagebuf[SECTOR_SIZE],ppn);	
 	return;
 }
 
@@ -104,66 +99,60 @@ void ftl_write(int lsn, char *sectorbuf)
 {
 	char pagebuf[PAGE_SIZE];
 	lbn = lsn / PAGES_PER_BLOCK;
+	pbn = lbn_table[lbn];
 	offset = (lsn % PAGES_PER_BLOCK);
-	ppn = offset + (PAGES_PER_BLOCK * pbn_table[lbn]) ; //pure offset
+	ppn = offset + (PAGES_PER_BLOCK * pbn) ; //pure offset
 
-	strncpy(pagebuf,sectorbuf, SECTOR_SIZE);
-	memset(pagebuf+SECTOR_SIZE, 0, SPARE_SIZE);
+	
+	
+	dd_read(ppn, pagebuf);
 
-	printf("pagebuf : %s\n", pagebuf);
-	printf("pagebuf spare : %d\n", pagebuf[SECTOR_SIZE]);
-	printf("freeblock : %d\n", freeblock);
 
 			if(pagebuf[SECTOR_SIZE] == -1) { //if user input data new
-				//printf("SECTOR SIZE BUFFER : %d\n", pagebuf[SECTOR_SIZE]);
-				
+				//printf("SECTOR SIZE BUFFER : %d\n", pagebuf[SECTOR_SIZE]);	
+				strncpy(pagebuf,sectorbuf, SECTOR_SIZE);		
 				pagebuf[SECTOR_SIZE] = 0; //input spare area
 				sparebuf[ppn] = 0;
 				dd_write(ppn, pagebuf);
 				memset(pagebuf,0,PAGE_SIZE);
 			}
 
-			else { //if user overwrite data	
-			printf("Check\n");
-			printf("%d\n", pagebuf[SECTOR_SIZE]);
+			else if(pagebuf[SECTOR_SIZE] == 0){ //if user overwrite data	
+			//printf("Check\n");
+			
 				for(int i=0; i < PAGES_PER_BLOCK; i++) {
 					if(i == offset){
+						strncpy(pagebuf,sectorbuf, SECTOR_SIZE);
 						pagebuf[SECTOR_SIZE] = 0;
 						sparebuf[PAGES_PER_BLOCK * freeblock + i] = 0;
 						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf);
-						memcpy(pagebuf, sectorbuf, SECTOR_SIZE);
+						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1;
+						
 					}
 					
-					else {
-						//memcpy(free_pagebuf, pagebuf, PAGE_SIZE);
-						memcpy(pagebuf, sectorbuf, SECTOR_SIZE);
-						pagebuf[SECTOR_SIZE] = 0;
+					else {					
+						dd_read(pbn * PAGES_PER_BLOCK + i, pagebuf);
 						dd_write(PAGES_PER_BLOCK * freeblock + i, pagebuf);
-						//memset(pagebuf, 0x00, PAGE_SIZE);
-						//memset(free_pagebuf, 0x00, PAGE_SIZE);
-						//printf("%s, %d %d %d\n",free_pagebuf, PAGES_PER_BLOCK , freeblock , i);
+						sparebuf[PAGES_PER_BLOCK * freeblock + i] = sparebuf[pbn * PAGES_PER_BLOCK + i];
+						sparebuf[pbn * PAGES_PER_BLOCK + i] = -1;
+						
 					}
 
 				}
-				
-				/*for(int i=0;i<pbn_count;i++)
-					printf("%d\n", pbn_table[i]);*/
 
-				dd_erase(pbn_table[lbn]);
-				for(int i = 0 ; i < PAGES_PER_BLOCK ; i++) {
-					sparebuf[PAGES_PER_BLOCK * pbn_table[lbn] + i] = -1;
-				}
-
-
-				pbn_table[lbn] = freeblock;
-				freeblock = lbn;
-				pbn_table[DATABLKS_PER_DEVICE] = freeblock;
-				
+				dd_erase(lbn_table[lbn]);
+				lbn_table[lbn] = freeblock;
+				//printf("lbn_table[%d] : %d\n", lbn, lbn_table[lbn]);
+				freeblock = pbn;
+				//printf("Changed freeblock : %d\n", freeblock);
 				
 			}
-			
+	
+	printf("freeblock : %d\n", freeblock);
 	for(int idx = 0 ; idx < (PAGES_PER_BLOCK * BLOCKS_PER_DEVICE) ; idx++) {
-		printf("%d\n", sparebuf[idx]);
+		printf("%d ", sparebuf[idx]);
 	}
+	printf("\n\n");
+	
 	return;
 }
