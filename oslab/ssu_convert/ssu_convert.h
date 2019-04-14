@@ -72,7 +72,7 @@ void getChar(); //식으로부터 문자를 받아들여오는 함수
 void getNonBlank(); //공백문자 처리 함수
 int lex(); //식을 토큰별로 나누는 함수
 
-void convert_java_to_c();
+void convert_java_to_c(int* opt_flag);
 void option_java_to_c(int* opt_flag);
 void create_makefile();
 

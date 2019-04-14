@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     }
    }
 
-	convert_java_to_c();
+	convert_java_to_c(opt_flag);
     option_java_to_c(opt_flag);
     create_makefile();
 	
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
 }
 
-void convert_java_to_c() {
+void convert_java_to_c(int* opt_flag) {
 
     char *filename_ptr;
     char *ptr;
@@ -231,8 +231,12 @@ void convert_java_to_c() {
         }
 
 
-        
         fprintf(newfp, "%s\n", tmp_str);
+
+        if(opt_flag[4] == 1) {
+        printf("%s\n",tmp_str);
+        sleep(1);
+        }
         //printf("ptr_count : %d\n", ptr_count);
         ptr_count ++;
         ptr = strtok(NULL, "\n");    
@@ -246,7 +250,9 @@ void convert_java_to_c() {
 
         //printf("%s\n",c_filename);
         if((stackc_fp = fopen(c_filename, "r")) == NULL) {
-        	fprintf(stderr, "creat error\n");
+        	fprintf(stderr, "creat error for %s\n", c_filename);
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
             exit(1);
         }
 
@@ -256,7 +262,9 @@ void convert_java_to_c() {
         fclose(stackc_fp);
 
         if((stackc_fp = fopen("Stack.c", "w+")) == NULL) {
-        	fprintf(stderr, "creat error\n");
+        	fprintf(stderr, "creat error for Stack.c\n");
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
             exit(1);
         }
         
@@ -319,9 +327,11 @@ void option_java_to_c(int* opt_flag) {
             fprintf(stderr, "No Stack.c file\n");
             }
 
+            else {
             fread(c_buffer, BUFFER_SIZE, 1, stackc_fp);
             printf("%s", c_buffer);
             fclose(stackc_fp);
+            }
         }
 	}
 
@@ -337,9 +347,11 @@ void option_java_to_c(int* opt_flag) {
             fprintf(stderr, "No Stack.c file\n");
             }
 
+            else {
             stat("Stack.c", &statbuf);
             printf("%s file size is %ld bytes.\n", "Stack.c", statbuf.st_size);
             fclose(stackc_fp);
+            }
         }
 	}
 
@@ -372,18 +384,17 @@ void option_java_to_c(int* opt_flag) {
 
             if((stackc_fp = fopen("Stack.c","r")) == NULL){
             fprintf(stderr, "No Stack.c file\n");
-            gettimeofday(&end_t,NULL);
-    	    ssu_runtime(&begin_t, &end_t);
-            exit(1);
             }
 
-            while (!feof(stackc_fp)){//파일의 끝을 만나지 않았다면 반복
-        	ch = fgetc(stackc_fp);//파일에서 하나의 문자를 읽음
-        		if (ch == '\n')//개행 문자일 때
-        		{
-            	line_count++;//라인 번호 1 증가
-        		}
-    		}
+            else {
+                while (!feof(stackc_fp)){//파일의 끝을 만나지 않았다면 반복
+        	    ch = fgetc(stackc_fp);//파일에서 하나의 문자를 읽음
+        		    if (ch == '\n')//개행 문자일 때
+        		    {
+            	    line_count++;//라인 번호 1 증가
+        		    }
+    		    }
+            }
 
             printf("%s line is %d lines\n", "Stack.c", line_count);
             fclose(stackc_fp);
