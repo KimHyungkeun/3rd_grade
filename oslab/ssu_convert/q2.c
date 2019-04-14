@@ -14,7 +14,7 @@ void printStack();
 
 int top = -1;
 int stack[STACK_SIZE];
-	}
+
  int peek(){
 		return stack[top];
 	}

@@ -26,8 +26,10 @@ char nextChar;
 int lexLen;
 int token;
 int nextToken;
+
 int stackc_flag = 0;
 int tab_flag = 0;
+int bracket_delete_flag = 0;
 
 FILE* fp;
 FILE* newfp;

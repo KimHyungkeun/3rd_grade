@@ -110,6 +110,11 @@ void convert_java_to_c(int* opt_flag) {
             strcpy(tmp_str, "\0");
         }
 
+        if(bracket_delete_flag == 1) {
+            strcpy(tmp_str, "\0");
+            bracket_delete_flag = 0;
+        }
+
         //printf("%d\n", strcmp(tmp_str, "import java.util.Scanner;"));
         
         if(strstr(tmp_str, "import java.util.Scanner;") != NULL) {
@@ -142,7 +147,7 @@ void convert_java_to_c(int* opt_flag) {
 
         else if(strstr(tmp_str, "stack = new int[STACK_SIZE];") != NULL) {
             strcpy(tmp_str, "int stack[STACK_SIZE];");
-            
+            bracket_delete_flag = 1;
         }
 
         else if(strstr(tmp_str, "File file = new File(\"q3java.txt\");") != NULL) {
@@ -194,10 +199,12 @@ void convert_java_to_c(int* opt_flag) {
 
         else if((sub_ptr = strstr(tmp_str, "public void")) != NULL) {
             strcpy(tmp_str, sub_ptr + 6);
+           
         }
 
         else if((sub_ptr = strstr(tmp_str, "public int")) != NULL) {
             strcpy(tmp_str, sub_ptr + 6);
+        
         }
 
         else if(strstr(tmp_str, "public static void main(String args[])") != NULL) {
@@ -213,9 +220,9 @@ void convert_java_to_c(int* opt_flag) {
         }
 
         else if((sub_ptr = strstr(tmp_str, "System.out.printf")) != NULL) {
-            tab_flag = 1;
+             tab_flag = 1;
              strcpy(tmp_str, sub_ptr + 11);
-             
+
              if(strstr(tmp_str, "st.peek") != NULL) {
                 strcpy(tmp_str, "printf(\"TOP OF STACK : %d\\n\", peek());");
                 tab_flag = 0;
