@@ -65,6 +65,7 @@ void convert_java_to_c(int* opt_flag) {
     char *tmp_ptr;
     char *sub_ptr;
     char tmp_str[100];
+    char tabadd_str[100];
 
     int ptr_count = 0;
     int sub_ptr_count = 0;
@@ -73,7 +74,7 @@ void convert_java_to_c(int* opt_flag) {
     
     //strcpy(filename, "q2.java");
     if((fp = fopen(filename, "r")) == NULL) {
-		fprintf(stderr, "open error\n");
+		fprintf(stderr, "open error for %s\n", filename);
 		exit(1);
 	}
 
@@ -82,7 +83,7 @@ void convert_java_to_c(int* opt_flag) {
     filename_ptr = strtok(filename,".");
     sprintf(c_filename,"%s%s",filename_ptr,".c");
     if((newfp = fopen(c_filename, "w+")) == NULL) {
-        	fprintf(stderr, "creat error\n");
+        	fprintf(stderr, "open error for %s\n", c_filename);
             exit(1);
     }
     
@@ -212,9 +213,12 @@ void convert_java_to_c(int* opt_flag) {
         }
 
         else if((sub_ptr = strstr(tmp_str, "System.out.printf")) != NULL) {
+            tab_flag = 1;
              strcpy(tmp_str, sub_ptr + 11);
+             
              if(strstr(tmp_str, "st.peek") != NULL) {
                 strcpy(tmp_str, "printf(\"TOP OF STACK : %d\\n\", peek());");
+                tab_flag = 0;
              }
         }
 
@@ -231,7 +235,14 @@ void convert_java_to_c(int* opt_flag) {
         }
 
 
+        if(tab_flag == 1) {
+        fprintf(newfp, "\t\t%s\n", tmp_str);
+        tab_flag = 0;
+        }
+
+        else {
         fprintf(newfp, "%s\n", tmp_str);
+        }
 
         if(opt_flag[4] == 1) {
         printf("%s\n",tmp_str);

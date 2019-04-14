@@ -15,7 +15,7 @@ int main(void){
 		fprintf(file, "%s" ,"2019 OSLAB\n");
 		fprintf(file, "%s" ,"Linux System Programming\n");
 		fflush(stdin);
-printf("DONE\n");
+		printf("DONE\n");
 
 		fclose(file);
 		

@@ -20,18 +20,18 @@ int stack[STACK_SIZE];
 	}
  void push(int value){
 		stack[++top] = value;
-printf("%d PUSH !\n", stack[top]);
+		printf("%d PUSH !\n", stack[top]);
 	}
  int pop(){
-printf("%d POP !\n", stack[top]);
+		printf("%d POP !\n", stack[top]);
 		return stack[top--];
 	}
  void printStack(){
-printf("\n-----STACK LIST-----\n");
+		printf("\n-----STACK LIST-----\n");
 		for(int i=top; i>=0; i--){
-printf("%d\n",stack[i]);
+		printf("%d\n",stack[i]);
 		}
-printf("-----END OF LIST-----\n");
+		printf("-----END OF LIST-----\n");
 	}
 
 

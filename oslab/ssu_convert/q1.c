@@ -4,7 +4,7 @@
 
 int main(void){
 
-printf("Enter the number : ");
+		printf("Enter the number : ");
 		int num;
 		scanf("%d",&num);
 		int even=0, odd=0;
@@ -16,8 +16,8 @@ printf("Enter the number : ");
 				odd+=i;
 			}
 		}
-printf("Sum of Even number : %d\n", even);
-printf("Sum of Odd number : %d\n", odd);
+		printf("Sum of Even number : %d\n", even);
+		printf("Sum of Odd number : %d\n", odd);
 		exit(0);
 	}
 
