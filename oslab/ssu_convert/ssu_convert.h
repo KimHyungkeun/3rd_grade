@@ -30,6 +30,7 @@ int nextToken;
 int stackc_flag = 0;
 int tab_flag = 0;
 int bracket_delete_flag = 0;
+int return_to_exit_flag = 0;
 
 FILE* fp;
 FILE* newfp;
@@ -78,4 +79,5 @@ int lex(); //식을 토큰별로 나누는 함수
 void convert_java_to_c(int* opt_flag);
 void option_java_to_c(int* opt_flag);
 void create_makefile();
+void find_header();
 
