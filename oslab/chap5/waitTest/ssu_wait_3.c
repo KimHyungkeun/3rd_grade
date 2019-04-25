@@ -20,7 +20,7 @@ int main(void) {
 
 	while (wait((int *)0) != -1);
 
-	printf("parent : all childeren terminated\n"); //자식프로세스 kill
+	printf("parent : all children terminated\n"); //자식프로세스 kill
 
 	gettimeofday(&end, NULL);
 	ssu_runtime(&begin, &end); //프로그램 실행시간 측정
