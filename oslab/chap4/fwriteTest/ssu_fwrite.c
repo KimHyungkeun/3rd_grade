@@ -34,7 +34,9 @@ int main(void) {
 		gettimeofday(&end_t, NULL);
 		ssu_runtime(&begin_t, &end_t);
 		exit(1);
-	}
+	}	
+	
+	printf("%ld %ld\n", sizeof(struct ssu_id), sizeof(test1));
 
 	fclose(fp);
 
@@ -51,7 +53,6 @@ int main(void) {
 		ssu_runtime(&begin_t, &end_t);
 		exit(1);
 	}
-
 	printf("\nID     name\n");
 	printf(" ============\n");
 	printf("%d       %s\n", test2.id, test2.name);
