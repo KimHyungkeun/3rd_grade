@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
 	strcpy(filename,argv[1]);
 
-	while ((opt = getopt(argc, argv, "jcflr")) != -1) { //옵션은 j,c,f,l,r 5종류가 있다
+	while ((opt = getopt(argc, argv, "jcflp")) != -1) { //옵션은 j,c,f,l,p 5종류가 있다
     switch(opt) {
 
         case 'j' : // 옵션
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
             opt_flag[3] = 1;
             break;
 		
-		case 'r' : // 옵션
+		case 'p' : // 옵션
             opt_flag[4] = 1;
             break;
 		
@@ -50,7 +50,9 @@ int main(int argc, char* argv[]) {
 
 	convert_java_to_c(opt_flag);
     option_java_to_c(opt_flag);
+    find_header();
     create_makefile();
+    
 	
 	gettimeofday(&end_t,NULL);
     ssu_runtime(&begin_t, &end_t);
@@ -66,13 +68,18 @@ void convert_java_to_c(int* opt_flag) {
     char *sub_ptr;
     char tmp_str[150];
     char tabadd_str[100];
+    char c_buffer_backup[BUFFER_SIZE];
 
     int ptr_count = 0;
     int sub_ptr_count = 0;
     int chr=0;
+    int idx=0;
+    int print_count = 0;
+    int c_buffer_length;
+    int total_length = 0;
     
     
-    //strcpy(filename, "q2.java");
+    
     if((fp = fopen(filename, "r")) == NULL) {
 		fprintf(stderr, "open error for %s\n", filename);
 		exit(1);
@@ -89,22 +96,22 @@ void convert_java_to_c(int* opt_flag) {
     
     fread(buffer, BUFFER_SIZE,1,fp);
 	fseek(fp, 0 , SEEK_SET);
-
+  
   
     while(buffer[chr] != '\n') {
         chr++;
     }
     
    
-    //chr = 0;
+    
+     printf("%s converting is finished!\n",c_filename);
 
-    //buffer[statbuf.st_size - 1] = ' ';
+
     ptr = strtok(buffer, "\n");
     while (ptr != NULL)              
     {
         strcpy(tmp_str, ptr);
-        //printf("\\n count : %d\n", chr);
-        //printf("TOKEN : %s\n", tmp_str);
+        
 
         if(strcmp(ptr,"}") == 0) {
             strcpy(tmp_str, "\0");
@@ -115,14 +122,16 @@ void convert_java_to_c(int* opt_flag) {
             bracket_delete_flag = 0;
         }
 
-        //printf("%d\n", strcmp(tmp_str, "import java.util.Scanner;"));
+        
         
         if(strstr(tmp_str, "import java.util.Scanner;") != NULL) {
-            strcpy(tmp_str, "#include <stdio.h>\n#include <stdlib.h>\n");
+           
+            strcpy(tmp_str, "\0");
         }
 
         else if(strstr(tmp_str, "import java.io.File;") != NULL) {
-            strcpy(tmp_str, "#include <stdio.h>\n#include <stdlib.h>\n#include <unistd.h>\n#include <fcntl.h>");
+            
+            strcpy(tmp_str, "\0");
         }
 
         else if(strstr(tmp_str, "import") != NULL) {
@@ -150,26 +159,35 @@ void convert_java_to_c(int* opt_flag) {
             bracket_delete_flag = 1;
         }
 
-        else if(strstr(tmp_str, "File file = new File(\"q3java.txt\");") != NULL) {
+        else if(strstr(tmp_str, "File file = new File") != NULL) {
             strcpy(tmp_str, "\t\tFILE* file;\n\t\tif((file = fopen(\"q3java.txt\", \"w+\")) == NULL){\n\t\t\tfprintf(stderr,\"open error\\n\");\n\t\t\texit(1);\n\t\t}");
+            if(opt_flag[4] == 1) {
+                printf("File file -> fopen\n");
+            }
         }
 
         else if(strstr(tmp_str, "FileWriter writer = new FileWriter(file, false);") != NULL) {
             strcpy(tmp_str, "\0");
+            if(opt_flag[4] == 1) {
+                printf("FileWriter -> fprintf\n");
+            }
         }
 
         else if(strstr(tmp_str, "writer.write(\"2019 OSLAB\\n\");") != NULL) {
-            //printf("Check\n");
+            
             strcpy(tmp_str, "\t\tfprintf(file, \"%s\" ,\"2019 OSLAB\\n\");");
         }
 
         else if(strstr(tmp_str, "writer.write(\"Linux System Programming\\n\");") != NULL) {
-             //printf("Check\n");
+             
             strcpy(tmp_str, "\t\tfprintf(file, \"%s\" ,\"Linux System Programming\\n\");");
         }
         
         else if(strstr(tmp_str, "writer.flush();") != NULL) {
             strcpy(tmp_str, "\t\tfflush(stdin);");
+            if(opt_flag[4] == 1) {
+                printf("writer.flush() -> fflush(stdin)\n");
+            }
         }
 
         else if(strstr(tmp_str, "if(writer != null)") != NULL) {
@@ -189,7 +207,8 @@ void convert_java_to_c(int* opt_flag) {
         }
 
         else if(strstr(tmp_str, "class Stack") != NULL) {
-            strcpy(tmp_str, "#include <stdio.h>\n#include <stdlib.h>\n#include <unistd.h>\n#include <fcntl.h>\n");
+            
+            strcpy(tmp_str, "\0");
             stackc_flag = 1;
         }
 
@@ -207,14 +226,12 @@ void convert_java_to_c(int* opt_flag) {
         
         }
 
-        else if(strstr(tmp_str, "public static void main(String args[])") != NULL) {
+        else if(strstr(tmp_str, "public static void main") != NULL) {
             strcpy(tmp_str, "int main(void){");
             return_to_exit_flag = 1;
-        }
-
-        else if(strstr(tmp_str, "public static void main(String[] args)") != NULL) {
-            strcpy(tmp_str, "int main(void){");
-            return_to_exit_flag = 1;
+            if(opt_flag[4] == 1) {
+                printf("public static void main -> int main(void)\n");
+            }
         }
 
         else if(strstr(tmp_str, "Scanner scn = new Scanner(System.in)") != NULL) {
@@ -225,18 +242,28 @@ void convert_java_to_c(int* opt_flag) {
              tab_flag = 1;
              strcpy(tmp_str, sub_ptr + 11);
 
+            if(opt_flag[4] == 1 && print_count < 1) {
+                printf("System.out.printf -> printf\n");
+                print_count++;
+            }
+
              if(strstr(tmp_str, "st.peek") != NULL) {
                 strcpy(tmp_str, "printf(\"TOP OF STACK : %d\\n\", peek());");
                 tab_flag = 0;
              }
+
+             
         }
 
         else if((sub_ptr = strstr(tmp_str, "st.")) != NULL) {
             strcpy(tmp_str, sub_ptr+3);
         }
 
-        else if(strstr(tmp_str, "num = scn.nextInt();") != NULL) {
+        else if(strstr(tmp_str, "scn.nextInt();") != NULL) {
             strcpy(tmp_str, "\t\tscanf(\"%d\",&num);");
+            if(opt_flag[4] == 1) {
+                printf("scn.nextInt -> scanf\n");
+            }
         }
 
         else if(strstr(tmp_str, "return") != NULL) {
@@ -256,33 +283,33 @@ void convert_java_to_c(int* opt_flag) {
         fprintf(newfp, "%s\n", tmp_str);
         }
 
-        if(opt_flag[4] == 1) {
-        printf("%s\n",tmp_str);
-        sleep(1);
-        }
-        //printf("ptr_count : %d\n", ptr_count);
+        
         ptr_count ++;
         ptr = strtok(NULL, "\n");    
     }
- 
+
     fclose(newfp);
     fclose(fp);
 
-
     if(stackc_flag == 1) {
 
-        //printf("%s\n",c_filename);
-        if((stackc_fp = fopen(c_filename, "r")) == NULL) {
+       
+
+        if((newfp = fopen(c_filename, "r+")) == NULL) {
         	fprintf(stderr, "creat error for %s\n", c_filename);
             gettimeofday(&end_t,NULL);
     	    ssu_runtime(&begin_t, &end_t);
             exit(1);
         }
+        fread(c_buffer, BUFFER_SIZE, 1 ,newfp);
+        fclose(newfp);
 
-        fread(c_buffer, BUFFER_SIZE, 1 ,stackc_fp);
-        //printf("%s\n", c_buffer);
-	    fseek(stackc_fp, 0 , SEEK_SET);
-        fclose(stackc_fp);
+        if((newfp = fopen(c_filename, "w+")) == NULL) {
+        	fprintf(stderr, "creat error for %s\n", c_filename);
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
+            exit(1);
+        }
 
         if((stackc_fp = fopen("Stack.c", "w+")) == NULL) {
         	fprintf(stderr, "creat error for Stack.c\n");
@@ -290,22 +317,35 @@ void convert_java_to_c(int* opt_flag) {
     	    ssu_runtime(&begin_t, &end_t);
             exit(1);
         }
+
         
+        strcpy(c_buffer_backup, c_buffer);
         ptr = strtok(c_buffer, "\n");
         while(ptr != NULL){
-            if(strstr(ptr,"int main(void){") != NULL)
+            
+            c_buffer_length = strlen(ptr);
+            total_length += c_buffer_length;
+           
+
+            if(strstr(ptr,"int main(void){") != NULL){
                 break;
+            }
+
             fprintf(stackc_fp,"%s\n", ptr);
             ptr = strtok(NULL,"\n");
+
+            
         }
 
+        strcpy(c_buffer, c_buffer_backup);
+        
+        fprintf(newfp, "%s", c_buffer + idx);
+         fclose(newfp);
         fclose(stackc_fp);
-
         
     }
 
-    //printf("CheckPoint\n");
-    printf("%s converting is finished!\n",c_filename);
+    
 
 }
 
@@ -430,17 +470,216 @@ void option_java_to_c(int* opt_flag) {
 	fseek(fp, 0 , SEEK_SET);
     fseek(newfp, 0 , SEEK_SET);
 	
-	/*getChar(); //전채 식에서 문자들을 하나씩 받는다 
-        do {
-            lex(); //각 식들의 요소 하나하나를 토큰화하여 판별한다.  
-        }while( nextToken != EOF);*/
+	
 
 	fclose(fp);
     fclose(newfp);
 	
 }
 
+void find_header() {
 
+    char* ptr;
+    char* sub_ptr;
+    char tmp_str[150] = "\0";
+    int include_sets_length;
+    int c_buffer_length;
+    int stackc_length;
+    int idx = 0, jdx = 0;
+    int line_count = 0;
+    int total_length = 0;
+
+    char include_buffer[5][100];
+    char include_sets_buffer[100] = "\0";
+    char c_buffer_backup[BUFFER_SIZE] = "\0";
+
+
+    if((newfp = fopen(c_filename, "w+")) == NULL) {
+		fprintf(stderr, "open error for %s\n",c_filename);
+		gettimeofday(&end_t,NULL);
+    	ssu_runtime(&begin_t, &end_t);
+		exit(1);
+	}
+
+
+    if((headfp = fopen("header", "r")) == NULL) {
+		fprintf(stderr, "open error for %s\n",c_filename);
+		gettimeofday(&end_t,NULL);
+    	ssu_runtime(&begin_t, &end_t);
+		exit(1);
+	}
+
+    
+    //printf("%s", c_buffer);
+    fread(c_buffer, BUFFER_SIZE, 1, newfp);
+    fread(header_buffer, BUFFER_SIZE, 1, headfp);
+
+    
+    if(strstr(c_buffer, "printf(") != NULL) {
+        header_flag[0] = 1;
+ 
+    }
+
+    if(strstr(c_buffer, "scanf(") != NULL) {
+        header_flag[1] = 1;
+    }
+
+    if(strstr(c_buffer, "open(") != NULL) {
+        header_flag[2] = 1;
+    }
+
+    if(strstr(c_buffer, "read(") != NULL) {
+        header_flag[3] = 1;
+    }
+
+    if(strstr(c_buffer, "exit(") != NULL) {
+        header_flag[4] = 1;
+    }
+
+
+    idx = 0;
+    ptr = strtok(header_buffer, "\n");
+
+    while(ptr != NULL) {
+      
+        strcpy(include_buffer[idx], ptr);
+        
+        ptr = strtok(NULL, "\n");
+        idx++;
+
+    }
+
+    for(int i = 0 ; i < 5 ; i++) {
+        
+        if(header_flag[i]) {
+
+            if(i == 2) {
+                ptr = strtok(include_buffer[i], "#");
+
+                for(i = 0 ;i < 3 ; i++) {
+                ptr = strtok(NULL, "#");
+                strcpy(tmp_str, ptr);
+                sprintf(include_buffer[i], "%s%s       %s", "#",tmp_str,"\n");
+                strcat(include_sets_buffer, include_buffer[i]);
+                }
+            }
+
+            else { 
+            ptr = strtok(include_buffer[i], "#");
+            ptr = strtok(NULL, "#");
+            strcpy(tmp_str, ptr);
+            sprintf(include_buffer[i], "%s%s    %s", "#",tmp_str,"\n");
+            strcat(include_sets_buffer, include_buffer[i]);
+            }
+        }
+
+        if(header_flag[0] == 1)
+            header_flag[1] = 0;
+        
+        if(header_flag[1] == 1)
+            header_flag[0] = 0;
+
+        header_flag[i] = 0;
+    }
+
+    if(stackc_flag) {
+
+        if((stackc_fp = fopen("Stack.c", "r")) == NULL) {
+		fprintf(stderr, "open error for %s\n",c_filename);
+		gettimeofday(&end_t,NULL);
+    	ssu_runtime(&begin_t, &end_t);
+		exit(1);
+	    }
+        fread(stackc_buffer, sizeof(stackc_buffer), 1, stackc_fp);
+        fclose(stackc_fp);
+
+        if((stackc_fp = fopen("Stack.c", "w+")) == NULL) {
+		fprintf(stderr, "open error for %s\n",c_filename);
+		gettimeofday(&end_t,NULL);
+    	ssu_runtime(&begin_t, &end_t);
+		exit(1);
+	    }
+
+        printf("c_buffer : %ld\n", strlen(c_buffer));
+
+        
+        ptr = strtok(c_buffer, "\n");
+        while(ptr != NULL) {
+
+            if(main_flag) {
+                sprintf(tmp_str, "%s%s", ptr, "\n");
+                strcat(c_buffer_backup, tmp_str);
+                strcpy(tmp_str, "\0");
+                printf("%s\n", ptr);
+                
+            }
+
+
+            if(strstr(ptr, "int main") != NULL) {
+                
+                sprintf(tmp_str, "\n\n%s%s", ptr, "\n");
+                strcpy(c_buffer_backup, tmp_str);
+                main_flag = 1;
+                strcpy(tmp_str, "\0");
+                
+            }
+
+            ptr = strtok(NULL, "\n");
+        }
+        strcpy(c_buffer, c_buffer_backup);
+        
+        
+        char stack_header[] = "#include \"Stack.c\"";
+        stackc_length = strlen(stackc_buffer);
+        include_sets_length = strlen(include_sets_buffer);
+        c_buffer_length = strlen(c_buffer);
+
+        
+
+        for(int i = stackc_length - 1 ; i >= 0 ; --i) {
+        stackc_buffer[i + include_sets_length] = stackc_buffer[i];
+        }
+
+        for(int i = 0 ; i< include_sets_length ; ++i) {
+        stackc_buffer[i] = include_sets_buffer[i];
+        }
+
+        for(int i = c_buffer_length ; i >= 0 ; --i) {
+        c_buffer[i + strlen(stack_header)] = c_buffer[i];
+        
+        }
+
+        for(int i = 0 ; i < strlen(stack_header); ++i) {
+        c_buffer[i] = stack_header[i];
+        }
+
+
+        fprintf(newfp, "%s", c_buffer);
+        fprintf(stackc_fp, "%s", stackc_buffer);
+        printf("c_buffer_length %ld\n", strlen(c_buffer));
+        fclose(stackc_fp);
+    }
+
+    else {
+    include_sets_length = strlen(include_sets_buffer);
+    c_buffer_length = strlen(c_buffer);
+
+    for(int i = c_buffer_length - 1 ; i > 0 ; --i) {
+        c_buffer[i + include_sets_length] = c_buffer[i];
+    }
+
+    for(int i = 0 ; i < include_sets_length ; ++i) {
+        c_buffer[i] = include_sets_buffer[i];
+    }
+
+    fprintf(newfp, "%s", c_buffer);
+    }
+
+    
+    fclose(headfp);
+    fclose(newfp);
+
+}
 
 void create_makefile() {
 
@@ -451,14 +690,16 @@ void create_makefile() {
 		exit(1);
 	}
 
+    fprintf(makefp,"%s","gcc :\n\tgcc ssu_convert.c -o ssu_convert\n");
+    fprintf(makefp,"%s","ssu_convert1 :\n\t./ssu_convert q1.java\n");
+    fprintf(makefp,"%s","ssu_convert2 :\n\t./ssu_convert q2.java\n");
+    fprintf(makefp,"%s","ssu_convert3 :\n\t./ssu_convert q3.java\n");
     fprintf(makefp,"%s","q1 :\n\tgcc q1.c -o q1\n");
-    fprintf(makefp,"%s","q2 :\n\tgcc q2.c Stack.c -o q2\n");
+    fprintf(makefp,"%s","q2 :\n\tgcc q2.c -o q2\n");
     fprintf(makefp,"%s","q3 :\n\tgcc q3.c -o q3\n");
 
     fclose(makefp);
 }
 
-void find_header() {
 
-}
 

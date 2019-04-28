@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <stdio.h>    
 #define STACK_SIZE 10
 int peek();
 void push(int);
