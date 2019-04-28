@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
 	convert_java_to_c(opt_flag);
     option_java_to_c(opt_flag);
-    find_header();
+    find_header(opt_flag);
     create_makefile();
     
 	
@@ -382,9 +382,12 @@ void option_java_to_c(int* opt_flag) {
 
     if(opt_flag[1] == 1) { //option c
 
-        printf("%s", c_buffer);
+        if(stackc_flag == 1)
+            ;
+        else
+            printf("%s", c_buffer);
 
-         if(stackc_flag == 1) {
+         /*if(stackc_flag == 1) {
 
             memset(c_buffer, 0, BUFFER_SIZE);
 
@@ -397,7 +400,7 @@ void option_java_to_c(int* opt_flag) {
             printf("%s", c_buffer);
             fclose(stackc_fp);
             }
-        }
+        }*/
 	}
 
 	if(opt_flag[2] == 1) { //option f
@@ -477,7 +480,7 @@ void option_java_to_c(int* opt_flag) {
 	
 }
 
-void find_header() {
+void find_header(int* opt_flag) {
 
     char* ptr;
     char* sub_ptr;
@@ -600,8 +603,6 @@ void find_header() {
 		exit(1);
 	    }
 
-        printf("c_buffer : %ld\n", strlen(c_buffer));
-
         
         ptr = strtok(c_buffer, "\n");
         while(ptr != NULL) {
@@ -610,7 +611,6 @@ void find_header() {
                 sprintf(tmp_str, "%s%s", ptr, "\n");
                 strcat(c_buffer_backup, tmp_str);
                 strcpy(tmp_str, "\0");
-                printf("%s\n", ptr);
                 
             }
 
@@ -656,7 +656,6 @@ void find_header() {
 
         fprintf(newfp, "%s", c_buffer);
         fprintf(stackc_fp, "%s", stackc_buffer);
-        printf("c_buffer_length %ld\n", strlen(c_buffer));
         fclose(stackc_fp);
     }
 
@@ -673,6 +672,12 @@ void find_header() {
     }
 
     fprintf(newfp, "%s", c_buffer);
+    }
+
+    if(opt_flag[1] == 1) {   
+        printf("%s", stackc_buffer);
+        printf("%s", c_buffer);
+
     }
 
     

@@ -8,8 +8,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-#define BUFFER_SIZE 4096
-#define HEADER_SIZE 2048
+#define BUFFER_SIZE 4096 //
+#define HEADER_SIZE 2048 //
 
 struct timeval begin_t, end_t;
 struct stat statbuf;
@@ -34,22 +34,14 @@ int return_to_exit_flag = 0;
 int header_flag[5] = {0,0,0,0,0};
 int main_flag = 0;
 
-
-
 FILE* fp;
 FILE* newfp;
 FILE* stackc_fp;
 FILE* makefp;
 FILE* headfp;
 
-
-void addChar(); //문자를 추가하는 함수
-void getChar(); //식으로부터 문자를 받아들여오는 함수
-void getNonBlank(); //공백문자 처리 함수
-int lex(); //식을 토큰별로 나누는 함수
-
-void convert_java_to_c(int* opt_flag);
+void convert_java_to_c(int* opt_flag); 
 void option_java_to_c(int* opt_flag);
 void create_makefile();
-void find_header();
+void find_header(int* opt_flag);
 
