@@ -4,43 +4,43 @@
 int main(int argc, char* argv[]) {
 
    int opt;
-   int opt_flag[5] = {0,0,0,0,0};
+   int opt_flag[5] = {0,0,0,0,0}; //옵션 플래그
 
 	gettimeofday(&begin_t, NULL);
 
 	if(argc < 2) {
-		fprintf(stderr, "Usage : %s javafile [option]\n", argv[0]);
+		fprintf(stderr, "Usage : %s javafile [option]\n", argv[0]); //비정상적인 명령어 입력시 에러 출력
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
 	}
 
-	strcpy(filename,argv[1]);
+	strcpy(filename,argv[1]); //바꾸려는 자바파일의 이름을 넣음
 
 	while ((opt = getopt(argc, argv, "jcflp")) != -1) { //옵션은 j,c,f,l,p 5종류가 있다
     switch(opt) {
 
         case 'j' : // 옵션
-            opt_flag[0] = 1;
+            opt_flag[0] = 1; //자바파일 보이기
             break;
          
         case 'c' : // 옵션
-            opt_flag[1] = 1;
+            opt_flag[1] = 1; //변경된 c파일 보이기
             break;
         
         case 'f' : // 옵션
-            opt_flag[2] = 1;
+            opt_flag[2] = 1; //파일 크기 출력
             break;
 
         case 'l' : // 옵션
-            opt_flag[3] = 1;
+            opt_flag[3] = 1; //라인수 출력
             break;
 		
 		case 'p' : // 옵션
-            opt_flag[4] = 1;
+            opt_flag[4] = 1; //변경된 함수들을 보여줌
             break;
 		
-		case '?':
+		case '?': //잘못된 옵션 입력시 종료
 			gettimeofday(&end_t,NULL);
     		ssu_runtime(&begin_t, &end_t);
 			exit(1);
@@ -48,10 +48,10 @@ int main(int argc, char* argv[]) {
     }
    }
 
-	convert_java_to_c(opt_flag);
-    option_java_to_c(opt_flag);
-    find_header(opt_flag);
-    create_makefile();
+	convert_java_to_c(opt_flag); //자바를 c로 바꾸기
+    option_java_to_c(opt_flag); //옵션 처리
+    find_header(opt_flag); //헤더파일 찾기
+    create_makefile(); //makefile 만들기
     
 	
 	gettimeofday(&end_t,NULL);
@@ -387,20 +387,6 @@ void option_java_to_c(int* opt_flag) {
         else
             printf("%s", c_buffer);
 
-         /*if(stackc_flag == 1) {
-
-            memset(c_buffer, 0, BUFFER_SIZE);
-
-            if((stackc_fp = fopen("Stack.c","r")) == NULL){
-            fprintf(stderr, "No Stack.c file\n");
-            }
-
-            else {
-            fread(c_buffer, BUFFER_SIZE, 1, stackc_fp);
-            printf("%s", c_buffer);
-            fclose(stackc_fp);
-            }
-        }*/
 	}
 
 	if(opt_flag[2] == 1) { //option f
