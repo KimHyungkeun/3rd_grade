@@ -640,7 +640,6 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
     if(stackc_flag) {
         if((stackc_fp = fopen("Stack.c", "r")) == NULL) { // Stack.c을 읽기모드로 연다
-         printf("CheckPoint\n");
 		fprintf(stderr, "open error for %s\n","Stack.c");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
