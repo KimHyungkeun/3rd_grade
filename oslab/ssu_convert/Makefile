@@ -1,11 +1,17 @@
 gcc :
 	gcc ssu_convert.c -o ssu_convert
-ssu_convert1 :
+convert1 :
 	./ssu_convert q1.java
-ssu_convert2 :
+convert2 :
 	./ssu_convert q2.java
-ssu_convert3 :
+convert3 :
 	./ssu_convert q3.java
+opt1 :
+	./ssu_convert q1.java -l
+opt2 :
+	./ssu_convert q2.java -f
+opt3 :
+	./ssu_convert q3.java -p
 q1 :
 	gcc q1.c -o q1
 q2 :
