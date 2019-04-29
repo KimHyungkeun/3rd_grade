@@ -380,15 +380,7 @@ void option_java_to_c(int* opt_flag) {
 		printf("%s", buffer); //자바파일 내용 보기
 	}
 
-    if(opt_flag[1] == 1) { //option c
-
-        if(stackc_flag == 1) //만약 stack.c 파일이 생성되는 파일이면 이 단계는 건너뜀
-            ;
-        else
-            printf("%s", c_buffer); // c파일 내용 보여줌
-
-	}
-
+   
 	if(opt_flag[2] == 1) { //option f
 		stat(filename, &statbuf);
 		printf("%s file size is %ld bytes.\n", filename, statbuf.st_size); //자바파일 용량 출력
@@ -663,8 +655,13 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     fprintf(newfp, "%s", c_buffer);
     }
 
-    if(opt_flag[1] == 1) {   //p 옵션 활성화 시 
+    if(opt_flag[1] == 1 && stackc_flag == 1) {   //c 옵션 활성화 시 그리고 스택플래그 활성화 시
         printf("%s", stackc_buffer); // stack.c 내용 출력
+        printf("%s", c_buffer); // c파일 내용 출력
+
+    }
+
+    else if(opt_flag[1] == 1) {   //c 옵션 활성화 시 
         printf("%s", c_buffer); // c파일 내용 출력
 
     }
