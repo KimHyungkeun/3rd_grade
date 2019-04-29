@@ -700,9 +700,12 @@ void create_makefile() { // makefile을 만들기 위한 함수
 	}
 
     fprintf(makefp,"%s","gcc :\n\tgcc ssu_convert.c -o ssu_convert\n"); // ssu_convert.c 컴파일
-    fprintf(makefp,"%s","ssu_convert1 :\n\t./ssu_convert q1.java\n"); // q1.java 변환
-    fprintf(makefp,"%s","ssu_convert2 :\n\t./ssu_convert q2.java\n"); // q2.java 변환
-    fprintf(makefp,"%s","ssu_convert3 :\n\t./ssu_convert q3.java\n"); // q3.java 변환
+    fprintf(makefp,"%s","convert1 :\n\t./ssu_convert q1.java\n"); // q1.java 변환
+    fprintf(makefp,"%s","convert2 :\n\t./ssu_convert q2.java\n"); // q2.java 변환
+    fprintf(makefp,"%s","convert3 :\n\t./ssu_convert q3.java\n"); // q3.java 변환
+    fprintf(makefp,"%s","opt1 :\n\t./ssu_convert q1.java -l\n"); // l옵션
+    fprintf(makefp,"%s","opt2 :\n\t./ssu_convert q2.java -f\n"); // f옵션
+    fprintf(makefp,"%s","opt3 :\n\t./ssu_convert q3.java -p\n"); // p옵션
     fprintf(makefp,"%s","q1 :\n\tgcc q1.c -o q1\n"); // q1.c 컴파일
     fprintf(makefp,"%s","q2 :\n\tgcc q2.c -o q2\n"); // q2.c 컴파일
     fprintf(makefp,"%s","q3 :\n\tgcc q3.c -o q3\n"); // q3.c 컴파일
