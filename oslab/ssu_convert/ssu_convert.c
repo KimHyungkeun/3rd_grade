@@ -293,8 +293,6 @@ void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
 
     if(stackc_flag == 1) { //만약 stack.c 플래그가 활성화 되어있다면
 
-       
-
         if((newfp = fopen(c_filename, "r+")) == NULL) {
         	fprintf(stderr, "creat error for %s\n", c_filename); //해당 파일 내용을 버퍼에 담기위해 읽기모드로 연다
             gettimeofday(&end_t,NULL);
@@ -384,18 +382,17 @@ void option_java_to_c(int* opt_flag) {
 	if(opt_flag[2] == 1) { //option f
 		stat(filename, &statbuf);
 		printf("%s file size is %ld bytes.\n", filename, statbuf.st_size); //자바파일 용량 출력
-        stat(c_filename, &statbuf);
-        printf("%s file size is %ld bytes.\n", c_filename, statbuf.st_size); // c파일 용량 출력
+        
         
         if(stackc_flag == 1) {
 
             if((stackc_fp = fopen("Stack.c","r")) == NULL){ 
             fprintf(stderr, "No Stack.c file\n");
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
             }
 
             else {
-            stat("Stack.c", &statbuf);
-            printf("%s file size is %ld bytes.\n", "Stack.c", statbuf.st_size);
             fclose(stackc_fp);
             }
         }
@@ -412,43 +409,8 @@ void option_java_to_c(int* opt_flag) {
     		}
 		
 		printf("%s line is %d lines\n", filename, line_count); // 자바파일 라인 수 출력
-
         line_count = 0;
-
-        while (!feof(newfp)){//파일의 끝을 만나지 않았다면 반복
-        	ch = fgetc(newfp);//파일에서 하나의 문자를 읽음
-        		if (ch == '\n')//개행 문자일 때
-        		{
-            	line_count++;//라인 번호 1 증가
-        		}
-    		}
-		
-		printf("%s line is %d lines\n", c_filename, line_count); // c파일 라인 수 출력
-
-        line_count = 0;
-        if(stackc_flag == 1) {
-
-            if((stackc_fp = fopen("Stack.c","r")) == NULL){ //스택파일 읽기모드로 오픈
-            fprintf(stderr, "No Stack.c file\n");
-            gettimeofday(&end_t,NULL);
-    	    ssu_runtime(&begin_t, &end_t);
-		    exit(1);
-            }
-
-            else {
-                while (!feof(stackc_fp)){//파일의 끝을 만나지 않았다면 반복
-        	    ch = fgetc(stackc_fp);//파일에서 하나의 문자를 읽음
-        		    if (ch == '\n')//개행 문자일 때
-        		    {
-            	    line_count++;//라인 번호 1 증가
-        		    }
-    		    }
-            }
-
-            printf("%s line is %d lines\n", "Stack.c", line_count); //라인 수 출력
-            fclose(stackc_fp);
-        }
-		
+        
 	}
 
 	fseek(fp, 0 , SEEK_SET);
@@ -655,7 +617,65 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     fprintf(newfp, "%s", c_buffer);
     }
 
-    if(opt_flag[1] == 1 && stackc_flag == 1) {   //c 옵션 활성화 시 그리고 스택플래그 활성화 시
+    fclose(headfp);
+    fclose(newfp);
+
+  
+
+    if(opt_flag[2] == 1 && stackc_flag) { //option f
+    stat("Stack.c", &statbuf);
+    printf("%s file size is %ld bytes.\n", "Stack.c", statbuf.st_size); // Stack.c파일 용량 출력
+    }
+
+    if(opt_flag[2] == 1) { //option f
+        stat(c_filename, &statbuf);
+        printf("%s file size is %ld bytes.\n", c_filename, statbuf.st_size); // c파일 용량 출력
+    }
+
+    if((newfp = fopen(c_filename, "r")) == NULL) {
+        	fprintf(stderr, "creat error for %s\n", c_filename); //해당 파일 내용을 버퍼에 담기위해 읽기모드로 연다
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
+            exit(1);
+    }
+
+    if((stackc_fp = fopen("Stack.c", "r")) == NULL) { // Stack.c을 쓰기 및 수정모드로 오픈한다
+		fprintf(stderr, "open error for %s\n",c_filename);
+		gettimeofday(&end_t,NULL);
+    	ssu_runtime(&begin_t, &end_t);
+		exit(1);
+	    }
+
+    if(opt_flag[3] == 1 && stackc_flag) { //option l
+    fseek(stackc_fp, 0 , SEEK_SET);
+
+    line_count = 0;
+    while (!feof(stackc_fp)){//파일의 끝을 만나지 않았다면 반복
+        	    ch = fgetc(stackc_fp);//파일에서 하나의 문자를 읽음
+        		    if (ch == '\n')//개행 문자일 때
+        		    {
+            	    line_count++;//라인 번호 1 증가
+        		    }
+    		    }
+    printf("%s line is %d lines\n", "Stack.c", line_count); //라인 수 출력
+    }
+
+    if(opt_flag[3] == 1) { //option l
+    fseek(newfp, 0 , SEEK_SET);
+    line_count = 0;
+
+        while (!feof(newfp)){//파일의 끝을 만나지 않았다면 반복
+        	ch = fgetc(newfp);//파일에서 하나의 문자를 읽음
+        		if (ch == '\n')//개행 문자일 때
+        		{
+            	line_count++;//라인 번호 1 증가
+        		}
+    		}
+		
+		printf("%s line is %d lines\n", c_filename, line_count); // c파일 라인 수 출력
+    }
+
+    if(opt_flag[1] == 1 && stackc_flag) {   //c 옵션 활성화 시 그리고 스택플래그 활성화 시
         printf("%s", stackc_buffer); // stack.c 내용 출력
         printf("%s", c_buffer); // c파일 내용 출력
 
@@ -666,9 +686,8 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
     }
 
-    
-    fclose(headfp);
     fclose(newfp);
+    fclose(stackc_fp);
 
 }
 
