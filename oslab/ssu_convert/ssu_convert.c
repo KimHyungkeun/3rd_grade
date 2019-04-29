@@ -343,8 +343,6 @@ void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
         
     }
 
-    
-
 }
 
 void option_java_to_c(int* opt_flag) {
@@ -386,10 +384,11 @@ void option_java_to_c(int* opt_flag) {
         
         if(stackc_flag == 1) {
 
-            if((stackc_fp = fopen("Stack.c","r")) == NULL){ 
-            fprintf(stderr, "No Stack.c file\n");
+            if((stackc_fp = fopen("Stack.c","r")) == NULL){ //Stack.c 파일을 오픈한다
+            fprintf(stderr, "No Stack.c file\n"); //없으면 에러 출력
             gettimeofday(&end_t,NULL);
     	    ssu_runtime(&begin_t, &end_t);
+            exit(1);
             }
 
             else {
