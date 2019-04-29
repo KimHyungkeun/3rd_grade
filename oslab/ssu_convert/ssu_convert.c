@@ -625,21 +625,21 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
         
 
-        for(int i = stackc_length - 1 ; i >= 0 ; --i) {
-        stackc_buffer[i + include_sets_length] = stackc_buffer[i];
+        for(int i = stackc_length - 1 ; i >= 0 ; --i) { //헤더를 넣기위해 파일내용들을 헤더문자열 길이만큼 민다.
+        stackc_buffer[i + include_sets_length] = stackc_buffer[i]; 
         }
 
-        for(int i = 0 ; i< include_sets_length ; ++i) {
-        stackc_buffer[i] = include_sets_buffer[i];
+        for(int i = 0 ; i< include_sets_length ; ++i) { 
+        stackc_buffer[i] = include_sets_buffer[i]; //헤더를 추가한다. (스택파일에 라이브러리가 들어갈 예정)
         }
 
         for(int i = c_buffer_length ; i >= 0 ; --i) {
-        c_buffer[i + strlen(stack_header)] = c_buffer[i];
+        c_buffer[i + strlen(stack_header)] = c_buffer[i]; //헤더를 넣기위해 파일내용들을 헤더문자열 길이만큼 민다.
         
         }
 
         for(int i = 0 ; i < strlen(stack_header); ++i) {
-        c_buffer[i] = stack_header[i];
+        c_buffer[i] = stack_header[i]; //헤더를 추가한다 . "Stack.c" 헤더를 추가할 예정
         }
 
 
