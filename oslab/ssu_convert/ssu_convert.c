@@ -448,7 +448,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
 
     if((headfp = fopen("header", "r")) == NULL) { // 헤더파일을 읽기모드로 오픈한다
-		fprintf(stderr, "open error for %s\n",c_filename);
+		fprintf(stderr, "open error for %s\n","header");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
@@ -530,7 +530,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     if(stackc_flag) { //스택 플래그 활성화 시
 
         if((stackc_fp = fopen("Stack.c", "r")) == NULL) { // Stack.c을 읽기모드로 오픈한다
-		fprintf(stderr, "open error for %s\n",c_filename);
+		fprintf(stderr, "open error for %s\n","Stack.c");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
@@ -539,7 +539,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
         fclose(stackc_fp); //파일을 닫는다.
 
         if((stackc_fp = fopen("Stack.c", "w+")) == NULL) { // Stack.c을 쓰기 및 수정모드로 오픈한다
-		fprintf(stderr, "open error for %s\n",c_filename);
+		fprintf(stderr, "open error for %s\n","Stack.c");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
@@ -638,12 +638,15 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
             exit(1);
     }
 
-    if((stackc_fp = fopen("Stack.c", "r")) == NULL) { // Stack.c을 쓰기 및 수정모드로 오픈한다
-		fprintf(stderr, "open error for %s\n",c_filename);
+    if(stackc_flag) {
+        if((stackc_fp = fopen("Stack.c", "r")) == NULL) { // Stack.c을 읽기모드로 연다
+         printf("CheckPoint\n");
+		fprintf(stderr, "open error for %s\n","Stack.c");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
 	    }
+    }
 
     if(opt_flag[3] == 1 && stackc_flag) { //option l
     fseek(stackc_fp, 0 , SEEK_SET);
@@ -686,7 +689,10 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     }
 
     fclose(newfp);
-    fclose(stackc_fp);
+
+    if(stackc_flag) { //stack 플래그가 설정되어있으면
+    fclose(stackc_fp); //스택파일을 닫는다.
+    }
 
 }
 
