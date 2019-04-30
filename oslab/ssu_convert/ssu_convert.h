@@ -13,6 +13,7 @@
 
 struct timeval begin_t, end_t;
 struct stat statbuf;
+
 char buffer[BUFFER_SIZE] = "\0"; //java내용을 담을 버퍼
 char c_buffer[BUFFER_SIZE] = "\0"; //c내용을 담을 버퍼
 char stackc_buffer[BUFFER_SIZE] = "\0"; // stackc내용을 담을 버퍼
@@ -41,7 +42,8 @@ FILE* makefp; //make파일 포인터
 FILE* headfp; //헤더파일 포인터
 
 void convert_java_to_c(int* opt_flag); //자바를 씨로 변경해주는 함수
-void option_java_to_c(int* opt_flag); //옵션을 처리하는 함수
+void createfile_java_to_c(int* opt_flag); //새 파일을 생성. (변경된 내용을 담을 새 파일)
 void create_makefile(); //make파일을 만드는 함수
+void option_java_to_c(int* opt_flag); //옵션을 처리하는 함수
 void find_header(int* opt_flag); //필요한 헤더들을 테이블에서 가져와서 넣어주는 함수
 

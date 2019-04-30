@@ -49,8 +49,9 @@ int main(int argc, char* argv[]) {
    }
 
 	convert_java_to_c(opt_flag); //자바를 c로 바꾸기
-    option_java_to_c(opt_flag); //옵션 처리
+    createfile_java_to_c(opt_flag); //옵션 처리
     find_header(opt_flag); //헤더파일 찾기
+    option_java_to_c(opt_flag);
     create_makefile(); //makefile 만들기
     
 	
@@ -62,7 +63,7 @@ int main(int argc, char* argv[]) {
 
 void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
 
-    char *filename_ptr;
+    char *filename_ptr; //파일이름(.앞에 붙는 이름)
     char *ptr;
     char *tmp_ptr;
     char *sub_ptr;
@@ -345,7 +346,7 @@ void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
 
 }
 
-void option_java_to_c(int* opt_flag) {
+void createfile_java_to_c(int* opt_flag) {
 
 	int length;
 	int line_count = 0;
@@ -372,16 +373,9 @@ void option_java_to_c(int* opt_flag) {
 	fseek(fp, 0 , SEEK_SET);
     fseek(newfp, 0 , SEEK_SET);
 	
-	if(opt_flag[0] == 1) { //option j
-		printf("%s", buffer); //자바파일 내용 보기
-	}
-
-   
+	   
 	if(opt_flag[2] == 1) { //option f
-		stat(filename, &statbuf);
-		printf("%s file size is %ld bytes.\n", filename, statbuf.st_size); //자바파일 용량 출력
-        
-        
+		        
         if(stackc_flag == 1) {
 
             if((stackc_fp = fopen("Stack.c","r")) == NULL){ //Stack.c 파일을 오픈한다
@@ -397,30 +391,13 @@ void option_java_to_c(int* opt_flag) {
         }
 	}
 
-	if(opt_flag[3] == 1) { //option l
-		
-		while (!feof(fp)){//파일의 끝을 만나지 않았다면 반복
-        	ch = fgetc(fp);//파일에서 하나의 문자를 읽음
-        		if (ch == '\n')//개행 문자일 때
-        		{
-            	line_count++;//라인 번호 1 증가
-        		}
-    		}
-		
-		printf("%s line is %d lines\n", filename, line_count); // 자바파일 라인 수 출력
-        line_count = 0;
-        
-	}
-
 	fseek(fp, 0 , SEEK_SET);
     fseek(newfp, 0 , SEEK_SET);
 	
-	
-
 	fclose(fp);
     fclose(newfp);
 	
-}
+} 
 
 void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 넣기위한 함수
 
@@ -431,7 +408,6 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     int c_buffer_length;
     int stackc_length;
     int idx = 0, jdx = 0;
-    int line_count = 0;
     int total_length = 0;
 
     char include_buffer[5][100];
@@ -504,7 +480,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
                 for(i = 0 ;i < 3 ; i++) {
                 ptr = strtok(NULL, "#");
                 strcpy(tmp_str, ptr);
-                sprintf(include_buffer[i], "%s%s       %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
+                sprintf(include_buffer[i], "%s%s     %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
                 strcat(include_sets_buffer, include_buffer[i]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다
                 }
             }
@@ -513,7 +489,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
             ptr = strtok(include_buffer[i], "#");
             ptr = strtok(NULL, "#");
             strcpy(tmp_str, ptr);
-            sprintf(include_buffer[i], "%s%s    %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
+            sprintf(include_buffer[i], "%s%s       %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
             strcat(include_sets_buffer, include_buffer[i]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다.
             }
         }
@@ -602,26 +578,30 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     }
 
     else {
-    include_sets_length = strlen(include_sets_buffer);
-    c_buffer_length = strlen(c_buffer);
+    include_sets_length = strlen(include_sets_buffer); //헤더버퍼에 담긴 총 문자 수
+    c_buffer_length = strlen(c_buffer); //버퍼에 있는 총 문자 수
 
     for(int i = c_buffer_length - 1 ; i > 0 ; --i) {
-        c_buffer[i + include_sets_length] = c_buffer[i];
+        c_buffer[i + include_sets_length] = c_buffer[i]; //헤더길이 만큼 글자들을 뒤로 민다
     }
 
     for(int i = 0 ; i < include_sets_length ; ++i) {
-        c_buffer[i] = include_sets_buffer[i];
+        c_buffer[i] = include_sets_buffer[i]; //헤더 추가
     }
 
-    fprintf(newfp, "%s", c_buffer);
+    fprintf(newfp, "%s", c_buffer); //버퍼의 내용을 새로 생성한 c파일에 넣는다.
     }
 
     fclose(headfp);
     fclose(newfp);
 
-  
+}
 
-    if(opt_flag[2] == 1 && stackc_flag) { //option f
+void option_java_to_c(int* opt_flag) {
+
+    int line_count = 0;
+
+     if(opt_flag[2] == 1 && stackc_flag) { //option f
     stat("Stack.c", &statbuf);
     printf("%s file size is %ld bytes.\n", "Stack.c", statbuf.st_size); // Stack.c파일 용량 출력
     }
@@ -629,10 +609,19 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     if(opt_flag[2] == 1) { //option f
         stat(c_filename, &statbuf);
         printf("%s file size is %ld bytes.\n", c_filename, statbuf.st_size); // c파일 용량 출력
+        stat(filename, &statbuf);
+		printf("%s file size is %ld bytes.\n", filename, statbuf.st_size); //자바파일 용량 출력
     }
 
     if((newfp = fopen(c_filename, "r")) == NULL) {
         	fprintf(stderr, "creat error for %s\n", c_filename); //해당 파일 내용을 버퍼에 담기위해 읽기모드로 연다
+            gettimeofday(&end_t,NULL);
+    	    ssu_runtime(&begin_t, &end_t);
+            exit(1);
+    }
+
+    if((fp = fopen(filename, "r")) == NULL) {
+        	fprintf(stderr, "creat error for %s\n", filename); //해당 파일 내용을 읽기위해 읽기모드로 연다
             gettimeofday(&end_t,NULL);
     	    ssu_runtime(&begin_t, &end_t);
             exit(1);
@@ -663,6 +652,20 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
     if(opt_flag[3] == 1) { //option l
     fseek(newfp, 0 , SEEK_SET);
+    fseek(fp, 0 , SEEK_SET);
+    
+    line_count = 0;
+    while (!feof(fp)){//파일의 끝을 만나지 않았다면 반복
+        	ch = fgetc(fp);//파일에서 하나의 문자를 읽음
+        		if (ch == '\n')//개행 문자일 때
+        		{
+            	line_count++;//라인 번호 1 증가
+        		}
+    		}
+		
+		printf("%s line is %d lines\n", filename, line_count); // 자바파일 라인 수 출력
+        line_count = 0;
+
     line_count = 0;
 
         while (!feof(newfp)){//파일의 끝을 만나지 않았다면 반복
@@ -676,6 +679,10 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 		printf("%s line is %d lines\n", c_filename, line_count); // c파일 라인 수 출력
     }
 
+    if(opt_flag[0] == 1) { //option j
+		printf("%s", buffer); //자바파일 내용 보기
+	}
+
     if(opt_flag[1] == 1 && stackc_flag) {   //c 옵션 활성화 시 그리고 스택플래그 활성화 시
         printf("%s", stackc_buffer); // stack.c 내용 출력
         printf("%s", c_buffer); // c파일 내용 출력
@@ -687,6 +694,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
     }
 
+    fclose(fp);
     fclose(newfp);
 
     if(stackc_flag) { //stack 플래그가 설정되어있으면
@@ -697,24 +705,23 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
 void create_makefile() { // makefile을 만들기 위한 함수
 
-    if((makefp = fopen("Makefile", "w+")) == NULL) { //makefile 생성
+    char *filename_ptr; //파일이름(.앞에 붙는 이름)
+    char makefile_name[30];
+    char makefile_command[40];
+
+    filename_ptr = strtok(filename,".");
+    sprintf(makefile_name, "%s%s%s", filename_ptr, "_", "Makefile");
+
+    if((makefp = fopen(makefile_name, "w+")) == NULL) { //makefile 생성
 		fprintf(stderr, "open error\n");
 		gettimeofday(&end_t,NULL);
     	ssu_runtime(&begin_t, &end_t);
 		exit(1);
 	}
 
-    fprintf(makefp,"%s","gcc :\n\tgcc ssu_convert.c -o ssu_convert\n"); // ssu_convert.c 컴파일
-    fprintf(makefp,"%s","convert1 :\n\t./ssu_convert q1.java\n"); // q1.java 변환
-    fprintf(makefp,"%s","convert2 :\n\t./ssu_convert q2.java\n"); // q2.java 변환
-    fprintf(makefp,"%s","convert3 :\n\t./ssu_convert q3.java\n"); // q3.java 변환
-    fprintf(makefp,"%s","opt1 :\n\t./ssu_convert q1.java -l\n"); // l옵션
-    fprintf(makefp,"%s","opt2 :\n\t./ssu_convert q2.java -f\n"); // f옵션
-    fprintf(makefp,"%s","opt3 :\n\t./ssu_convert q3.java -p\n"); // p옵션
-    fprintf(makefp,"%s","q1 :\n\tgcc q1.c -o q1\n"); // q1.c 컴파일
-    fprintf(makefp,"%s","q2 :\n\tgcc q2.c -o q2\n"); // q2.c 컴파일
-    fprintf(makefp,"%s","q3 :\n\tgcc q3.c -o q3\n"); // q3.c 컴파일
+    sprintf(makefile_command, "%s %s%s%s%s %s %s %s","gcc",":","\n","\t","gcc", c_filename , "-o", filename_ptr);
 
+    fprintf(makefp,"%s",makefile_command); // ssu_convert.c 컴파일
     fclose(makefp);
 }
 
