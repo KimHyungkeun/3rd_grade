@@ -410,10 +410,15 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     int include_sets_length;
     int c_buffer_length;
     int stackc_length;
-    int idx = 0, jdx = 0;
+    int header_count = 0;
     int total_length = 0;
+    int sharp_count = 0; //라이브러리 갯수
+    int sharp_count_backup; //라이브러리 갯수를 따로 저장
+    int many_header_idx; //헤더가 2개 이상인 곳의 위치
+    int scanf_idx = 0; // 헤더파일에서 scanf가 자리잡은 위치
+    int printf_idx = 0; // 헤더파일에서 printf가 자리잡은 위치
 
-    char include_buffer[5][100];
+    char include_buffer[10][100];
     char include_sets_buffer[100] = "\0";
     char c_buffer_backup[BUFFER_SIZE] = "\0";
 
@@ -438,53 +443,89 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     fread(c_buffer, BUFFER_SIZE, 1, newfp); //버퍼에 c파일 내용을 담는다
     fread(header_buffer, BUFFER_SIZE, 1, headfp); //버퍼에 헤더 내용을 담는다
 
-    
-    if(strstr(c_buffer, "printf(") != NULL) { //printf를 찾으면 헤더플래그0을 활성
-        header_flag[0] = 1;
- 
-    }
-
-    if(strstr(c_buffer, "scanf(") != NULL) { //scanf를 찾으면 헤더플래그1을 활성
-        header_flag[1] = 1;
-    }
-
-    if(strstr(c_buffer, "open(") != NULL) { //open를 찾으면 헤더플래그2을 활성
-        header_flag[2] = 1;
-    }
-
-    if(strstr(c_buffer, "read(") != NULL) { //read를 찾으면 헤더플래그3을 활성
-        header_flag[3] = 1;
-    }
-
-    if(strstr(c_buffer, "exit(") != NULL) { //exit를 찾으면 헤더플래그4을 활성
-        header_flag[4] = 1;
-    }
-
-
-    idx = 0;
+    header_count = 0;
     ptr = strtok(header_buffer, "\n"); //헤더 테이블의 내용을 한줄씩 읽어들인다
 
     while(ptr != NULL) {
       
-        strcpy(include_buffer[idx], ptr); //헤더내용을 버퍼에 담는다.
+        strcpy(include_buffer[header_count], ptr); //헤더내용을 버퍼에 담는다.
+        for(int idx = 0 ; idx < strlen(include_buffer[header_count]) ; idx++) {
+            if(include_buffer[header_count][idx] == '#') //라이브러리의 갯수를 세어본다
+                    sharp_count ++;
+        }
+
+        if(sharp_count >= 2) {//만약 라이브러리 갯수가 3개이상이면
+            many_header_idx = header_count; //해당 헤더를 따로 지목한다.
+            sharp_count_backup = sharp_count;
+        }
         
+        sharp_count = 0; //카운트 갯수 초기화
+
         ptr = strtok(NULL, "\n");
-        idx++;
+        header_count++; //헤더 줄 수 증가
 
     }
 
-    for(int i = 0 ; i < 5 ; i++) {
+    header_flag = (int*)malloc(sizeof(int) * header_count); //헤더테이블에 담긴 헤더수 만큼 플래그 수를 생성한다.
+    for(int i = 0 ; i < header_count ; i++)
+        header_flag[i] = 0; //기본적으로 전부 0으로 초기화한다.
+
+    if(strstr(c_buffer, "printf(") != NULL) { //printf를 찾으면 헤더플래그를 활성
+        for(int i = 0 ; i < header_count ; i++) {
+                if(strstr(include_buffer[i], "printf") != NULL) {
+                    header_flag[i] = 1; //해당 헤더플래그를 활성
+                    printf_idx = i;
+                    break;
+                }
+        }
         
+    }
+
+    if(strstr(c_buffer, "scanf(") != NULL) { //scanf를 찾으면 헤더플래그를 활성
+        for(int i = 0 ; i < header_count ; i++) {
+                if(strstr(include_buffer[i], "scanf") != NULL) {
+                    header_flag[i] = 1; //해당 헤더플래그를 활성
+                    scanf_idx = i;
+                    break;
+                }
+        }
+    }
+
+    if(strstr(c_buffer, "open(") != NULL) { //open를 찾으면 헤더플래그를 활성
+        header_flag[many_header_idx] = 1;
+    }
+
+    if(strstr(c_buffer, "read(") != NULL) { //read를 찾으면 헤더플래그를 활성
+        for(int i = 0 ; i < header_count ; i++) {
+                if(strstr(include_buffer[i], "read") != NULL) {
+                    header_flag[i] = 1; //해당 헤더플래그를 활성
+                    break;
+                }
+        }
+    }
+
+    if(strstr(c_buffer, "exit(") != NULL) { //exit를 찾으면 헤더플래그4를 활성
+        for(int i = 0 ; i < header_count ; i++) {
+                if(strstr(include_buffer[i], "exit") != NULL) {
+                    header_flag[i] = 1; //해당 헤더플래그를 활성
+                    break;
+                }
+        }
+    }
+
+   
+    for(int i = 0 ; i < header_count ; i++) {
+       
         if(header_flag[i]) { //헤더플래그가 활성화 되었을 시 이 문장을 수행한다.
 
-            if(i == 2) { //만약 헤더가 3개이상 있는 파일의 경우
+            if(i == many_header_idx) { //만약 헤더가 3개이상 있는 파일의 경우
                 ptr = strtok(include_buffer[i], "#"); // #을 기준으로 토큰화 한다
 
-                for(i = 0 ;i < 3 ; i++) {
+                for(int j = 0 ;j < sharp_count_backup ; j++) {
                 ptr = strtok(NULL, "#");
                 strcpy(tmp_str, ptr);
-                sprintf(include_buffer[i], "%s%s%s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
-                strcat(include_sets_buffer, include_buffer[i]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다
+                sprintf(include_buffer[j], "%s%s%s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
+                strcat(include_sets_buffer, include_buffer[j]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다
                 }
             }
 
@@ -497,13 +538,14 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
             }
         }
 
-        if(header_flag[0] == 1) //헤더플래그0이 활성화 되면 
-            header_flag[1] = 0; //헤더플래그1을 비활성화 시킴 (printf와 scanf는 같은 헤더를 참조하므로 중복입력되지 않도록 한다.)
+        if(header_flag[printf_idx] == 1) //헤더플래그0이 활성화 되면 
+            header_flag[scanf_idx] = 0; //헤더플래그1을 비활성화 시킴 (printf와 scanf는 같은 헤더를 참조하므로 중복입력되지 않도록 한다.)
         
-        if(header_flag[1] == 1) //헤더플래그 1이 활성화되면
-            header_flag[0] = 0; //헤더플래그 0을 비활성화 시킴 (printf와 scanf는 같은 헤더를 참조하므로 중복입력되지 않도록 한다.)
+        if(header_flag[scanf_idx] == 1) //헤더플래그 1이 활성화되면
+            header_flag[printf_idx] = 0; //헤더플래그 0을 비활성화 시킴 (printf와 scanf는 같은 헤더를 참조하므로 중복입력되지 않도록 한다.)
 
         header_flag[i] = 0; //작업이 끝난 헤더플래그는 비활성화 시킨다.
+         
     }
 
     if(stackc_flag) { //스택 플래그 활성화 시
@@ -600,6 +642,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 
     fclose(headfp);
     fclose(newfp);
+    free(header_flag);
 
 }
 

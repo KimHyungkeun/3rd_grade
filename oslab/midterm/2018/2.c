@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 
 	int fd;
 
-	if (argc != 1) {
+	if (argc != 3) {
 		fprintf(stderr, "usage : %s <oldname> <newname>\n", argv[0]);
 		exit(1);
 	}
