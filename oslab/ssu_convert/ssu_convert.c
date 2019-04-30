@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
    }
 
 	convert_java_to_c(opt_flag); //자바를 c로 바꾸기
-    createfile_java_to_c(opt_flag); //옵션 처리
+    newbuffer_java_to_c(opt_flag); // 파일에서 읽은 내용을 버퍼에 담는다
     find_header(opt_flag); //헤더파일 찾기
-    option_java_to_c(opt_flag);
+    option_java_to_c(opt_flag); //옵션 처리
     create_makefile(); //makefile 만들기
     
 	
@@ -346,7 +346,7 @@ void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
 
 }
 
-void createfile_java_to_c(int* opt_flag) {
+void newbuffer_java_to_c(int* opt_flag) {
 
 	int length;
 	int line_count = 0;
@@ -370,8 +370,8 @@ void createfile_java_to_c(int* opt_flag) {
 	fread(buffer, BUFFER_SIZE,1,fp); //자바파일 내용을 버퍼에 담는다
     fread(c_buffer, BUFFER_SIZE,1,newfp); // c파일 내용을 버퍼에 담는다
 
-	fseek(fp, 0 , SEEK_SET);
-    fseek(newfp, 0 , SEEK_SET);
+	fseek(fp, 0 , SEEK_SET); //offset 초기화
+    fseek(newfp, 0 , SEEK_SET); //offset 초기화
 	
 	   
 	if(opt_flag[2] == 1) { //option f
@@ -391,9 +391,6 @@ void createfile_java_to_c(int* opt_flag) {
         }
 	}
 
-	fseek(fp, 0 , SEEK_SET);
-    fseek(newfp, 0 , SEEK_SET);
-	
 	fclose(fp);
     fclose(newfp);
 	
