@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 
    int opt;
-   int opt_flag[5] = {0,0,0,0,0}; //옵션 플래그
+   int opt_flag[6] = {0,0,0,0,0,0}; //옵션 플래그
 
 	gettimeofday(&begin_t, NULL);
 
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
 	strcpy(filename,argv[1]); //바꾸려는 자바파일의 이름을 넣음
 
-	while ((opt = getopt(argc, argv, "jcflp")) != -1) { //옵션은 j,c,f,l,p 5종류가 있다
+	while ((opt = getopt(argc, argv, "jcflpr")) != -1) { //옵션은 j,c,f,l,p 5종류가 있다
     switch(opt) {
 
         case 'j' : // 옵션
@@ -38,6 +38,10 @@ int main(int argc, char* argv[]) {
 		
 		case 'p' : // 옵션
             opt_flag[4] = 1; //변경된 함수들을 보여줌
+            break;
+        
+        case 'r' : // 옵션
+            opt_flag[5] = 1; //파일 변환 과정을 보여준다.
             break;
 		
 		case '?': //잘못된 옵션 입력시 종료
@@ -104,7 +108,9 @@ void convert_java_to_c(int* opt_flag) { //자바를 c로 바꾸는 함수
     }
     
    
-    
+     if(opt_flag[5] == 1)
+        ;
+     else
      printf("%s converting is finished!\n",c_filename);
 
 
@@ -600,6 +606,13 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
 void option_java_to_c(int* opt_flag) {
 
     int line_count = 0;
+    int idx = 0;
+    int idx_c = 0;
+    int idx_java = 0;
+    int idx_stack = 0;
+    char r_option_buffer_c[512] = "\0";
+    char r_option_buffer_java[512] = "\0";
+    char r_option_buffer_stack[512] = "\0";
 
      if(opt_flag[2] == 1 && stackc_flag) { //option f
     stat("Stack.c", &statbuf);
@@ -680,17 +693,77 @@ void option_java_to_c(int* opt_flag) {
     }
 
     if(opt_flag[0] == 1) { //option j
-		printf("%s", buffer); //자바파일 내용 보기
+		line_count = 0;
+        idx = 0;
+        fseek(fp , 0, SEEK_SET);
+        while (fgets(r_option_buffer_java, sizeof(r_option_buffer_java), fp) != NULL ) {
+            idx ++;
+            printf("%d %s", idx, r_option_buffer_java);
+        }
 	}
 
     if(opt_flag[1] == 1 && stackc_flag) {   //c 옵션 활성화 시 그리고 스택플래그 활성화 시
-        printf("%s", stackc_buffer); // stack.c 내용 출력
-        printf("%s", c_buffer); // c파일 내용 출력
+        line_count = 0;
+        idx = 0;
+        fseek(stackc_fp , 0, SEEK_SET);
+        while (fgets(r_option_buffer_stack, sizeof(r_option_buffer_stack), stackc_fp) != NULL ) {
+            idx ++; 
+            printf("%d %s", idx, r_option_buffer_stack); //한 줄씩 읽어서 파일에 담긴 내용을 보여준다
+        }
+
+       line_count = 0;
+        idx = 0;
+        fseek(newfp , 0, SEEK_SET);
+        while (fgets(r_option_buffer_c, sizeof(r_option_buffer_c), newfp) != NULL ) {
+            idx ++;
+            printf("%d %s", idx, r_option_buffer_c); //한 줄씩 읽어서 파일에 담긴 내용을 보여준다.
+        }
 
     }
 
     else if(opt_flag[1] == 1) {   //c 옵션 활성화 시 
-        printf("%s", c_buffer); // c파일 내용 출력
+        line_count = 0;
+        idx = 0;
+        fseek(newfp , 0, SEEK_SET);
+        while (fgets(r_option_buffer_c, sizeof(r_option_buffer_c), newfp) != NULL ) {
+            idx ++;
+            printf("%d %s", idx, r_option_buffer_c);
+        }
+       
+    }
+
+    if(opt_flag[5] == 1 && stackc_flag) { //r 옵션 활성화 시 작동 그리고 스택플래그 활성화 시
+
+        idx_c = 0;
+        idx_stack = 0;
+        fseek(fp , 0, SEEK_SET);
+        fseek(newfp, 0, SEEK_SET);
+        while (fgets(r_option_buffer_stack, sizeof(r_option_buffer_stack), stackc_fp) != NULL ) {
+        
+            printf("%d %s",idx_stack, r_option_buffer_stack); //한 줄씩 줄번호와 파일 내용을 출력한다.
+            sleep(1);
+        }
+
+        while (fgets(r_option_buffer_c, sizeof(r_option_buffer_c), newfp) != NULL ) {
+            
+            printf("%d %s",idx_c, r_option_buffer_c); //한줄씩 줄번호와 파일 내용을 출력한다
+            sleep(1);
+        }
+        printf("%s convert is finished!\n", c_filename);
+        
+    }
+
+    else if(opt_flag[5]) { //r 옵션 활성화 시 작동
+
+        idx_c = 0;
+        fseek(newfp , 0, SEEK_SET);
+        while (fgets(r_option_buffer_c, sizeof(r_option_buffer_c), newfp) != NULL ) {
+            idx_c++;
+            printf("%d %s", idx_c, r_option_buffer_c); //한 줄씩 줄번호와 파일내용을 출력한다.
+            sleep(1);
+            
+        }
+       printf("%s convert is finished!\n", c_filename);
 
     }
 
