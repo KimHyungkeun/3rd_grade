@@ -480,7 +480,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
                 for(i = 0 ;i < 3 ; i++) {
                 ptr = strtok(NULL, "#");
                 strcpy(tmp_str, ptr);
-                sprintf(include_buffer[i], "%s%s     %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
+                sprintf(include_buffer[i], "%s%s%s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
                 strcat(include_sets_buffer, include_buffer[i]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다
                 }
             }
@@ -489,7 +489,7 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
             ptr = strtok(include_buffer[i], "#");
             ptr = strtok(NULL, "#");
             strcpy(tmp_str, ptr);
-            sprintf(include_buffer[i], "%s%s       %s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
+            sprintf(include_buffer[i], "%s%s%s", "#",tmp_str,"\n"); //헤더만을 골라내서 추출한다
             strcat(include_sets_buffer, include_buffer[i]); //헤더들을 모아놓은 배열에 하나씩 중첩시킨다.
             }
         }
@@ -581,13 +581,16 @@ void find_header(int* opt_flag) { //헤더테이블을 참조하여 헤더를 �
     include_sets_length = strlen(include_sets_buffer); //헤더버퍼에 담긴 총 문자 수
     c_buffer_length = strlen(c_buffer); //버퍼에 있는 총 문자 수
 
-    for(int i = c_buffer_length - 1 ; i > 0 ; --i) {
+
+    for(int i = c_buffer_length - 1 ; i >= 0 ; --i) {
         c_buffer[i + include_sets_length] = c_buffer[i]; //헤더길이 만큼 글자들을 뒤로 민다
     }
 
+   
     for(int i = 0 ; i < include_sets_length ; ++i) {
         c_buffer[i] = include_sets_buffer[i]; //헤더 추가
     }
+
 
     fprintf(newfp, "%s", c_buffer); //버퍼의 내용을 새로 생성한 c파일에 넣는다.
     }
