@@ -4,10 +4,10 @@
 
 #define BUFFER_SIZE 1024
 
-void ssu_setbuf(FILE *fp, char *buf);
+void ssu_setbuf(FILE* fp, char *buf);
 
 int main(void) {
-	
+
 	char buf[BUFFER_SIZE];
 	char *fname = "/dev/pts/1";
 	FILE *fp;
@@ -17,31 +17,32 @@ int main(void) {
 		exit(1);
 	}
 
-	ssu_setbuf(fp, buf);
+	ssu_setbuf(fp,buf);
 	fprintf(fp, "Hello ");
 	sleep(1);
 	fprintf(fp, "Unix ");
 	sleep(1);
-	fprintf(fp, "\n");
+	fprintf(fp, "\n ");
 	sleep(1);
+	ssu_setbuf(fp,NULL);
 
-	ssu_setbuf(fp, NULL);
-	fprintf(fp, "How ");
+	fprintf(fp, "HOW ");
 	sleep(1);
-	fprintf(fp, "Are ");
+	fprintf(fp, "ARE ");
 	sleep(1);
-	fprintf(fp, "You?");
+	fprintf(fp, "YOU? ");
+	sleep(1);
+	fprintf(fp, "\n");
 	sleep(1);
 	exit(0);
 
 }
 
 void ssu_setbuf(FILE* fp, char *buf) {
+
 	size_t size;
 	int fd;
 	int mode;
-
-	fd = fileno(fp);
 
 	if(isatty(fd))
 		mode = _IOLBF;
@@ -54,7 +55,7 @@ void ssu_setbuf(FILE* fp, char *buf) {
 		size = 0;
 	}
 
-	else 
+	else
 		size = BUFFER_SIZE;
 
 	setvbuf(fp, buf, mode, size);

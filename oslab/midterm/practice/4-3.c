@@ -42,7 +42,8 @@ int main(void) {
 
 		i = 0;
 
-		while((list[j].res[i] != '\n')) i++;
+		while((list[j].res[i] != '\n')) 
+			i++;
 
 		list[j].res[i] = '\0';
 		i = 0;
@@ -50,7 +51,7 @@ int main(void) {
 		for( ; i < Q_SIZE ; i++) {
 			if(list[j].res[i] == answer[i]) {
 				list[j].score += 10;
-				list[j].res[i] = '0';
+				list[j].res[i] = 'O';
 			}
 			else
 				list[j].res[i] = 'X';

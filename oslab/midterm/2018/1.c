@@ -12,24 +12,25 @@ int main(void) {
 	int fd;
 	int length;
 
-	if((fd = open(fname, O_RDONLY, 0644)) < 0) {
+	if ((fd = open(fname, O_RDONLY, 0644)) < 0) {
 		fprintf(stderr, "open error for %s\n", fname);
 		exit(1);
 	}
 
-	if(dup2(1,4) < 0) {
+	if (dup2(1, 4) < 0) {
 		fprintf(stderr, "dup2 call failed\n");
 		exit(1);
 	}
 
-	while(1) {
+	while (1) {
 		length = read(fd, buf, BUFFER_SIZE);
 
-		if(length <= 0)
+		if (length <= 0)
 			break;
 
-		write(1, buf, length);
+		write(4, buf, length);
 	}
 
-	exit(0);
 }
+
+
