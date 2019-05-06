@@ -28,7 +28,7 @@ int main(void) {
 
 	else {
 		ssu_print_ids("child"); //child를 이름으로 둔다
-		signal(SIGHUP, ssu_sig_hup);//연결이 끊어졌음을 제어 터미널 인터페이스가 검출했을 때 제어 터미널에 연고나도니 제어프로세스로 SIGHUP 시그널이 전달
+		signal(SIGHUP, ssu_sig_hup);//연결이 끊어졌음을 제어 터미널 인터페이스가 검출했을 때 제어 터미널에 연관된 제어프로세스로 SIGHUP 시그널이 전달
 		kill(getpid(), SIGTSTP);  //프로세스 죽임
 		ssu_print_ids("child"); 
 
