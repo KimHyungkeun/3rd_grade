@@ -16,6 +16,7 @@ void ftl_read(int lsn, char *sectorbuf);
 // file system이 flash memory로부터 512B씩 데이터를 저장하거나 데이터를 읽어 오기 위해서는
 // 본인이 구현한 FTL의 ftl_write()와 ftl_read()를 호출하면 됨
 //
+
 int main(int argc, char *argv[])
 {
 	char *blockbuf;
@@ -47,6 +48,40 @@ int main(int argc, char *argv[])
 	//
 	// ftl_write() 및 ftl_read() 테스트를 위한 코드를 자유자재로 만드세요
 	//
+	
+	strcpy(sectorbuf,"A");
+	ftl_write(0, sectorbuf);
+	strcpy(sectorbuf,"B");
+	ftl_write(1, sectorbuf);
+	strcpy(sectorbuf,"C");
+	ftl_write(2, sectorbuf);
+	strcpy(sectorbuf,"D");
+	ftl_write(3, sectorbuf);
+	strcpy(sectorbuf,"E");
+	ftl_write(4, sectorbuf);
+	strcpy(sectorbuf,"F");
+	ftl_write(5, sectorbuf);
+
+	strcpy(sectorbuf,"A'");
+	ftl_write(0, sectorbuf);
+	strcpy(sectorbuf,"C'");
+	ftl_write(2, sectorbuf);
+	strcpy(sectorbuf,"A''");
+	ftl_write(0, sectorbuf);
+	strcpy(sectorbuf,"B'");
+	ftl_write(1, sectorbuf);
+	
+	
+	
+	
+
+	ftl_read(0,sectorbuf);
+	ftl_read(1,sectorbuf);
+	ftl_read(2,sectorbuf);
+	ftl_read(3,sectorbuf);
+	ftl_read(4,sectorbuf);
+	ftl_read(5,sectorbuf);
+	
 
 
 	fclose(devicefp);
