@@ -8,12 +8,12 @@ void ssu_signal_handler2(int signo);
 int main(void) {
 
 	if (signal(SIGINT, ssu_signal_handler1) == SIG_ERR) {
-		fprintf(stderr, "cannot handle SIGINT\n");
+		fprintf(stderr, "cannot handle SIGINT\n");//Ctrl+C를 누르면 발생하는 시그널
 		exit(EXIT_FAILURE);
 	}
 
-	if (signal(SIGINT, ssu_signal_handler2) == SIG_ERR) {
-		fprintf(stderr, "cannot handle SIGUSR1\n"); 
+	if (signal(SIGUSR1, ssu_signal_handler2) == SIG_ERR) {
+		fprintf(stderr, "cannot handle SIGUSR1\n");//Ctrl+C를 누르면 발생하는 시그널
 		exit(EXIT_FAILURE);
 	}
 

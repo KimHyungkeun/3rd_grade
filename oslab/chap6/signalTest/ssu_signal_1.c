@@ -13,7 +13,7 @@ int main(void) {
 
 	while(1) {
 		printf("process running...\n"); //프로세스 가동중
-		exit(1);
+		sleep(1);
 	}
 
 	exit(0);
