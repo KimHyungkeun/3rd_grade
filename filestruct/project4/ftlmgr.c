@@ -145,7 +145,7 @@ void ftl_write(int lsn, char *sectorbuf)
 					
 					if(sparebuf[i] == -1) {
 					strncpy(pagebuf,sectorbuf, SECTOR_SIZE);	
-					//printf("%s\n", pagebuf);	
+					
 					pagebuf[SECTOR_SIZE] = lsn; //input spare area
 					sparebuf[i] = lsn; //데이터가 들어갔으므로 spare는 lsn이다.
 					dd_write(i, pagebuf);
@@ -157,13 +157,13 @@ void ftl_write(int lsn, char *sectorbuf)
 
 			
 			if(buf_full == BUF_PAGES_PER_BLOCK + 1) {
-				printf("buf_full = %d\n", buf_full);
+				
 				buf_full = 0;
 		
 				strncpy(pagebuf,sectorbuf, SECTOR_SIZE); 
 				pagebuf[SECTOR_SIZE] = lsn; 
 				sparebuf[PAGES_PER_BLOCK * freeblock + offset] = lsn; //freeblock쪽의 ppn의 spare을 lsn으로 
-				//printf("pagebuf = %s, lsn = %d, ppn = %d\n", pagebuf,sparebuf[PAGES_PER_BLOCK * freeblock + offset],PAGES_PER_BLOCK * freeblock + offset);
+
 				dd_write(PAGES_PER_BLOCK * freeblock + offset, pagebuf);//해당하는 freeblock에 데이터넣음
 				sparebuf[pbn * PAGES_PER_BLOCK + offset] = -1; //기존 블록의 spare는 -1로 초기화
 
@@ -206,7 +206,7 @@ void ftl_write(int lsn, char *sectorbuf)
 				dd_erase(lbn_table[lbn]); //이전의 block의 데이터들을 전부 clear 시킨다
 				lbn_table[lbn] = freeblock; 
 				freeblock = pbn; //이전의 block 위치가 freeblock 위치로  변경된다.
-				printf("Freeblock = %d\n", freeblock);
+				
 				
 			}
 
