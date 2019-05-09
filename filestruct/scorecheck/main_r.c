@@ -9,11 +9,13 @@ FILE *devicefp;
 int write_cnt;
 int erase_cnt;
 
+
 /****************  prototypes ****************/
 void ftl_open();
 void ftl_write(int lsn, char *sectorbuf);
 void ftl_read(int lsn, char *sectorbuf);
-void dd_read(int ppn, char *pagebuf);
+
+
 int main(int argc, char *argv[])
 {
 	char *blockbuf;
@@ -44,10 +46,8 @@ int main(int argc, char *argv[])
 	ftl_write(2,"A2");
 	ftl_write(3,"A3");
 	ftl_write(4,"A4");
+
 	ftl_write(5,"B0");
-	ftl_write(5,"a0");
-	ftl_write(1,"a1");
-	ftl_write(2,"a2");
 	ftl_write(6,"B1");
 	ftl_write(7,"B2");
 	ftl_write(8,"B3");
@@ -75,34 +75,22 @@ int main(int argc, char *argv[])
 	char pagebuf[PAGE_SIZE];
 	char buf[4];
 
-	printf("\n>>>>>>>>>>>>>> WRITE <<<<<<<<<<<<<<\n\n");
-	for(i=0;i<6;i+=2){
-		for(j=0;j<7;j++){
-			memset(pagebuf,'\0',sizeof(pagebuf));
-			memset(buf,'\0',sizeof(buf));
-			dd_read(i*7+j,pagebuf);
-			if(pagebuf[0]==-1 && pagebuf[1]==-1 && pagebuf[2]==-1){
-				printf("[ NULL ]");
-			}else{
-				strncpy(buf,pagebuf,4);
-				buf[3]='\0';
-				printf("[  %s  ]",buf);
-			}
-			printf("                   ");
-		
-			memset(pagebuf,'\0',sizeof(pagebuf));
-			memset(buf,'\0',sizeof(buf));
-			dd_read((i+1)*7+j,pagebuf);
-			if(pagebuf[0]==-1 && pagebuf[1]==-1 && pagebuf[2]==-1){
-				printf("[ NULL ]\n");
-			}else{
-				strncpy(buf,pagebuf,4);
-				buf[3]='\0';
-				printf("[  %s  ]\n",buf);
-			}
-		}
-		printf("\n");
-	}
+	printf("\n>>>>>>>>>>>>>> READ <<<<<<<<<<<<<<\n\n");
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(0,sectorbuf);
+	printf("lbn[0] : %s\n",sectorbuf);
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(6,sectorbuf);
+	printf("lbn[6] : %s\n",sectorbuf);	
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(12,sectorbuf);
+	printf("lbn[12]: %s\n",sectorbuf);	
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(18,sectorbuf);
+	printf("lbn[18]: %s\n",sectorbuf);
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(24,sectorbuf);
+	printf("lbn[24]: %s\n",sectorbuf);
 	printf("===================================\n");
 	printf("Insert Grade: ");
 	scanf("%d",&i);
@@ -111,4 +99,3 @@ int main(int argc, char *argv[])
 
 	return i;
 }
-

@@ -14,6 +14,7 @@ void ftl_open();
 void ftl_write(int lsn, char *sectorbuf);
 void ftl_read(int lsn, char *sectorbuf);
 void dd_read(int ppn, char *pagebuf);
+
 int main(int argc, char *argv[])
 {
 	char *blockbuf;
@@ -44,10 +45,8 @@ int main(int argc, char *argv[])
 	ftl_write(2,"A2");
 	ftl_write(3,"A3");
 	ftl_write(4,"A4");
+
 	ftl_write(5,"B0");
-	ftl_write(5,"a0");
-	ftl_write(1,"a1");
-	ftl_write(2,"a2");
 	ftl_write(6,"B1");
 	ftl_write(7,"B2");
 	ftl_write(8,"B3");
@@ -111,4 +110,3 @@ int main(int argc, char *argv[])
 
 	return i;
 }
-

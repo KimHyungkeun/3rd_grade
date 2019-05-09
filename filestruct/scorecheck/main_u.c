@@ -9,11 +9,13 @@ FILE *devicefp;
 int write_cnt;
 int erase_cnt;
 
+
 /****************  prototypes ****************/
 void ftl_open();
 void ftl_write(int lsn, char *sectorbuf);
 void ftl_read(int lsn, char *sectorbuf);
 void dd_read(int ppn, char *pagebuf);
+
 int main(int argc, char *argv[])
 {
 	char *blockbuf;
@@ -42,21 +44,19 @@ int main(int argc, char *argv[])
 	ftl_write(0,"A0");
 	ftl_write(1,"A1");
 	ftl_write(2,"A2");
-	ftl_write(3,"A3");
+//	ftl_write(3,"A3");
 	ftl_write(4,"A4");
+
 	ftl_write(5,"B0");
-	ftl_write(5,"a0");
-	ftl_write(1,"a1");
-	ftl_write(2,"a2");
 	ftl_write(6,"B1");
 	ftl_write(7,"B2");
-	ftl_write(8,"B3");
+//	ftl_write(8,"B3");
 	ftl_write(9,"B4");
 
 	ftl_write(10,"C0");
 	ftl_write(11,"C1");
 	ftl_write(12,"C2");
-	ftl_write(13,"C3");
+//	ftl_write(13,"C3");
 	ftl_write(14,"C4");
 
 	ftl_write(15,"D0");
@@ -71,11 +71,15 @@ int main(int argc, char *argv[])
 	ftl_write(23,"E3");
 	ftl_write(24,"E4");
 
+	ftl_write(0,"U0");
+	ftl_write(6,"U1");
+	ftl_write(12,"U2");
+
 	int j;
 	char pagebuf[PAGE_SIZE];
 	char buf[4];
 
-	printf("\n>>>>>>>>>>>>>> WRITE <<<<<<<<<<<<<<\n\n");
+	printf("\n>>>>>>>>>>>>>> UPDATE <<<<<<<<<<<<<<\n\n");
 	for(i=0;i<6;i+=2){
 		for(j=0;j<7;j++){
 			memset(pagebuf,'\0',sizeof(pagebuf));
@@ -104,6 +108,17 @@ int main(int argc, char *argv[])
 		printf("\n");
 	}
 	printf("===================================\n");
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(0,sectorbuf);
+	printf("lbn[0] : %s\n",sectorbuf);
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(6,sectorbuf);
+	printf("lbn[6] : %s\n",sectorbuf);	
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	ftl_read(12,sectorbuf);
+	printf("lbn[12]: %s\n",sectorbuf);	
+	memset(sectorbuf,'\0',sizeof(sectorbuf));
+	printf("===================================\n");
 	printf("Insert Grade: ");
 	scanf("%d",&i);
 
@@ -111,4 +126,3 @@ int main(int argc, char *argv[])
 
 	return i;
 }
-
