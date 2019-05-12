@@ -25,7 +25,10 @@ int lbn;
 int pbn;
 int ppn;
 int offset;
-int buf_full = 0;//nonbuffer와 buffer내의 spare 중복 횟수	
+
+
+//int buf_full = 0;//nonbuffer와 buffer내의 spare 중복 횟수	;
+
 
 int last_buf_page;
 int first_buf_page;
@@ -73,6 +76,7 @@ void ftl_read(int lsn, char *sectorbuf)
 	int repeat_count = 0;; //nonbuffer와 buffer내의 spare 중복 횟수
 	char pagebuf[PAGE_SIZE]; //한 페이지의 내용을 담을것이다
 
+
 	lbn = lsn / NONBUF_PAGES_PER_BLOCK; 
 	pbn = lbn_table[lbn]; //해당 lbn에 대응되는 pbn 값
 	offset = (lsn % NONBUF_PAGES_PER_BLOCK); //offset
@@ -81,8 +85,13 @@ void ftl_read(int lsn, char *sectorbuf)
 	last_buf_page = PAGES_PER_BLOCK + (PAGES_PER_BLOCK * pbn) - 1;
 	first_buf_page = last_buf_page - BUF_PAGES_PER_BLOCK + 1;
 
+	//printf("입력된 lsn : %d\n", lsn);
+	//printf("지정된 pbn : %d\n", pbn);
+
 	for(int i = last_buf_page ; i >= first_buf_page ; i-- ) {
+		
 		if(sparebuf[i] == lsn) {
+			printf("sparebuf[%d] : %d\n", i , sparebuf[i]);
 			ppn = i;
 			dd_read(ppn, pagebuf);
 			repeat_count = 1;
@@ -109,10 +118,12 @@ void ftl_read(int lsn, char *sectorbuf)
 //
 void ftl_write(int lsn, char *sectorbuf)
 {
-	
+	int bufpage_full = 0;
+	int buffull_true;
 	int nonbuf_notexist = 0;
 	int buf_notexist = 0;
 	char pagebuf[PAGE_SIZE];//페이지의 내용을 담을배열
+
 
 	lbn = lsn / NONBUF_PAGES_PER_BLOCK; 
 	pbn = lbn_table[lbn]; //lbn table을 읽어서, pbn과 대응되는 값을 찾음
@@ -136,12 +147,21 @@ void ftl_write(int lsn, char *sectorbuf)
 
 			else if(pagebuf[SECTOR_SIZE] == lsn){ //유저가 데이터를 업데이트해야하는 경우
 
+				for(int i = last_buf_page ; i >= first_buf_page ; i--) {
+					if(sparebuf[i] != -1) {
+						bufpage_full++;
+					}
+
+					if(bufpage_full == BUF_PAGES_PER_BLOCK) {
+					buffull_true = 1;
+					break;
+					}
+				}
+				
+
 				for(int i = first_buf_page ; i <= last_buf_page ; i++) {
 
-					if(buf_full == BUF_PAGES_PER_BLOCK) {
-						buf_full++;
-						break;
-					}
+					
 					
 					if(sparebuf[i] == -1) {
 					strncpy(pagebuf,sectorbuf, SECTOR_SIZE);	
@@ -150,16 +170,13 @@ void ftl_write(int lsn, char *sectorbuf)
 					sparebuf[i] = lsn; //데이터가 들어갔으므로 spare는 lsn이다.
 					dd_write(i, pagebuf);
 					memset(pagebuf,0,PAGE_SIZE); //해당 버퍼를 다시 깨끗이 비운다
-					buf_full++;
 					break;
 					}
-				}
+				}	
 
-			
-			if(buf_full == BUF_PAGES_PER_BLOCK + 1) {
+			if(buffull_true) {
+
 				
-				buf_full = 0;
-		
 				strncpy(pagebuf,sectorbuf, SECTOR_SIZE); 
 				pagebuf[SECTOR_SIZE] = lsn; 
 				sparebuf[PAGES_PER_BLOCK * freeblock + offset] = lsn; //freeblock쪽의 ppn의 spare을 lsn으로 
@@ -202,10 +219,17 @@ void ftl_write(int lsn, char *sectorbuf)
 
 				nonbuf_notexist = 0;
 				buf_notexist = 0;
+				buffull_true = 0;
+				bufpage_full = 0;
+
+				for(int j = last_buf_page ; j >= first_buf_page ; j--) { 
+					sparebuf[j] = -1;
+				}
 
 				dd_erase(lbn_table[lbn]); //이전의 block의 데이터들을 전부 clear 시킨다
 				lbn_table[lbn] = freeblock; 
 				freeblock = pbn; //이전의 block 위치가 freeblock 위치로  변경된다.
+				
 				
 				
 			}

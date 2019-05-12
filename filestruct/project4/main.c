@@ -45,9 +45,6 @@ int main(int argc, char *argv[])
 	ftl_write(3,"A3");
 	ftl_write(4,"A4");
 	ftl_write(5,"B0");
-	ftl_write(5,"a0");
-	ftl_write(1,"a1");
-	ftl_write(2,"a2");
 	ftl_write(6,"B1");
 	ftl_write(7,"B2");
 	ftl_write(8,"B3");
@@ -70,6 +67,17 @@ int main(int argc, char *argv[])
 	ftl_write(22,"E2");
 	ftl_write(23,"E3");
 	ftl_write(24,"E4");
+
+	ftl_write(1,"a1");
+	ftl_write(2,"a2");
+	ftl_write(5,"b0");
+	ftl_write(5,"b1");
+	ftl_write(1,"newa1");
+	ftl_write(2,"newa2");
+	ftl_write(3,"newa3");
+	ftl_write(4,"newa4");
+	ftl_write(5,"newb2");
+	
 
 	int j;
 	char pagebuf[PAGE_SIZE];
@@ -104,8 +112,13 @@ int main(int argc, char *argv[])
 		printf("\n");
 	}
 	printf("===================================\n");
-	printf("Insert Grade: ");
-	scanf("%d",&i);
+	
+	ftl_read(0,sectorbuf);
+	ftl_read(1,sectorbuf);
+	ftl_read(2,sectorbuf);
+	ftl_read(3,sectorbuf);
+	ftl_read(4,sectorbuf);
+	ftl_read(5,sectorbuf);
 
 	fclose(devicefp);
 
