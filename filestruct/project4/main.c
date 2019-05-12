@@ -44,9 +44,13 @@ int main(int argc, char *argv[])
 	ftl_write(2,"A2");
 	ftl_write(3,"A3");
 	ftl_write(4,"A4");
-	ftl_write(5,"B0");
-	ftl_write(6,"B1");
-	ftl_write(7,"B2");
+	ftl_write(5,"A5");
+	ftl_write(6,"A6");
+	ftl_write(0,"a0");
+	ftl_write(1,"a1");
+	ftl_write(2,"a2");
+	ftl_write(3,"a3");
+	/*ftl_write(7,"B2");
 	ftl_write(8,"B3");
 	ftl_write(9,"B4");
 
@@ -76,10 +80,10 @@ int main(int argc, char *argv[])
 	ftl_write(2,"newa2");
 	ftl_write(3,"newa3");
 	ftl_write(4,"newa4");
-	ftl_write(5,"newb2");
+	ftl_write(5,"newb2");*/
 	
 
-	int j;
+	/*int j;
 	char pagebuf[PAGE_SIZE];
 	char buf[4];
 
@@ -111,7 +115,7 @@ int main(int argc, char *argv[])
 		}
 		printf("\n");
 	}
-	printf("===================================\n");
+	printf("===================================\n");*/
 	
 	ftl_read(0,sectorbuf);
 	ftl_read(1,sectorbuf);
@@ -119,6 +123,7 @@ int main(int argc, char *argv[])
 	ftl_read(3,sectorbuf);
 	ftl_read(4,sectorbuf);
 	ftl_read(5,sectorbuf);
+	ftl_read(6,sectorbuf);
 
 	fclose(devicefp);
 

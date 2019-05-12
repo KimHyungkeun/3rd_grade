@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
 	ftl_write(0,"U0");
 	ftl_write(6,"U1");
-	ftl_write(1,"U2");
+	ftl_write(12,"U2");
 
 	int j;
 	char pagebuf[PAGE_SIZE];

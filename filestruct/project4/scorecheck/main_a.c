@@ -122,8 +122,8 @@ int main(int argc, char *argv[])
 	}
 	printf("===================================\n");
 	printf("Write[77]: %d, Erase[12]: %d\n",write_cnt, erase_cnt);
-	printf("Insert Grade: ");
-	scanf("%d",&i);
+	//printf("Insert Grade: ");
+	//scanf("%d",&i);
 
 	fclose(devicefp);
 

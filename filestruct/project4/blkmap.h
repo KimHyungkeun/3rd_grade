@@ -15,7 +15,7 @@
 #define SPARE_SIZE			       16			
 #define PAGE_SIZE			(SECTOR_SIZE+SPARE_SIZE)
 #define SECTORS_PER_PAGE	   1
-#define PAGES_PER_BLOCK       7   // 상수값 수정 가능
+#define PAGES_PER_BLOCK       10   // 상수값 수정 가능
 #define RS_BUF_PAGES            0.3 // 여기서 '0.3은 30%를 의미하며 상수값 수정 가능
 #define BUF_PAGES_PER_BLOCK (int)(PAGES_PER_BLOCK * RS_BUF_PAGES)
 #define NONBUF_PAGES_PER_BLOCK  (PAGES_PER_BLOCK - BUF_PAGES_PER_BLOCK)

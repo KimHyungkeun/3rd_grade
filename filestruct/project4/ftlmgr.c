@@ -91,7 +91,6 @@ void ftl_read(int lsn, char *sectorbuf)
 	for(int i = last_buf_page ; i >= first_buf_page ; i-- ) {
 		
 		if(sparebuf[i] == lsn) {
-			printf("sparebuf[%d] : %d\n", i , sparebuf[i]);
 			ppn = i;
 			dd_read(ppn, pagebuf);
 			repeat_count = 1;
