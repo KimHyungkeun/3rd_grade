@@ -50,6 +50,10 @@ int main(int argc, char *argv[])
 	ftl_write(1,"a1");
 	ftl_write(2,"a2");
 	ftl_write(3,"a3");
+	ftl_write(0,"AA0");
+	ftl_write(1,"AA1");
+	ftl_write(2,"AA2");
+	ftl_write(3,"AA3");
 	/*ftl_write(7,"B2");
 	ftl_write(8,"B3");
 	ftl_write(9,"B4");
