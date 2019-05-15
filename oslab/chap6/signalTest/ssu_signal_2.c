@@ -22,7 +22,7 @@ int main(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	if (signal(SIGPROF, SIG_IGN) == SIG_ERR) {//setitimer로 설정한 프로파일링 구간 타이머가 만료될때 발생, IGN액션이므로 아무런 액션이 없음
+	if (signal(SIGHUP, SIG_IGN) == SIG_ERR) {//setitimer로 설정한 프로파일링 구간 타이머가 만료될때 발생, IGN액션이므로 아무런 액션이 없음
 		fprintf(stderr, "cannot handle SIGHUP\n");
 		exit(EXIT_FAILURE);
 	}
