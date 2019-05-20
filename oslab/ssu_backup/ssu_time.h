@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sys/time.h>
 
 #define SECOND_TO_MICRO 1000000
@@ -12,7 +13,6 @@ void ssu_runtime (struct timeval* begin_t, struct timeval* end_t) {  //프로그
         }
 
         end_t -> tv_usec -= begin_t -> tv_usec;
-        printf("Runtime : %ld:%06ld(sec:usec)\n",end_t -> tv_sec, end_t -> tv_usec);
-
+        printf("Runtime : %ld:%06ld(sec:usec)\n",end_t -> tv_sec, end_t -> tv_usec); //sec와 msec출력
 }
 
