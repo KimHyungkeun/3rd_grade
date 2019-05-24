@@ -452,9 +452,9 @@ int main(int argc, char *argv[])
 
 	
 	if (argc < 3) {
-		fprintf(stderr, "Usage : %s -a \"field_value1\" \"field_value2\" ... \"field_value7\" \n", argv[0]);
-		fprintf(stderr, "Usage : %s -s \"key_value\" \n", argv[0]);
-		fprintf(stderr, "Usage : %s -d \"key_value\" \n", argv[0]);
+		//fprintf(stderr, "Usage : %s -a \"field_value1\" \"field_value2\" ... \"field_value7\" \n", argv[0]);
+		//fprintf(stderr, "Usage : %s -s \"key_value\" \n", argv[0]);
+		//fprintf(stderr, "Usage : %s -d \"key_value\" \n", argv[0]);
 		exit(1);
 	}
 
@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(argv[1],"-a") == 0) { //add 可记
 		if (argc != 9) {
-			fprintf(stderr, "You must input 7 fields!\n");
+			//fprintf(stderr, "You must input 7 fields!\n");
 			exit(1);
 		}
 		
@@ -487,7 +487,7 @@ int main(int argc, char *argv[])
 
 	else if (strcmp(argv[1],"-s") == 0) { //search 可记
 		if (argc > 3) {
-			fprintf(stderr, "Only input 1 key_value to search!\n");
+			//fprintf(stderr, "Only input 1 key_value to search!\n");
 			exit(1);
 		}
 
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
 
 	else if (strcmp(argv[1],"-d") == 0) { //delete 可记
 		if (argc > 3) {
-			fprintf(stderr, "Only input 1 key_value to delete!\n");
+			//fprintf(stderr, "Only input 1 key_value to delete!\n");
 			exit(1);
 		}
 
@@ -514,7 +514,7 @@ int main(int argc, char *argv[])
 	}
 
 	else {
-		printf("Wrong Option\n");
+		//printf("Wrong Option\n");
 		exit(1);
 	}
 
