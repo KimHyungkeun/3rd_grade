@@ -24,6 +24,7 @@ test :
 	#@-hd student.idx
 	#@-hd student.dat
 	@echo "---------------------------------------------------------------------------------------------------------------------"
+	@ifeq("27","177")
 	@echo "test #3 - 좀 더 짧은 데이터 추가"
 	@-$(TARGET) -a "20142303" "shk.im" "Computer Science" "3" "hongcheon, Gangwon-do" "010-xxxx-yyyy" "niceb5y@gmail.com"
 	#@-hd student.idx
@@ -53,7 +54,6 @@ test :
 	@-$(TARGET) -s "20150001"
 	@-$(TARGET) -s "20150002"
 	@-$(TARGET) -s "20150003"
-	@ifeq("56","177")
 	@echo "test #8 - 삽입(삭제된 위치 재활용)"
 	$(TARGET) -a "20150004" "newface" "new" "0" "hav" "010-123" "short@email" # 삽입했는데 헤더가 -1이 되는 버그가 있음 삽입하면 헤더가 기존에 이 포지션을 가져야함
 	#@-hd student.idx
