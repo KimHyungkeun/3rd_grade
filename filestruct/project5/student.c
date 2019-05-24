@@ -82,11 +82,11 @@ void readRecord(FILE *fp, char *recordbuf, int rn){
 		idx_fp = fopen(INDEX_FILE_NAME, "r");
 		fp = fopen(RECORD_FILE_NAME, "r");
 
-		printf("found rn : %d\n", rn);
+		//printf("found rn : %d\n", rn);
 		fseek(idx_fp, rn*2 + sizeof(short), SEEK_SET);
 		fread(&byte_offset, sizeof(short), 1, idx_fp);
 		fseek(fp, sizeof(short), SEEK_SET);
-		printf("found byte_offset : %d\n", byte_offset);
+		//printf("found byte_offset : %d\n", byte_offset);
 
 		if ((rn*2 + 2*sizeof(short)) == idx_statbuf.st_size) {
 			fseek(fp, sizeof(short) + byte_offset, SEEK_SET);
@@ -146,7 +146,7 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 	if (head == -1) {
 		record_count++;
 		//printf("head : %d\n", head);
-		printf("record_count : %d\n", record_count);
+		//printf("record_count : %d\n", record_count);
 
 		byte_offset = dat_statbuf.st_size - sizeof(short);
 		fwrite(&record_count, sizeof(short), 1, idx_fp);
@@ -276,7 +276,7 @@ int search(FILE *fp,const char *keyval){
 	}
 
 	if (not_found == count_record) {
-		fprintf(stderr,"Could not found record\n");
+		//fprintf(stderr,"Could not found record\n");
 		return -1;
 	}
 
@@ -379,7 +379,7 @@ void delete(FILE *fp, const char *keyval){
 	}
 
 	if (not_found == count_record) {
-		fprintf(stderr,"Cannot find key_value(Delete Failed)\n");
+		//fprintf(stderr,"Cannot find key_value(Delete Failed)\n");
 		return;
 	}
 
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 		rn = search(fp, argv[2]);
 		
 		if(rn == -1) {
-			printf("Key value does no exist.\n");
+			//printf("Key value does no exist.\n");
 			exit(1);
 		}
 
@@ -518,11 +518,6 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	short dat;
-	fp = fopen(RECORD_FILE_NAME, "r");
-	fread(&dat, sizeof(short), 1 ,fp);
-	printf("head : %d\n", dat);
-	fclose(fp);
 	
 	
 	return 1;
