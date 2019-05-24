@@ -15,25 +15,25 @@ void pack(char *recordbuf, const STUDENT *s){
 	char* delimeter = "|";
 	strcat(recordbuf, s -> id);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> name);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> dept);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> year);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> addr);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> phone);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> email);
 	strcat(recordbuf,delimeter);
-	printf("%s\n", recordbuf);
+	//printf("%s\n", recordbuf);
 }
 
 // 
@@ -125,7 +125,6 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 	short record_count;
 	short byte_offset;
 	short len;
-	char dump = 0;
 	
 	stat(RECORD_FILE_NAME, &dat_statbuf);
 	stat(INDEX_FILE_NAME, &idx_statbuf);
@@ -162,13 +161,13 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 	else {
 		fseek(fp, sizeof(short) + head + 3, SEEK_SET);
 		fread(&len, sizeof(short), 1 , fp);
-		printf("len : %d\n", len);
-		printf("strlen : %ld\n", strlen(recordbuf));
-		printf("strlen : %s\n", recordbuf);
+		//printf("len : %d\n", len);
+		//printf("strlen : %ld\n", strlen(recordbuf));
+		//printf("strlen : %s\n", recordbuf);
 
 		if (strlen(recordbuf) > len) {
 			record_count++;
-			printf("head : %d\n", head);
+			//printf("head : %d\n", head);
 			//printf("record_count : %d\n", record_count);
 
 			byte_offset = dat_statbuf.st_size - sizeof(short);
@@ -191,7 +190,6 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 			fwrite(&head, sizeof(short), 1, fp);
 			fseek(fp , sizeof(short) + byte_offset, SEEK_SET);
 			fwrite(recordbuf, strlen(recordbuf), 1, fp);
-			fwrite(&dump,len - strlen(recordbuf), 1, fp);
 		}
 	}
 
@@ -215,6 +213,7 @@ int search(FILE *fp,const char *keyval){
 	stat(INDEX_FILE_NAME, &idx_statbuf);
 	char recordbuf[dat_statbuf.st_size];
 	char testbuf[dat_statbuf.st_size];
+	char onlykey[11] = "\0";
 	char* ptr;
 	
 	short byte_offset;
@@ -222,6 +221,7 @@ int search(FILE *fp,const char *keyval){
 	short offset_check;
 	int seek;
 	int i;
+	int word_count;
 	int not_found = 0;
 
 	short count_record;
@@ -240,7 +240,7 @@ int search(FILE *fp,const char *keyval){
 		fread(&byte_offset, sizeof(short) , 1, idx_fp);
 
 		if( i*2 + sizeof(short) == idx_statbuf.st_size )
-			next_byte_offset = dat_statbuf.st_size;
+			next_byte_offset = dat_statbuf.st_size - sizeof(short);
 
 		else {
 			fseek(idx_fp, i*2 + sizeof(short) , SEEK_SET);
@@ -248,10 +248,22 @@ int search(FILE *fp,const char *keyval){
 			fseek(idx_fp , i*2 , SEEK_SET);
 		}
 
+		//printf("byte_offset move : %d\n", byte_offset);
 		len = next_byte_offset - byte_offset;
-		strncpy(testbuf, recordbuf + byte_offset , len);
-		//printf("ASDFASDF byte_offset : %d\n", byte_offset);
-		if((ptr = strstr(testbuf, keyval)) == NULL) {
+		snprintf(testbuf, len,"%s",recordbuf + byte_offset);
+		//printf("len : %d\n", len);
+		//printf("testbuf : %s\n", testbuf);
+		
+		for(word_count = 0 ; word_count < strlen(testbuf) ; word_count++) {
+			if(testbuf[word_count] == '|') 
+				break;
+		}
+
+		
+		snprintf(onlykey, word_count+1 , "%s" , testbuf);
+		//printf("onlykey : %s\n", onlykey);
+
+		if(strcmp(onlykey, keyval) != 0) {
 			not_found++;
 			continue;
 		}
@@ -285,8 +297,8 @@ int search(FILE *fp,const char *keyval){
 	fclose(fp);
 	fclose(idx_fp);
 
-	printf("rn : %d\n", --seek);
-	return seek;
+	
+	return --seek;
 }
 
 //
@@ -305,6 +317,7 @@ void delete(FILE *fp, const char *keyval){
 	char recordbuf[dat_statbuf.st_size];
 	char* ptr;
 	char testbuf[dat_statbuf.st_size];
+	char onlykey[11] = "\0";
 	
 	char delete_char = '*';
 	short head;
@@ -313,6 +326,7 @@ void delete(FILE *fp, const char *keyval){
 	short check_offset;
 	short len;
 	short rn;
+	int word_count;
 	int i;
 	int not_found = 0;
 
@@ -335,7 +349,7 @@ void delete(FILE *fp, const char *keyval){
 		fread(&byte_offset, sizeof(short) , 1, idx_fp);
 
 		if( i*2 + sizeof(short) == idx_statbuf.st_size )
-			next_byte_offset = dat_statbuf.st_size;
+			next_byte_offset = dat_statbuf.st_size - sizeof(short);
 
 		else {
 			fseek(idx_fp, i*2 + sizeof(short) , SEEK_SET);
@@ -344,16 +358,22 @@ void delete(FILE *fp, const char *keyval){
 		}
 
 		len = next_byte_offset - byte_offset;
-		strncpy(testbuf, recordbuf + byte_offset , len);
-		printf("testbuf : %s\n", testbuf);
-		if((ptr = strstr(testbuf, keyval)) == NULL) {
+		snprintf(testbuf, len, "%s",recordbuf + byte_offset);
+	
+
+		for (word_count = 0; word_count < strlen(testbuf) ; word_count++) {
+			if(testbuf[word_count] == '|')
+				break;
+		}
+
+		snprintf(onlykey, word_count+1 , "%s" , testbuf);
+		
+		if(strcmp(onlykey, keyval) != 0) {
 			not_found++;
 			continue;
 		}
 
 		else {
-			//printf("ptr : %s\n", ptr);
-			//printf("not_found : %d\n", not_found);
 			break;
 		}
 	}
@@ -366,7 +386,7 @@ void delete(FILE *fp, const char *keyval){
 	
 	fseek(fp, byte_offset, SEEK_CUR);
 	//printf("Cutted : %s\n", ptr);
-	printf("byte_offset : %d\n", byte_offset);
+	//printf("byte_offset : %d\n", byte_offset);
 
 	for (rn = sizeof(short) ; rn <= idx_statbuf.st_size - sizeof(short) ; rn+=2) {
 		fseek(idx_fp, rn, SEEK_SET);
@@ -384,7 +404,7 @@ void delete(FILE *fp, const char *keyval){
 	
 
 	if((rn + sizeof(short)) == idx_statbuf.st_size) {
-		next_byte_offset = dat_statbuf.st_size;
+		next_byte_offset = dat_statbuf.st_size - sizeof(short);
 		len = next_byte_offset - byte_offset;
 	}
 
@@ -392,7 +412,7 @@ void delete(FILE *fp, const char *keyval){
 		len = next_byte_offset - byte_offset;
 	}
 
-	printf("next_byte_offset : %d\n", next_byte_offset);
+	//printf("next_byte_offset : %d\n", next_byte_offset);
 	//printf("len : %d\n", len);
 
 	fseek(fp, sizeof(short) + byte_offset, SEEK_SET);
