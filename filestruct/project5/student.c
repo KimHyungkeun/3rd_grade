@@ -454,13 +454,13 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 		
-		strncpy(s.id, argv[2],sizeof(s.id) - 1);
-		strncpy(s.name, argv[3], sizeof(s.name) - 1);
-		strncpy(s.dept, argv[4], sizeof(s.dept) - 1);
-		strncpy(s.year, argv[5], sizeof(s.year) - 1);
-		strncpy(s.addr, argv[6], sizeof(s.addr) - 1);
-		strncpy(s.phone, argv[7], sizeof(s.phone) - 1);
-		strncpy(s.email, argv[8], sizeof(s.email) - 1);
+		strncpy(s.id, argv[2],sizeof(s.id) );
+		strncpy(s.name, argv[3], sizeof(s.name) );
+		strncpy(s.dept, argv[4], sizeof(s.dept) );
+		strncpy(s.year, argv[5], sizeof(s.year) );
+		strncpy(s.addr, argv[6], sizeof(s.addr) );
+		strncpy(s.phone, argv[7], sizeof(s.phone) );
+		strncpy(s.email, argv[8], sizeof(s.email) );
 		add(fp, idx_fp ,&s);
 			
 	}
