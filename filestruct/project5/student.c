@@ -119,6 +119,7 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 	short record_count;
 	short byte_offset;
 	short len;
+	char dump = 0;
 	
 	stat(RECORD_FILE_NAME, &dat_statbuf);
 	stat(INDEX_FILE_NAME, &idx_statbuf);
@@ -139,7 +140,7 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 
 	if (head == -1) {
 		record_count++;
-		printf("head : %d\n", head);
+		//printf("head : %d\n", head);
 		printf("record_count : %d\n", record_count);
 
 		byte_offset = dat_statbuf.st_size - sizeof(short);
@@ -157,7 +158,7 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 		fread(&len, sizeof(short), 1 , fp);
 		printf("len : %d\n", len);
 
-		if (len < strlen(recordbuf)) {
+		if (strlen(recordbuf) > len) {
 			record_count++;
 			printf("head : %d\n", head);
 			printf("record_count : %d\n", record_count);
@@ -170,6 +171,19 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 			fwrite(&head, sizeof(short), 1, fp);
 			fseek(fp, 0 , SEEK_END);
 			fwrite(recordbuf, strlen(recordbuf), 1, fp);
+		}
+
+		else {
+			fseek(fp , 0 , SEEK_SET);
+			fread(&head, sizeof(short) ,1 ,fp);
+			byte_offset = head;
+			fseek(fp , sizeof(short) + byte_offset + 1, SEEK_SET);
+			fread(&head, sizeof(short) , 1 , fp);
+			fseek(fp, 0 , SEEK_SET);
+			fwrite(&head, sizeof(short), 1, fp);
+			fseek(fp , sizeof(short) + byte_offset, SEEK_SET);
+			fwrite(recordbuf, strlen(recordbuf), 1, fp);
+			fwrite(&dump,len - strlen(recordbuf), 1, fp);
 		}
 	}
 
@@ -371,7 +385,7 @@ void delete(FILE *fp, const char *keyval){
 	}
 
 	printf("next_byte_offset : %d\n", next_byte_offset);
-	printf("len : %d\n", len);
+	//printf("len : %d\n", len);
 
 	fseek(fp, sizeof(short) + byte_offset, SEEK_SET);
 	fwrite(&delete_char, sizeof(char), 1, fp);
@@ -402,8 +416,7 @@ int main(int argc, char *argv[])
 
 	short record_count = 0; //레코드들의 수
 	short head = -1; //삭제 레코드를 다루는 헤더
-	short byte_offset = 0; //가변길이 레코드에서 각 레코드의 위치를 알기위한 offset
-	short len = 0; //각 레코드에 저장된 필드의 길이
+	
 
 	int rn; //레코드 번호
 	char recordbuf[MAX_RECORD_SIZE];
