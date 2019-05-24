@@ -15,18 +15,25 @@ void pack(char *recordbuf, const STUDENT *s){
 	char* delimeter = "|";
 	strcat(recordbuf, s -> id);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> name);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> addr);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> year);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> dept);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> phone);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> email);
 	strcat(recordbuf,delimeter);
+	printf("%s\n", recordbuf);
 }
 
 // 
@@ -69,7 +76,6 @@ void readRecord(FILE *fp, char *recordbuf, int rn){
 
 		short byte_offset;
 		short next_byte_offset;
-		short file_size;
 	
 		stat(RECORD_FILE_NAME, &dat_statbuf);
 		stat(INDEX_FILE_NAME,&idx_statbuf);
@@ -157,11 +163,13 @@ void add(FILE *fp, FILE *idx_fp, const STUDENT *s){
 		fseek(fp, sizeof(short) + head + 3, SEEK_SET);
 		fread(&len, sizeof(short), 1 , fp);
 		printf("len : %d\n", len);
+		printf("strlen : %ld\n", strlen(recordbuf));
+		printf("strlen : %s\n", recordbuf);
 
 		if (strlen(recordbuf) > len) {
 			record_count++;
 			printf("head : %d\n", head);
-			printf("record_count : %d\n", record_count);
+			//printf("record_count : %d\n", record_count);
 
 			byte_offset = dat_statbuf.st_size - sizeof(short);
 			fwrite(&record_count, sizeof(short), 1, idx_fp);
@@ -357,7 +365,7 @@ void delete(FILE *fp, const char *keyval){
 
 	
 	fseek(fp, byte_offset, SEEK_CUR);
-	printf("Cutted : %s\n", ptr);
+	//printf("Cutted : %s\n", ptr);
 	printf("byte_offset : %d\n", byte_offset);
 
 	for (rn = sizeof(short) ; rn <= idx_statbuf.st_size - sizeof(short) ; rn+=2) {
@@ -419,7 +427,7 @@ int main(int argc, char *argv[])
 	
 
 	int rn; //레코드 번호
-	char recordbuf[MAX_RECORD_SIZE];
+	char recordbuf[MAX_RECORD_SIZE]; //레코드를 담을 버퍼
 
 
 	
@@ -445,14 +453,14 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "You must input 7 fields!\n");
 			exit(1);
 		}
-
-		strcpy(s.id, argv[2]);
-		strcpy(s.name, argv[3]);
-		strcpy(s.addr, argv[4]);
-		strcpy(s.year, argv[5]);
-		strcpy(s.dept, argv[6]);
-		strcpy(s.phone, argv[7]);
-		strcpy(s.email, argv[8]);
+		
+		strncpy(s.id, argv[2],sizeof(s.id) - 1);
+		strncpy(s.name, argv[3], sizeof(s.name) - 1);
+		strncpy(s.addr, argv[4], sizeof(s.addr) - 1);
+		strncpy(s.year, argv[5], sizeof(s.year) - 1);
+		strncpy(s.dept, argv[6], sizeof(s.dept) - 1);
+		strncpy(s.phone, argv[7], sizeof(s.phone) - 1);
+		strncpy(s.email, argv[8], sizeof(s.email) - 1);
 		add(fp, idx_fp ,&s);
 			
 	}
