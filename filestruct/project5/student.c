@@ -19,13 +19,13 @@ void pack(char *recordbuf, const STUDENT *s){
 	strcat(recordbuf, s -> name);
 	strcat(recordbuf,delimeter);
 	printf("%s\n", recordbuf);
-	strcat(recordbuf, s -> addr);
+	strcat(recordbuf, s -> dept);
 	strcat(recordbuf,delimeter);
 	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> year);
 	strcat(recordbuf,delimeter);
 	printf("%s\n", recordbuf);
-	strcat(recordbuf, s -> dept);
+	strcat(recordbuf, s -> addr);
 	strcat(recordbuf,delimeter);
 	printf("%s\n", recordbuf);
 	strcat(recordbuf, s -> phone);
@@ -51,11 +51,11 @@ void unpack(const char *recordbuf, STUDENT *s){
 	ptr = strtok(NULL, delimeter);
 	strcpy(s -> name, ptr);
 	ptr = strtok(NULL, delimeter);
-	strcpy(s -> addr, ptr);
+	strcpy(s -> dept, ptr);
 	ptr = strtok(NULL, delimeter);
 	strcpy(s -> year, ptr);
 	ptr = strtok(NULL, delimeter);
-	strcpy(s -> dept, ptr);
+	strcpy(s -> addr, ptr);
 	ptr = strtok(NULL, delimeter);
 	strcpy(s -> phone, ptr);
 	ptr = strtok(NULL, delimeter);
@@ -456,9 +456,9 @@ int main(int argc, char *argv[])
 		
 		strncpy(s.id, argv[2],sizeof(s.id) - 1);
 		strncpy(s.name, argv[3], sizeof(s.name) - 1);
-		strncpy(s.addr, argv[4], sizeof(s.addr) - 1);
+		strncpy(s.dept, argv[4], sizeof(s.dept) - 1);
 		strncpy(s.year, argv[5], sizeof(s.year) - 1);
-		strncpy(s.dept, argv[6], sizeof(s.dept) - 1);
+		strncpy(s.addr, argv[6], sizeof(s.addr) - 1);
 		strncpy(s.phone, argv[7], sizeof(s.phone) - 1);
 		strncpy(s.email, argv[8], sizeof(s.email) - 1);
 		add(fp, idx_fp ,&s);
