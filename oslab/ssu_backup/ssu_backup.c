@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     }
 
     if(argv[1] == NULL) {
-         strcpy(backup_dir, "ssu_backup_directory");
+         strcpy(backup_dir, "ssu_backup_dir");
          
 
          if(access(backup_dir, F_OK) == 0) {
@@ -73,17 +73,13 @@ void list_function(void) {
 }
 
 void prompt_environment(void) {
-
-    
-    int status;
-    pthread_t tid;
-    pid_t pid;
-    
+    int idx = 0;
    
     if((log_fp = fopen(logfile, "w")) == NULL) {
         fprintf(stderr, "fopen error\n");
         return;
     }
+
     head = (Backup_list*)malloc(sizeof(Backup_list));
     curr = head;
     curr -> next = NULL;
@@ -119,14 +115,14 @@ void prompt_environment(void) {
 
             if(add_command_analyzer() != 0) 
                 continue;
+
+            curr -> next = (Backup_list*)malloc(sizeof(Backup_list));
             
-            
-            if(pthread_create(&tid, NULL ,add_function, curr) != 0) {
+            if(pthread_create(&curr -> next -> tid, NULL ,add_function, (void *)curr) != 0) {
                 fprintf(stderr, "thread_create error\n");
                 continue;
             }
-           
-            
+            printf("Thread count : %d\n", ++idx);
             //printf("Main Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
             //pthread_join(tid, (void*)&status);
             continue;
@@ -140,6 +136,7 @@ void prompt_environment(void) {
              }
 
              remove_function();
+             printf("Thread count : %d\n", --idx);
              continue;
         }
 
@@ -193,6 +190,7 @@ int add_command_analyzer(void) {
     char* command_token[10];
     char filename_buf[BUFFER_MAX];
     int i = 0;
+    double num;
     Backup_list* listhead = head;
     Backup_list* curr;
 
@@ -239,6 +237,17 @@ int add_command_analyzer(void) {
 
     strcpy(period, command_token[2]);
 
+    num = atof(period);
+    printf("%lf\n", num);
+
+    if(num/1.00 == (int)num)
+        ;
+
+    else {
+        fprintf(stderr,"Not Integer. Try again\n");
+        return 1;
+    }
+
     if(atoi(period) < 5 || atoi(period) > 10) {
         fprintf(stderr,"Please retry (5 <= PERIOD <= 10)\n");
         return 1;
@@ -256,23 +265,21 @@ void *add_function(void *arg) {
     char bck_buf[BUFFER_MAX];
     char cp_command[500];
     //printf("Add Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
-    Backup_list* curr;
-    curr = (Backup_list*)arg;
+    Backup_list* listcurr;
+    listcurr = (Backup_list*)arg;
     
-    curr -> next = (Backup_list*)malloc(sizeof(Backup_list));
-    curr -> next -> prev = curr;
-   
-
-    curr -> next -> pid = getpid();
-    curr -> next -> tid = pthread_self();
-    strcpy(curr -> next ->  filepath, realpath(filename,buf));
-    curr -> next -> period = atoi(period);
     
-    curr -> next -> next = NULL;
-    curr = curr -> next;
+    listcurr -> next -> prev = listcurr;
+    listcurr -> next -> pid = getpid();
+    listcurr -> next -> tid = pthread_self();
+    strcpy(listcurr -> next ->  filepath, realpath(filename,buf));
+    listcurr -> next -> period = atoi(period);
+    
+    listcurr -> next -> next = NULL;
+    listcurr = listcurr -> next;
 
     sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
-    sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+    sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename,buf),backup_dir,bck_buf);
     printf("%s\n", log_buf);
     system(cp_command);
@@ -283,7 +290,7 @@ void *add_function(void *arg) {
         tm_p = localtime(&now);
 
         sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename ,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
-        sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+        sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename,buf),backup_dir,bck_buf);
         printf("%s\n", log_buf);
         system(cp_command);
@@ -372,6 +379,8 @@ void compare_function(void) {
     struct stat statbuf2;
     char *ptr;
     int i = 0;
+    int exist_flag = 0;
+    int regular_flag = 0;
     char* command_token[3];
 
     char filename1[BUFFER_MAX];
@@ -387,43 +396,67 @@ void compare_function(void) {
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
 
-    if(command_token[1] == NULL || command_token[2] == NULL) {
+    if (i != 3) {
         fprintf(stderr, "Usage : %s FILENAME1 FILENAME2\n", command_token[0]);
         return;
     }
+
 
     strcpy(filename1, command_token[1]);
     strcpy(filename2, command_token[2]);
     stat(filename1, &statbuf1);
     stat(filename2, &statbuf2);
 
-    if(access(filename1, F_OK) < 0) {
+
+    if(access(filename1, F_OK) < 0 && access(filename2, F_OK) < 0) {
         fprintf(stderr, "%s does not exist\n", filename1);
-        return;
-    }
-
-    if(access(filename2, F_OK) < 0) {
         fprintf(stderr, "%s does not exist\n", filename2);
-        return;
+        exist_flag = 1;
     }
 
-    if(!S_ISREG(statbuf1.st_mode)) {
+    else if(access(filename1, F_OK) < 0) {
+        fprintf(stderr, "%s does not exist\n", filename1);
+        exist_flag = 1;
+    }
+
+    else if(access(filename2, F_OK) < 0) {
+        fprintf(stderr, "%s does not exist\n", filename2);
+        exist_flag = 1;
+    }
+
+    if(exist_flag == 1)
+        return;
+
+
+    if(!S_ISREG(statbuf1.st_mode) && !S_ISREG(statbuf2.st_mode)) {
         fprintf(stderr, "%s is not regular file\n", filename1);
-        return;
+        fprintf(stderr, "%s is not regular file\n", filename2);
+        regular_flag = 1;
     }
 
-    if(!S_ISREG(statbuf2.st_mode)) {
-        fprintf(stderr, "%s is not regular file\n", filename2);
-        return;
+    else if(!S_ISREG(statbuf1.st_mode)) {
+        fprintf(stderr, "%s is not regular file\n", filename1);
+        regular_flag = 1;
     }
+
+    else if(!S_ISREG(statbuf2.st_mode)) {
+        fprintf(stderr, "%s is not regular file\n", filename2);
+        regular_flag = 1;
+    }
+
+    if(regular_flag == 1)
+        return;
+
 
     if((statbuf1.st_mtime == statbuf2.st_mtime) && (statbuf1.st_size == statbuf2.st_size)) {
         printf("%s and %s is same!\n", filename1, filename2);
+        return;
     }
 
     else {
         printf("FILE1 : %s MTIME : %lu SIZE : %lu\n", filename1, statbuf1.st_mtime, statbuf1.st_size);
         printf("FILE2 : %s MTIME : %lu SIZE : %lu\n", filename2, statbuf2.st_mtime, statbuf2.st_size);
+        return;
     }
 
 
