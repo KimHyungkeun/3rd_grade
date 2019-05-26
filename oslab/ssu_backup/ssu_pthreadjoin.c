@@ -30,8 +30,8 @@ int main(void) {
 
 
     pthread_join(tid1, (void *)&status);
-    pthread_join(tid2, (void *)&status);
-    pthread_join(tid3, (void *)&status);
+    //pthread_join(tid2, (void *)&status);
+    //pthread_join(tid3, (void *)&status);
     exit(0);
 }
 
