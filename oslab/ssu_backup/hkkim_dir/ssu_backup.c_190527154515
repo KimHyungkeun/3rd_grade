@@ -17,14 +17,13 @@ int main(int argc, char* argv[]) {
          strcpy(backup_dir, "ssu_backup_dir");
          
 
-         if(access(backup_dir, F_OK) == 0) 
-                        ;
-         
+         if(access(backup_dir, F_OK) == 0) {
+             sprintf(mkdir_command, "%s %s", "rm -rf", backup_dir);
+             system(mkdir_command);
+         }
 
-         else {
          sprintf(mkdir_command, "%s %s", "mkdir", backup_dir);
          system(mkdir_command);
-         }
             
     }
 
