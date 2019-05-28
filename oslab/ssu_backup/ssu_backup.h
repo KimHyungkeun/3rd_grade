@@ -24,8 +24,7 @@ typedef struct backup_list {
 
 
 struct stat statbuf;
-struct tm *tm_p;
-time_t now;
+
 
 
 FILE *log_fp;
@@ -38,7 +37,7 @@ char *prompt = "20142332>";
 char backup_dir[BUFFER_MAX];
 char logfile[BUFFER_MAX];
 char regular_name[BUFFER_MAX];
-char period[1];
+char period[4];
 
 
 int add_opt;

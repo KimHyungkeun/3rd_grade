@@ -75,11 +75,15 @@ void list_function(void) {
 
 void prompt_environment(void) {
     int idx = 0;
+    struct tm *tm_p;
+    time_t now;
    
     if((log_fp = fopen(logfile, "w")) == NULL) {
         fprintf(stderr, "fopen error\n");
         return;
     }
+    setbuf(log_fp, NULL);
+    //fprintf(log_fp, "이건 써지나?");
 
     head = (Backup_list*)malloc(sizeof(Backup_list));
     curr = head;
@@ -108,15 +112,13 @@ void prompt_environment(void) {
 
         else if (strstr(command,"add") != NULL) { //add 명령
             //printf("add is executed\n");
-
             if(strcmp(command,"add") == 0) {
                 fprintf(stderr, "Usage : %s FILENAME [PERIOD] [OPTION]\n", command);
                 continue;
             }
-
             if(add_command_analyzer() != 0) 
                 continue;
-
+            //fprintf(log_fp, "여기는?\n");
             curr -> next = (Backup_list*)malloc(sizeof(Backup_list));
             
             if(pthread_create(&curr -> next -> tid, NULL ,add_function, (void *)curr) != 0) {
@@ -188,13 +190,12 @@ void prompt_environment(void) {
 int add_command_analyzer(void) {
 
     char *ptr;
-    char* command_token[10];
+    char *command_token[10];
     char filename_buf[BUFFER_MAX];
     int i = 0;
-    double num;
+    int num;
     Backup_list* listhead = head;
     Backup_list* curr;
-
     ptr = strtok(command, " ");
 
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
@@ -207,10 +208,8 @@ int add_command_analyzer(void) {
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
 
-    
     strcpy(filename, command_token[1]);
     stat(filename, &statbuf);
-
     if(i < 3) {
         fprintf(stderr,"Usage : %s FILENAME [PERIOD] [OPTION]\n",command_token[0]);
         return 1;
@@ -235,19 +234,15 @@ int add_command_analyzer(void) {
         curr = curr -> next;
     }
 
-
     strcpy(period, command_token[2]);
+    num = atoi(period);
+    
 
-    num = atof(period);
-    printf("%lf\n", num);
-
-    if(num/1.00 == (int)num)
-        ;
-
-    else {
-        fprintf(stderr,"Not Integer. Try again\n");
+    if (strstr(period,".") != NULL) {
+        fprintf(stderr,"%s is not Integer\n", period);
         return 1;
     }
+
 
     if(atoi(period) < 5 || atoi(period) > 10) {
         fprintf(stderr,"Please retry (5 <= PERIOD <= 10)\n");
@@ -260,7 +255,9 @@ int add_command_analyzer(void) {
 }
 
 void *add_function(void *arg) {
-
+    struct tm *tm_p;
+    struct tm time_struct;
+    time_t now;
     char buf[BUFFER_MAX];
     char log_buf[BUFFER_MAX];
     char bck_buf[BUFFER_MAX];
@@ -268,6 +265,7 @@ void *add_function(void *arg) {
     //printf("Add Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
     Backup_list* listcurr;
     listcurr = (Backup_list*)arg;
+    //printf("테스트\n");
     
     
     listcurr -> next -> prev = listcurr;
@@ -278,22 +276,26 @@ void *add_function(void *arg) {
     
     listcurr -> next -> next = NULL;
     listcurr = listcurr -> next;
-
+    time(&now);
+    tm_p = localtime_r(&now, &time_struct);
     sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename,buf),backup_dir,bck_buf);
-    printf("%s\n", log_buf);
+    //printf("ptr : %p\n", log_fp);
+    //printf("[%s] %ld\n", log_buf, ftell(log_fp));
+    fprintf(log_fp, "%s", log_buf);
     system(cp_command);
     sleep(atoi(period));
   
     while(1) {
         time(&now);
-        tm_p = localtime(&now);
+        tm_p = localtime_r(&now, &time_struct);
 
         sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename ,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename,buf),backup_dir,bck_buf);
-        printf("%s\n", log_buf);
+        //printf("[%s]\n", log_buf);
+        fprintf(log_fp, "%s", log_buf);
         system(cp_command);
         sleep(atoi(period));
     }
@@ -303,15 +305,16 @@ void *add_function(void *arg) {
 
 void remove_function(void) {
 
-     char *ptr;
-     char* command_token[2];
-     char buf[BUFFER_MAX];
-     int i = 0;
-     struct tm *tm_p;
-     time_t now;
+    char *ptr;
+    char *command_token[2];
+    char buf[BUFFER_MAX];
+    int i = 0;
+    struct tm *tm_p; 
+    struct tm time_struct;
+    time_t now;
 
 
-     ptr = strtok(command, " ");
+    ptr = strtok(command, " ");
 
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
     {
@@ -346,7 +349,7 @@ void remove_function(void) {
         curr = head -> next;
         while (curr != NULL) {
             time(&now);
-            tm_p = localtime(&now);
+            tm_p = localtime_r(&now, &time_struct);
             
             if(strcmp(curr -> filepath, realpath(filename, buf)) == 0) {
                 pthread_cancel(curr -> tid);
@@ -356,7 +359,7 @@ void remove_function(void) {
                 else 
                     curr -> next -> prev = curr -> prev;
 
-                printf("[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+                fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
                 free(curr);
                 curr = head;
                 while(curr != NULL) {
