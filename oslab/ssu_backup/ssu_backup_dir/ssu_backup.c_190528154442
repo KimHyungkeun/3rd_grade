@@ -257,7 +257,6 @@ void *add_function(void *arg) {
     struct tm *tm_p;
     struct tm time_struct;
     time_t now;
-
     char buf[BUFFER_MAX];
     char log_buf[BUFFER_MAX];
     char bck_buf[BUFFER_MAX];
@@ -282,7 +281,6 @@ void *add_function(void *arg) {
     
     time(&now);
     tm_p = localtime_r(&now, &time_struct);
-    
     sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_local,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> next -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename_local,buf),backup_dir,bck_buf);
