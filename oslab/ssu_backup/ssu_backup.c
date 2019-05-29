@@ -267,15 +267,20 @@ void *add_function(void *arg) {
     char cp_command[500];
     char period[4];
 
+    char *strrchr_ptr;
     char *ptr;
     char *command_token[10];
 
     char filename_local[BUFFER_MAX];
     char command_local[BUFFER_MAX];
-    //printf("Add Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
+    char backup_local[BUFFER_MAX];
+
+    char backup_realpath[BUFFER_MAX];
+    char filename_final[BUFFER_MAX];
+  
     Backup_list* listcurr;
     listcurr = (Backup_list*)arg;
-    //printf("테스트\n");
+
 
     strcpy(command_local, command_tmp);
 
@@ -290,6 +295,7 @@ void *add_function(void *arg) {
 
     strcpy(period, command_token[2]);
     strcpy(filename_local, filename);
+    strcpy(backup_local, backup_dir);
     
     listcurr -> next -> prev = listcurr;
     listcurr -> next -> pid = getpid();
@@ -298,14 +304,21 @@ void *add_function(void *arg) {
     listcurr -> next -> period = atoi(period);
     
     listcurr -> next -> next = NULL;
+
+    strrchr_ptr = strrchr(filename_local, '/');
+
+    if (strrchr_ptr != NULL)
+        strcpy(filename_final, strrchr_ptr+1);
+    else
+        strcpy(filename_final, filename_local);
     
     time(&now);
     tm_p = localtime_r(&now, &time_struct);
     
-    sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_local,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
-    sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> next -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+    sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+    sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath), filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename_local,buf),backup_dir,bck_buf);
-    //printf("ptr : %p\n", log_fp);
+    //printf("bck_buf : %s\n", bck_buf);
     //printf("[%s] %ld\n", log_buf, ftell(log_fp));
     fprintf(log_fp, "%s", log_buf);
     system(cp_command);
@@ -315,8 +328,8 @@ void *add_function(void *arg) {
         time(&now);
         tm_p = localtime_r(&now, &time_struct);
 
-        sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_local ,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
-        sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, listcurr -> next -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+        sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_final ,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+        sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath), filename_final, tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename_local,buf),backup_dir,bck_buf);
         //printf("tid : %lu\n", listcurr -> tid);
         fprintf(log_fp, "%s", log_buf);
@@ -329,16 +342,28 @@ void *add_function(void *arg) {
 
 Backup_list* remove_function(Backup_list* head) {
 
+    char *strrchr_ptr;
     char *ptr;
     char *command_token[2];
     char buf[BUFFER_MAX];
+    char backup_local[BUFFER_MAX];
+    char backup_realpath[BUFFER_MAX];
+    char filename_local[BUFFER_MAX];
+
+    char filename_realpath[BUFFER_MAX];
+    char token_realpath[BUFFER_MAX];
+
+    char filename_final[BUFFER_MAX];
+
     int i = 0;
     struct tm *tm_p; 
     struct tm time_struct;
     time_t now;
+    pthread_t local_tid;
     Backup_list *curr;
 
-
+    strcpy(backup_local, backup_dir);
+    strcpy(filename_local, filename);
     ptr = strtok(command, " ");
 
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
@@ -350,6 +375,13 @@ Backup_list* remove_function(Backup_list* head) {
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
 
+    
+    strrchr_ptr = strrchr(filename_local, '/');
+
+    if (strrchr_ptr != NULL)
+        strcpy(filename_final, strrchr_ptr+1);
+    else
+        strcpy(filename_final, filename_local);
 
     if(strcmp(command_token[1], "-a") == 0) {
         curr = head -> next;
@@ -364,7 +396,7 @@ Backup_list* remove_function(Backup_list* head) {
             else 
                 curr -> next -> prev = curr -> prev;
 
-            fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+            fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath) ,filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
             free(curr);
             curr = head -> next;
         }
@@ -372,29 +404,36 @@ Backup_list* remove_function(Backup_list* head) {
     }
 
     else {
+        
         curr = head -> next;
         while (curr != NULL) {
             time(&now);
             tm_p = localtime_r(&now, &time_struct);
             
-            if(strcmp(curr -> filepath, realpath(command_token[1], buf)) == 0) {
-                pthread_cancel(curr -> tid);
+            if(strcmp(curr -> filepath, realpath(filename_local, buf)) == 0) {
+                local_tid = curr -> tid;
+                pthread_cancel(local_tid);
                 curr -> prev -> next = curr -> next;
                 if(curr -> next == NULL)
                             ;
                 else 
                     curr -> next -> prev = curr -> prev;
 
-                fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, curr -> filepath,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
+                
+                fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_dir, backup_realpath), filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
                 free(curr);
 
                 curr = head;
                 while(curr != NULL) {
-                    if(curr -> next == NULL)
+                    
+                    if(curr -> next == NULL) {
+                    //printf("%s\n", curr -> filepath);
                     break;
+                    }
 
                     curr = curr -> next;
                 }
+                
                 return curr;
             }
 
@@ -403,6 +442,7 @@ Backup_list* remove_function(Backup_list* head) {
         }
        
     }
+
 
     return curr;
 }

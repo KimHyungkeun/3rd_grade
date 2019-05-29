@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-#define BUFFER_MAX 255
+#define BUFFER_MAX 256
 
 typedef struct backup_list {
     struct backup_list *prev;
