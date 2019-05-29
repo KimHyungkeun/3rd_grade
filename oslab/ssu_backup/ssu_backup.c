@@ -98,6 +98,7 @@ void prompt_environment(void) {
 
         fgets(command, sizeof(command), stdin);
         command[strlen(command) - 1] = 0;
+        strcpy(command_tmp, command);
 
         if (strstr(command,"vi") != NULL) { //vi 명령
              system(command); //명령 실행
@@ -191,6 +192,7 @@ int add_command_analyzer(Backup_list* head) {
     char *ptr;
     char *command_token[10];
     char filename_buf[BUFFER_MAX];
+    char period[4];
     int i = 0;
     int num;
     //Backup_list* listhead = head;
@@ -234,7 +236,7 @@ int add_command_analyzer(Backup_list* head) {
     }
 
     strcpy(period, command_token[2]);
-    num = atoi(period);
+  
     
 
     if (strstr(period,".") != NULL) {
@@ -257,20 +259,37 @@ void *add_function(void *arg) {
     struct tm *tm_p;
     struct tm time_struct;
     time_t now;
+    int i = 0;
 
     char buf[BUFFER_MAX];
     char log_buf[BUFFER_MAX];
     char bck_buf[BUFFER_MAX];
     char cp_command[500];
+    char period[4];
+
+    char *ptr;
+    char *command_token[10];
 
     char filename_local[BUFFER_MAX];
+    char command_local[BUFFER_MAX];
     //printf("Add Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
     Backup_list* listcurr;
     listcurr = (Backup_list*)arg;
     //printf("테스트\n");
 
+    strcpy(command_local, command_tmp);
+
+    ptr = strtok(command_local, " ");
+    while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
+    {
+        command_token[i] = ptr;          // 자른 문자열 출력
+        i++;  
+        
+        ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
+    }
+
+    strcpy(period, command_token[2]);
     strcpy(filename_local, filename);
-    
     
     listcurr -> next -> prev = listcurr;
     listcurr -> next -> pid = getpid();

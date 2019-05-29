@@ -27,12 +27,13 @@ struct stat statbuf;
 FILE *log_fp;
 
 char command[BUFFER_MAX];
+char command_tmp[BUFFER_MAX];
 char filename[BUFFER_MAX];
 char *prompt = "20142332>";
 char backup_dir[BUFFER_MAX];
 char logfile[BUFFER_MAX];
 char regular_name[BUFFER_MAX];
-char period[4];
+
 
 void prompt_environment(void);
 int add_command_analyzer(Backup_list*);
