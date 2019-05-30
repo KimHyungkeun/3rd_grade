@@ -2,15 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "ssu_employee.h"
 
 #define DUMMY 0
 
-struct ssu_employee {
-
-	char name[100];
-	int salary;
-	int pid;
-};
 
 int main(int argc, char* argv[]) {
 
@@ -25,8 +20,8 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	if ((fd = open(argv[1], O_RDWR)) < 0) {a
-	
+	if ((fd = open(argv[1], O_RDWR)) < 0) {
+		fprintf(stderr, "open_error");	
 		exit(1);
 	}
 
