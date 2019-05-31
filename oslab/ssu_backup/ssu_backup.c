@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
            system(mkdir_command);
     }
 
-    //printf("%s\n", backup_dir);
+    
     stat(backup_dir, &statbuf);
 
     if(access(backup_dir, F_OK) < 0) {
@@ -90,7 +90,7 @@ void prompt_environment(void) {
         return;
     }
     setbuf(log_fp, NULL);
-    //fprintf(log_fp, "이건 써지나?");
+   
 
     head = (Backup_list*)malloc(sizeof(Backup_list));
     curr = head;
@@ -126,15 +126,14 @@ void prompt_environment(void) {
             }
             if(add_command_analyzer(head) != 0) 
                 continue;
-            //fprintf(log_fp, "여기는?\n");
+           
             curr -> next = (Backup_list*)malloc(sizeof(Backup_list));
             
             if(pthread_create(&curr -> next -> tid, NULL ,add_function, (void *)curr) != 0) {
                 fprintf(stderr, "thread_create error\n");
                 continue;
             }
-            //printf("Main Thread : pid %u tid %u \n", (unsigned int)pid, (unsigned int)tid);
-            //pthread_join(tid, (void*)&status);
+            
             curr = curr -> next;
             continue;
         }
@@ -151,7 +150,7 @@ void prompt_environment(void) {
         }
 
         else if (strstr(command,"compare") != NULL) { //compare 명령
-             //printf("compare is executed\n");
+             
              if(strcmp(command,"compare") == 0) {
                  fprintf(stderr, "Usage : %s FILENAME1 FILENAME2\n", command);
                  continue;
@@ -167,13 +166,13 @@ void prompt_environment(void) {
                  continue;
              }
              
-             recover_function();
+             recover_function(head, curr);
              continue;
         }
 
 
         else if (strstr(command,"list") != NULL) { //list 명령
-             //printf("list is executed\n"); //명령 실행
+             
              list_function(head);
              continue;
         }
@@ -210,15 +209,13 @@ int add_command_analyzer(Backup_list* head) {
     char period[4];
     int i = 0;
     int num;
-    //Backup_list* listhead = head;
+  
     Backup_list *curr;
     ptr = strtok(command, " ");
 
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
     {
         command_token[i] = ptr;          // 자른 문자열 출력
-        //printf("%s\n", command_token[i]);
-        //printf("i : %d\n", i);
         i++;  
         
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
@@ -314,7 +311,6 @@ void *add_function(void *arg) {
     
     listcurr -> next -> prev = listcurr;
     listcurr -> next -> pid = getpid();
-    //listcurr -> next -> tid = pthread_self();
     strcpy(listcurr -> next ->  filepath, realpath(filename_local,buf));
     listcurr -> next -> period = atoi(period);
     
@@ -333,8 +329,7 @@ void *add_function(void *arg) {
     sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d added\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath), filename_final,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename_local,buf),backup_dir,bck_buf);
-    //printf("bck_buf : %s\n", bck_buf);
-    //printf("[%s] %ld\n", log_buf, ftell(log_fp));
+   
     fprintf(log_fp, "%s", log_buf);
     system(cp_command);
     sleep(atoi(period));
@@ -346,7 +341,7 @@ void *add_function(void *arg) {
         sprintf(bck_buf, "%s_%d%02d%02d%02d%02d%02d", filename_final ,tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(log_buf,"[%d%02d%02d %02d%02d%02d] %s/%s_%d%02d%02d%02d%02d%02d generated\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath), filename_final, tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         sprintf(cp_command, "%s %s %s/%s","cp",realpath(filename_local,buf),backup_dir,bck_buf);
-        //printf("tid : %lu\n", listcurr -> tid);
+        
         fprintf(log_fp, "%s", log_buf);
         system(cp_command);
         sleep(atoi(period));
@@ -375,24 +370,21 @@ Backup_list* remove_function(Backup_list* head) {
     struct tm time_struct;
     time_t now;
     pthread_t local_tid;
+    Backup_list *listhead = head;
     Backup_list *curr;
 
 
-    
     strcpy(backup_local, backup_dir);
-    strcpy(filename_local, filename);
     ptr = strtok(command, " ");
 
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
     {
         command_token[i] = ptr;          // 자른 문자열 출력
-        //printf("%s\n", command_token[i]);
-        //printf("i : %d\n", i);
         i++;  
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
 
-    
+    strcpy(filename_local, command_token[1]);
     strrchr_ptr = strrchr(filename_local, '/');
 
     if (strrchr_ptr != NULL)
@@ -400,36 +392,40 @@ Backup_list* remove_function(Backup_list* head) {
     else
         strcpy(filename_final, filename_local);
 
-    fprintf(log_fp,"remove is executed\n");
+    
 
     if(strcmp(command_token[1], "-a") == 0) {
-        curr = head -> next;
+        curr = listhead -> next;
         while (curr != NULL) { 
             time(&now);
             tm_p = localtime_r(&now, &time_struct);
-            pthread_cancel(curr -> tid);
-            //printf("tid :%u\n", (unsigned int)curr -> tid);
+            local_tid = curr -> tid;
+            pthread_cancel(local_tid);
+     
             curr -> prev -> next = curr -> next;
             if(curr -> next == NULL)
                 curr -> next = NULL;
             else 
                 curr -> next -> prev = curr -> prev;
 
-            fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath) ,filename_final);
+            fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_local, backup_realpath) ,strrchr(curr -> filepath, '/')+1);
             free(curr);
-            curr = head -> next;
+            curr = listhead -> next;
         }
-        curr = head;
+        curr = listhead;
+        fprintf(log_fp,"remove is executed\n");
+        return curr;
     }
 
     else {
         
-        curr = head -> next;
+        curr = listhead -> next;
         while (curr != NULL) {
             time(&now);
             tm_p = localtime_r(&now, &time_struct);
-            
+
             if(strcmp(curr -> filepath, realpath(filename_local, buf)) == 0) {
+                
                 local_tid = curr -> tid;
                 pthread_cancel(local_tid);
                 curr -> prev -> next = curr -> next;
@@ -439,31 +435,31 @@ Backup_list* remove_function(Backup_list* head) {
                     curr -> next -> prev = curr -> prev;
 
                 
-                fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_dir, backup_realpath), filename_final);
+                fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_dir, backup_realpath), strrchr(curr -> filepath,'/')+1);
                 free(curr);
 
-                curr = head;
+                curr = listhead -> next;
                 while(curr != NULL) {
                     
                     if(curr -> next == NULL) {
-                    //printf("%s\n", curr -> filepath);
                     break;
                     }
 
                     curr = curr -> next;
                 }
                 
+                fprintf(log_fp,"remove is executed\n");
                 return curr;
             }
 
             else
                 curr = curr -> next;
         }
-       
-    }
 
-
+    fprintf(log_fp,"remove is executed\n");
     return curr;
+    }
+    
 }
 
 void compare_function(void) {
@@ -483,8 +479,6 @@ void compare_function(void) {
     while (ptr != NULL)               // 자른 문자열이 나오지 않을 때까지 반복
     {
         command_token[i] = ptr;          // 자른 문자열 출력
-        //printf("%s\n", command_token[i]);
-        //printf("i : %d\n", i);
         i++;  
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
@@ -554,11 +548,16 @@ void compare_function(void) {
 
 }
 
-void recover_function(void) {
+void recover_function(Backup_list* head, Backup_list* curr) {
 
     char* tmp_filename = "tmp.txt";
     FILE* tmp_fp;
     tmp_fp = fopen(tmp_filename, "w+");
+
+    struct tm *tm_p; 
+    struct tm time_struct;
+    time_t now;
+    pthread_t local_tid;
 
     struct stat tmp_statbuf;
     struct stat backup_statbuf;
@@ -599,19 +598,7 @@ void recover_function(void) {
         return ;
     }
    
-    
-    /*if(strcmp(command_token[2], "-n") == 0) {
-        
-        printf("%s\n", command_token[3]);
-        if(command_token[3] == NULL) {
-            fprintf(stderr, "Usage : %s FILENAME [OPTION] NEWFILE\n", command_token[0]);
-            fclose(tmp_fp);
-            system("rm -rf tmp.txt");
-            return;
-        }
-    }*/
-    
-    
+    realpath(command_token[1], filename_fullpath);
     strcpy(filename_local, command_token[1]);
     strcpy(backdir_local, backup_dir);
     
@@ -623,11 +610,10 @@ void recover_function(void) {
         strcpy(filename_final, filename_local);
 
     sprintf(system_command, "%s %s/%s* > %s", "ls", realpath(backdir_local, backdir_fullpath), filename_final, "tmp.txt");
-    //printf("%s\n", system_command);
     system(system_command);
     
     stat(tmp_filename, &tmp_statbuf);
-    //printf("%ld\n", tmp_statbuf.st_size);
+    
     
     char tmp_buf[tmp_statbuf.st_size];
     char tmp_buf_final[tmp_statbuf.st_size];
@@ -636,9 +622,9 @@ void recover_function(void) {
     strcpy(tmp_buf_final, tmp_buf);
     
     
-    //printf("%s\n", tmp_buf);
+    
     strtok_ptr = strtok(tmp_buf,"\n");
-    //printf("%s\n", strtok_ptr);
+   
     
     printf("0  exit\n");
     while (strtok_ptr != NULL) {
@@ -674,18 +660,17 @@ void recover_function(void) {
 
     if(i == 2){
        
-        printf("Check\n");
         for(int count = 1 ; count <= select_num-1 ; count++) {
             strtok_ptr = strtok(NULL,"\n");
         }
         
         sprintf(system_command, "%s %s %s", "cp", strtok_ptr , realpath(filename_final, final_realpath));
         system(system_command);
-        printf("Recovery Sucess\n");
+        printf("Recovery Success\n");
     }
   
     else if (strcmp(command_token[2], "-n") == 0) {
-        printf("Check\n");
+    
         for(int count = 1 ; count <= select_num-1 ; count++) {
             strtok_ptr = strtok(NULL,"\n");
         }
@@ -700,11 +685,44 @@ void recover_function(void) {
         }
 
         system(system_command);
-        printf("Recovery Sucess\n");
+        printf("Recovery Success\n");
     }
 
     
-   
+    curr = head -> next;
+    
+    while (curr != NULL) {
+        time(&now);
+        tm_p = localtime_r(&now, &time_struct);
+        
+        if(strcmp(curr -> filepath, filename_fullpath) == 0 ){
+            local_tid = curr -> tid;
+            pthread_cancel(local_tid);
+
+            curr -> prev -> next = curr -> next;
+            if(curr -> next == NULL)
+                curr -> next = NULL;
+            else 
+                curr -> next -> prev = curr -> prev;
+
+            fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, backdir_fullpath, strrchr(curr -> filepath,'/')+1);
+            free(curr);
+            break;
+        }
+
+        else
+        curr = curr -> next;
+    }
+
+    curr = head -> next;
+    while(curr != NULL) {
+
+        if(curr -> next == NULL)
+            break;
+
+        else
+            curr = curr -> next;
+    }
 
     
     fprintf(log_fp, "recover is executed\n");

@@ -40,4 +40,4 @@ void *add_function(void*);
 Backup_list* remove_function(Backup_list*);
 void list_function(Backup_list*);
 void compare_function(void);
-void recover_function(void);
+void recover_function(Backup_list*, Backup_list*);
