@@ -71,14 +71,21 @@ void list_function(Backup_list* head) {
 }
 
 void prompt_environment(void) {
+
     int idx = 0;
     struct tm *tm_p;
     time_t now;
     Backup_list *head;
     Backup_list *curr;
+    char *prompt = "20142332>";
+    char backdir_fullpath[BUFFER_MAX];
+    
+    realpath(backup_dir, backdir_fullpath);
+    strcat(backdir_fullpath,"/");
+    strcat(backdir_fullpath,logfile);
  
    
-    if((log_fp = fopen(logfile, "w")) == NULL) {
+    if((log_fp = fopen(backdir_fullpath, "w")) == NULL) {
         fprintf(stderr, "fopen error\n");
         return;
     }
@@ -95,7 +102,7 @@ void prompt_environment(void) {
         time(&now);
         tm_p = localtime(&now);
         fputs(prompt, stdout);
-
+        
         fgets(command, sizeof(command), stdin);
         command[strlen(command) - 1] = 0;
         strcpy(command_tmp, command);
@@ -112,7 +119,7 @@ void prompt_environment(void) {
            
 
         else if (strstr(command,"add") != NULL) { //add 명령
-            //printf("add is executed\n");
+            
             if(strcmp(command,"add") == 0) {
                 fprintf(stderr, "Usage : %s FILENAME [PERIOD] [OPTION]\n", command);
                 continue;
@@ -133,7 +140,7 @@ void prompt_environment(void) {
         }
 
         else if (strstr(command,"remove") != NULL) { //remove 명령
-             //printf("remove is executed\n");
+             
              if(strcmp(command,"remove") == 0) {
                 fprintf(stderr, "Usage : %s FILENAME [OPTION]\n", command);
                 continue;
@@ -154,7 +161,13 @@ void prompt_environment(void) {
         }
 
         else if (strstr(command,"recover") != NULL) { //recover 명령
-             printf("recover is executed\n");
+             
+             if(strcmp(command,"recover") == 0) {
+                 fprintf(stderr, "Usage : %s FILENAME [OPTION]\n", command);
+                 continue;
+             }
+             
+             recover_function();
              continue;
         }
 
@@ -178,6 +191,8 @@ void prompt_environment(void) {
             printf("Unknown Command\n");  //프롬프트 종료 명령
             continue;
         }
+
+        
 
     }
 
@@ -250,7 +265,7 @@ int add_command_analyzer(Backup_list* head) {
         return 1;
     }
 
-
+    fprintf(log_fp,"add is executed\n");
     return 0;
 
 }
@@ -281,7 +296,7 @@ void *add_function(void *arg) {
     Backup_list* listcurr;
     listcurr = (Backup_list*)arg;
 
-
+    
     strcpy(command_local, command_tmp);
 
     ptr = strtok(command_local, " ");
@@ -362,6 +377,8 @@ Backup_list* remove_function(Backup_list* head) {
     pthread_t local_tid;
     Backup_list *curr;
 
+
+    
     strcpy(backup_local, backup_dir);
     strcpy(filename_local, filename);
     ptr = strtok(command, " ");
@@ -382,6 +399,8 @@ Backup_list* remove_function(Backup_list* head) {
         strcpy(filename_final, strrchr_ptr+1);
     else
         strcpy(filename_final, filename_local);
+
+    fprintf(log_fp,"remove is executed\n");
 
     if(strcmp(command_token[1], "-a") == 0) {
         curr = head -> next;
@@ -533,4 +552,164 @@ void compare_function(void) {
         return;
     }
 
+}
+
+void recover_function(void) {
+
+    char* tmp_filename = "tmp.txt";
+    FILE* tmp_fp;
+    tmp_fp = fopen(tmp_filename, "w+");
+
+    struct stat tmp_statbuf;
+    struct stat backup_statbuf;
+
+    int i = 0;
+    int j = 0;
+    int select_num;
+    char* strrchr_ptr;
+    char* ptr;
+    char* strtok_ptr;
+    char* command_token[4];
+
+    char system_command[BUFFER_MAX];
+    char filename_local[BUFFER_MAX];
+    char backdir_local[BUFFER_MAX];
+    char filename_fullpath[BUFFER_MAX];
+    char backdir_fullpath[BUFFER_MAX];
+
+    char filename_final[BUFFER_MAX];
+    char final_realpath[BUFFER_MAX];
+    char newfile_fullpath[BUFFER_MAX];
+   
+    
+   
+    ptr = strtok(command," ");
+    while(ptr != NULL) {
+        command_token[i] = ptr;
+        printf("%s ", command_token[i]);
+        i++;
+        ptr = strtok(NULL, " ");
+    }
+    printf("\n");
+
+    if(access(command_token[1], F_OK) < 0) {
+        fprintf(stderr, "\"%s\" does not exist\n", command_token[1]);
+        fclose(tmp_fp);
+        system("rm -rf tmp.txt");
+        return ;
+    }
+   
+    
+    /*if(strcmp(command_token[2], "-n") == 0) {
+        
+        printf("%s\n", command_token[3]);
+        if(command_token[3] == NULL) {
+            fprintf(stderr, "Usage : %s FILENAME [OPTION] NEWFILE\n", command_token[0]);
+            fclose(tmp_fp);
+            system("rm -rf tmp.txt");
+            return;
+        }
+    }*/
+    
+    
+    strcpy(filename_local, command_token[1]);
+    strcpy(backdir_local, backup_dir);
+    
+    strrchr_ptr = strrchr(filename_local, '/');
+
+    if (strrchr_ptr != NULL)
+        strcpy(filename_final, strrchr_ptr+1);
+    else
+        strcpy(filename_final, filename_local);
+
+    sprintf(system_command, "%s %s/%s* > %s", "ls", realpath(backdir_local, backdir_fullpath), filename_final, "tmp.txt");
+    //printf("%s\n", system_command);
+    system(system_command);
+    
+    stat(tmp_filename, &tmp_statbuf);
+    //printf("%ld\n", tmp_statbuf.st_size);
+    
+    char tmp_buf[tmp_statbuf.st_size];
+    char tmp_buf_final[tmp_statbuf.st_size];
+
+    fread(&tmp_buf, sizeof(tmp_buf), 1, tmp_fp);
+    strcpy(tmp_buf_final, tmp_buf);
+    
+    
+    //printf("%s\n", tmp_buf);
+    strtok_ptr = strtok(tmp_buf,"\n");
+    //printf("%s\n", strtok_ptr);
+    
+    printf("0  exit\n");
+    while (strtok_ptr != NULL) {
+        
+        if(strstr(strtok_ptr, "/home") == NULL)
+            break;
+
+        stat(strtok_ptr, &backup_statbuf);
+        printf("%d.  %s  %lubytes\n", j+1 ,strtok_ptr + strlen(backdir_fullpath) + strlen(filename_final) + 2, backup_statbuf.st_size);
+        j++;
+        strtok_ptr = strtok(NULL, "\n");
+    }
+    printf("Choose file to recover : ");
+    scanf("%d", &select_num);
+    fflush(stdin);
+    
+    
+   
+    if(select_num == 0) {
+         fclose(tmp_fp);
+         system("rm -rf tmp.txt");
+         return;    
+    }
+
+    else if(select_num > j || select_num < 0) {
+        fprintf(stderr, "Wrong Select\n");
+        fclose(tmp_fp);
+        system("rm -rf tmp.txt");
+        return;    
+    }
+
+    strtok_ptr = strtok(tmp_buf_final,"\n");
+
+    if(i == 2){
+       
+        printf("Check\n");
+        for(int count = 1 ; count <= select_num-1 ; count++) {
+            strtok_ptr = strtok(NULL,"\n");
+        }
+        
+        sprintf(system_command, "%s %s %s", "cp", strtok_ptr , realpath(filename_final, final_realpath));
+        system(system_command);
+        printf("Recovery Sucess\n");
+    }
+  
+    else if (strcmp(command_token[2], "-n") == 0) {
+        printf("Check\n");
+        for(int count = 1 ; count <= select_num-1 ; count++) {
+            strtok_ptr = strtok(NULL,"\n");
+        }
+        
+        sprintf(system_command, "%s %s %s", "cp", strtok_ptr , command_token[3]);
+        
+        if(access(realpath(command_token[3],newfile_fullpath), F_OK) == 0) {
+            fprintf(stderr, "\"%s\" is already exist\n", command_token[3]);
+            fclose(tmp_fp);
+            system("rm -rf tmp.txt");
+            return;
+        }
+
+        system(system_command);
+        printf("Recovery Sucess\n");
+    }
+
+    
+   
+
+    
+    fprintf(log_fp, "recover is executed\n");
+    fclose(tmp_fp);
+    system("rm -rf tmp.txt");
+    return;
+    
 }

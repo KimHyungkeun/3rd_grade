@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if ((fd = open(argv[1], O_RDWR)) < 0) {
-		fprintf(stderr, "open_error");	
+		fprintf(stderr, "open_error\n");	
 		exit(1);
 	}
 

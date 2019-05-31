@@ -1,3 +1,0 @@
-[190530 145602] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_backup.c_190530145602 added
-[190530 145607] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_backup.c_190530145607 generated
-[190530 145611] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_backup.c deleted
