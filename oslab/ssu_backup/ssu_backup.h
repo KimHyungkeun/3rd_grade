@@ -32,6 +32,7 @@ char filename[BUFFER_MAX];
 char backup_dir[BUFFER_MAX];
 char logfile[BUFFER_MAX];
 char regular_name[BUFFER_MAX];
+int recover_flag = 0;
 
 
 void prompt_environment(void);

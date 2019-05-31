@@ -101,7 +101,12 @@ void prompt_environment(void) {
 
         time(&now);
         tm_p = localtime(&now);
-        fputs(prompt, stdout);
+
+        if(recover_flag == 0)
+            fputs(prompt, stdout);
+        else {
+            recover_flag = 0;
+        }
         
         fgets(command, sizeof(command), stdin);
         command[strlen(command) - 1] = 0;
@@ -196,12 +201,15 @@ void prompt_environment(void) {
     }
 
     fclose(log_fp);
-    //fprintf(stdout, "Bye~!\n");
-    //fflush(stdout);
+
 }
 
 
 int add_command_analyzer(Backup_list* head) {
+
+    struct tm *tm_p;
+    struct tm time_struct;
+    time_t now;
 
     char *ptr;
     char *command_token[10];
@@ -262,7 +270,9 @@ int add_command_analyzer(Backup_list* head) {
         return 1;
     }
 
-    fprintf(log_fp,"add is executed\n");
+    time(&now);
+    tm_p = localtime(&now);
+    fprintf(log_fp,"[%d%02d%02d %02d%02d%02d] add is executed\n", tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     return 0;
 
 }
@@ -413,7 +423,7 @@ Backup_list* remove_function(Backup_list* head) {
             curr = listhead -> next;
         }
         curr = listhead;
-        fprintf(log_fp,"remove is executed\n");
+        fprintf(log_fp,"[%d%02d%02d %02d%02d%02d] remove is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
         return curr;
     }
 
@@ -448,7 +458,7 @@ Backup_list* remove_function(Backup_list* head) {
                     curr = curr -> next;
                 }
                 
-                fprintf(log_fp,"remove is executed\n");
+                fprintf(log_fp,"[%d%02d%02d %02d%02d%02d] remove is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
                 return curr;
             }
 
@@ -456,7 +466,7 @@ Backup_list* remove_function(Backup_list* head) {
                 curr = curr -> next;
         }
 
-    fprintf(log_fp,"remove is executed\n");
+    fprintf(log_fp,"[%d%02d%02d %02d%02d%02d] remove is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     return curr;
     }
     
@@ -585,11 +595,10 @@ void recover_function(Backup_list* head, Backup_list* curr) {
     ptr = strtok(command," ");
     while(ptr != NULL) {
         command_token[i] = ptr;
-        printf("%s ", command_token[i]);
         i++;
         ptr = strtok(NULL, " ");
     }
-    printf("\n");
+    
 
     if(access(command_token[1], F_OK) < 0) {
         fprintf(stderr, "\"%s\" does not exist\n", command_token[1]);
@@ -622,7 +631,7 @@ void recover_function(Backup_list* head, Backup_list* curr) {
     strcpy(tmp_buf_final, tmp_buf);
     
     
-    
+    recover_flag = 1;
     strtok_ptr = strtok(tmp_buf,"\n");
    
     
@@ -664,7 +673,7 @@ void recover_function(Backup_list* head, Backup_list* curr) {
             strtok_ptr = strtok(NULL,"\n");
         }
         
-        sprintf(system_command, "%s %s %s", "cp", strtok_ptr , realpath(filename_final, final_realpath));
+        sprintf(system_command, "%s %s %s", "cp", strtok_ptr , filename_fullpath);
         system(system_command);
         printf("Recovery Success\n");
     }
@@ -690,7 +699,6 @@ void recover_function(Backup_list* head, Backup_list* curr) {
 
     
     curr = head -> next;
-    
     while (curr != NULL) {
         time(&now);
         tm_p = localtime_r(&now, &time_struct);
@@ -724,8 +732,8 @@ void recover_function(Backup_list* head, Backup_list* curr) {
             curr = curr -> next;
     }
 
-    
-    fprintf(log_fp, "recover is executed\n");
+   
+    fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] recover is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     fclose(tmp_fp);
     system("rm -rf tmp.txt");
     return;
