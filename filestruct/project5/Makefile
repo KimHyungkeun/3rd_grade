@@ -24,7 +24,6 @@ test :
 	#@-hd student.idx
 	#@-hd student.dat
 	@echo "---------------------------------------------------------------------------------------------------------------------"
-	@ifeq("27","177")
 	@echo "test #3 - 좀 더 짧은 데이터 추가"
 	@-$(TARGET) -a "20142303" "shk.im" "Computer Science" "3" "hongcheon, Gangwon-do" "010-xxxx-yyyy" "niceb5y@gmail.com"
 	#@-hd student.idx
@@ -175,4 +174,4 @@ test :
 	@-$(TARGET) -s "2017"
 	@-$(TARGET) -s "2018"
 	@-$(TARGET) -s "2019"
-	@endif
+	
