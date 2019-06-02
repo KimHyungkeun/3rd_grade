@@ -135,6 +135,7 @@ void prompt_environment(void) { //prompt 환경
            
             curr -> next = (Backup_list*)malloc(sizeof(Backup_list)); //백업리스트를 새로 추가
             
+            
             if(pthread_create(&curr -> next -> tid, NULL ,add_function, (void *)curr) != 0) { //백업파일 하나당 쓰레드를 생성.
                 fprintf(stderr, "thread_create error\n");
                 continue;
@@ -396,7 +397,9 @@ Backup_list* remove_function(Backup_list* head) {
     }
 
     strcpy(filename_local, command_token[1]);
+    
     strrchr_ptr = strrchr(filename_local, '/'); //파일의 절대경로에서 파일이름만을 추출한다.
+
 
     if (strrchr_ptr != NULL)
         strcpy(filename_final, strrchr_ptr+1); //파일의 절대경로 입력시 추출하는 방법
@@ -429,13 +432,27 @@ Backup_list* remove_function(Backup_list* head) {
     }
 
     else {
-        
         curr = listhead -> next;
         while (curr != NULL) {
             time(&now);
             tm_p = localtime_r(&now, &time_struct);
 
-            if(strcmp(curr -> filepath, realpath(filename_local, buf)) == 0) { //파일 이름과 실제 절대경로가 같은경우
+            if(access(filename_local, F_OK) < 0) { //현 디렉터리 내에 파일이 존재하지 않는다면
+                
+                curr = listhead;
+                while(curr != NULL) {
+                    
+                    if(curr -> next == NULL) {
+                    break;
+                    }
+
+                curr = curr -> next; //백업리스트의 위치를 맨 마지막으로 이동시킨다.
+                }
+                fprintf(stderr, "Can't find \"%s\" in ssu_backup\n", filename_local); //에러메세지 출력
+                return curr; //백업리스트 주소값을 반환
+            }
+
+            else if(strcmp(curr -> filepath, realpath(filename_local, buf)) == 0) { //파일 이름과 실제 절대경로가 같은경우
                 
                 local_tid = curr -> tid;
                 pthread_cancel(local_tid); //해당 쓰레드를 취소시킨다.
@@ -449,7 +466,7 @@ Backup_list* remove_function(Backup_list* head) {
                 fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] %s/%s deleted\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec, realpath(backup_dir, backup_realpath), strrchr(curr -> filepath,'/')+1);
                 free(curr); //로그파일에 삭제 기록을 기록후에 해당 리스트를 삭제한다.
 
-                curr = listhead -> next;
+                curr = listhead;
                 while(curr != NULL) {
                     
                     if(curr -> next == NULL) {
@@ -463,12 +480,12 @@ Backup_list* remove_function(Backup_list* head) {
                 return curr; //삭제완료되었다는 기록을 레코드파일에 기록한다.
             }
 
-            else
+            else 
                 curr = curr -> next;
+
         }
 
-    fprintf(log_fp,"[%d%02d%02d %02d%02d%02d] remove is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
-    return curr; //삭제완료되었다는 기록을 레코드파일에 기록한다.
+    
     }
     
 }
