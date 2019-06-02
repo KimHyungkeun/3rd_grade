@@ -173,7 +173,7 @@ void prompt_environment(void) { //prompt 환경
                  continue;
              }
              
-             recover_function(head, curr);
+             curr = recover_function(head);
              continue;
         }
 
@@ -576,11 +576,12 @@ void compare_function(void) {
 
 }
 
-void recover_function(Backup_list* head, Backup_list* curr) {
+Backup_list* recover_function(Backup_list* head) {
 
     char* tmp_filename = "tmp.txt";
     FILE* tmp_fp;
     tmp_fp = fopen(tmp_filename, "w+");
+    Backup_list* curr;
 
     struct tm *tm_p; 
     struct tm time_struct;
@@ -622,7 +623,15 @@ void recover_function(Backup_list* head, Backup_list* curr) {
         fprintf(stderr, "\"%s\" does not exist\n", command_token[1]); //해당 파일이 없으면 에러처리후 프롬프트로 돌아감
         fclose(tmp_fp);
         system("rm -rf tmp.txt");
-        return ;
+        curr = head;
+            while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
+
+                if(curr -> next == NULL)
+                break;
+                
+                curr = curr -> next;
+            }
+        return curr;
     }
    
     realpath(command_token[1], filename_fullpath); //해당 파일의 절대 경로를 구한다
@@ -673,14 +682,30 @@ void recover_function(Backup_list* head, Backup_list* curr) {
     if(select_num == 0) { 
          fclose(tmp_fp);
          system("rm -rf tmp.txt"); //0번이면 선택을 끝내고 프롬프트로 돌아간다
-         return;    
+         curr = head;
+            while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
+
+                if(curr -> next == NULL)
+                break;
+                
+                curr = curr -> next;
+            }
+            return curr;   
     }
 
     else if(select_num > j || select_num < 0) { //0보다 크거나 선택할수있는 최대번호를 넘어선 경우 끝내고 프롬프트로 돌아간다.
         fprintf(stderr, "Wrong Select\n");
         fclose(tmp_fp);
         system("rm -rf tmp.txt");
-        return;    
+        curr = head;
+            while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
+
+                if(curr -> next == NULL)
+                break;
+                
+                curr = curr -> next;
+            }
+            return curr;    
     }
 
     strtok_ptr = strtok(tmp_buf_final,"\n");
@@ -708,7 +733,15 @@ void recover_function(Backup_list* head, Backup_list* curr) {
             fprintf(stderr, "\"%s\" is already exist\n", command_token[3]); //만약 이미 존재하는 파일이면 종료시키고 프롬프트로 돌아간다.
             fclose(tmp_fp);
             system("rm -rf tmp.txt");
-            return;
+            curr = head;
+            while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
+
+                if(curr -> next == NULL)
+                break;
+                
+                curr = curr -> next;
+            }
+            return curr;
         }
 
         system(system_command); //커맨드를 실행시킨다.
@@ -740,20 +773,20 @@ void recover_function(Backup_list* head, Backup_list* curr) {
         curr = curr -> next;
     }
 
-    curr = head -> next;
+    curr = head;
     while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
 
         if(curr -> next == NULL)
             break;
 
-        else
-            curr = curr -> next;
+        
+        curr = curr -> next;
     }
 
    
     fprintf(log_fp, "[%d%02d%02d %02d%02d%02d] recover is executed\n",tm_p -> tm_year - 100, tm_p -> tm_mon+1, tm_p -> tm_mday, tm_p -> tm_hour, tm_p -> tm_min, tm_p -> tm_sec);
     fclose(tmp_fp); //recover가 완료되었다면 레코드를 로그파일에 기록하고 해당 로그파일을 닫는다.
     system("rm -rf tmp.txt"); //임시파일은 다시 삭제시킨다.
-    return;
+    return curr;
     
 }

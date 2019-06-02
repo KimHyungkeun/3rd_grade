@@ -41,4 +41,4 @@ void *add_function(void*); //add 함수
 Backup_list* remove_function(Backup_list*); //remove 함수
 void list_function(Backup_list*); //list 함수
 void compare_function(void); //compare 함수
-void recover_function(Backup_list*, Backup_list*); //recover 함수
+Backup_list* recover_function(Backup_list*); //recover 함수
