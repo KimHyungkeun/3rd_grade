@@ -65,7 +65,6 @@ void makeHashfile(int n){
 	struct stat statbuf;
 	int hsh_size;  
 	int filesize = 4;
-	int hsh_size_except_filesize;
 	int home_address;
 	int is_full = 0;
 	int dat_offset;
@@ -77,7 +76,7 @@ void makeHashfile(int n){
 	dat_fp = fopen(RECORD_FILE_NAME, "r");
 	hsh_fp = fopen(HASH_FILE_NAME, "w+");
 	hsh_size = filesize + (HASH_RECORD_SIZE * n);
-	hsh_size_except_filesize = (HASH_RECORD_SIZE * n);
+	
 	//printf("Real size : %d\n", hsh_size_except_filesize);
 
 	stat(RECORD_FILE_NAME, &statbuf);
@@ -89,7 +88,7 @@ void makeHashfile(int n){
 	}
 
 	fseek(hsh_fp, 0 , SEEK_SET);
-	fwrite(&hsh_size_except_filesize , sizeof(int) ,1 ,hsh_fp);
+	fwrite(&n , sizeof(int) ,1 ,hsh_fp);
 	
 
 	for (int offset = 0 ; offset < statbuf.st_size ; offset += 120) {
