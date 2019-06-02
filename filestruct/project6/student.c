@@ -9,28 +9,28 @@
 #include "student.h"
 
 //
-// �л� ���ڵ� ���Ϸκ���  ���ڵ� ��ȣ�� �ش��ϴ� ���ڵ带 �о� ���ڵ� ���ۿ� �����Ѵ�.
+// ?��? ????? ????��???  ????? ????? ?????? ????? ?��? ????? ????? ???????.
 //
 /*void readStudentRec(FILE *fp, char *recordbuf, int rn){
 
 }
 
 //
-// Hash file�κ��� rn�� ���ڵ� ��ȣ�� �ش��ϴ� ���ڵ带 �о� ���ڵ� ���ۿ� �����Ѵ�.
+// Hash file?��??? rn?? ????? ????? ?????? ????? ?��? ????? ????? ???????.
 //
 void readHashRec(FILE *fp, char *recordbuf, int rn){
 
 }
 
 //
-// Hash file�� rn�� ���ڵ� ��ȣ�� �ش��ϴ� ��ġ�� ���ڵ� ������ ���ڵ带 �����Ѵ�.
+// Hash file?? rn?? ????? ????? ?????? ????? ????? ?????? ????? ???????.
 //
 void writeHashRec(FILE *fp, const char *recordbuf, int rn){
 
 }*/
 
 //
-// n�� ũ�⸦ ���� hash file���� �־��� �й� Ű���� hashing�Ͽ� �ּҰ�(���ڵ� ��ȣ)�� �����Ѵ�.
+// n?? ??? ???? hash file???? ????? ?��? ????? hashing??? ????(????? ???)?? ???????.
 //
 int hashFunction(const char *sid, int n){
 
@@ -54,27 +54,31 @@ int hashFunction(const char *sid, int n){
 }
 
 //
-// n�� ũ�⸦ ���� hash file�� �����Ѵ�.
-// Hash file�� fixed length record ������� ����Ǹ�, ���ڵ��� ũ��� 14 ����Ʈ�̴�.
-// (student.h ����)
+// n?? ??? ???? hash file?? ???????.
+// Hash file?? fixed length record ??????? ??????, ??????? ???? 14 ????????.
+// (student.h ????)
 //
 void makeHashfile(int n){
 
 	FILE* hsh_fp;
 	FILE* dat_fp;
 	struct stat statbuf;
-	int hsh_size = HASH_RECORD_SIZE * n;
+	int hsh_size;  
+	int filesize = 4;
+	int hsh_size_except_filesize;
 	int home_address;
 	int is_full = 0;
 	int dat_offset;
 	char dummy = '\0';
 	char recordbuf[HASH_RECORD_SIZE];
-
 	char sid[11];
 
 	
 	dat_fp = fopen(RECORD_FILE_NAME, "r");
 	hsh_fp = fopen(HASH_FILE_NAME, "w+");
+	hsh_size = filesize + (HASH_RECORD_SIZE * n);
+	hsh_size_except_filesize = (HASH_RECORD_SIZE * n);
+	//printf("Real size : %d\n", hsh_size_except_filesize);
 
 	stat(RECORD_FILE_NAME, &statbuf);
 	//printf("statbuf size : %ld\n", statbuf.st_size);
@@ -84,8 +88,9 @@ void makeHashfile(int n){
 		fwrite(&dummy, sizeof(char) , 1, hsh_fp);
 	}
 
-	
 	fseek(hsh_fp, 0 , SEEK_SET);
+	fwrite(&hsh_size_except_filesize , sizeof(int) ,1 ,hsh_fp);
+	
 
 	for (int offset = 0 ; offset < statbuf.st_size ; offset += 120) {
 		
@@ -98,9 +103,9 @@ void makeHashfile(int n){
 		
 		while(is_full != n) {
 
-			fseek(hsh_fp, home_address * HASH_RECORD_SIZE , SEEK_SET);
+			fseek(hsh_fp, filesize + (home_address * HASH_RECORD_SIZE) , SEEK_SET);
 			fread(recordbuf, sizeof(recordbuf), 1, hsh_fp);
-			fseek(hsh_fp, home_address * HASH_RECORD_SIZE , SEEK_SET);
+			fseek(hsh_fp, filesize + (home_address * HASH_RECORD_SIZE) , SEEK_SET);
 
 			if(strlen(recordbuf) == 0) {
 				fwrite(sid, strlen(sid) ,1 ,hsh_fp);
@@ -132,16 +137,17 @@ void makeHashfile(int n){
 }
 
 //
-// �־��� �й� Ű���� hash file���� �˻��Ѵ�.
-// �� ����� �־��� �й� Ű���� �����ϴ� hash file������ �ּ�(���ڵ� ��ȣ)�� search length�̴�.
-// �˻��� hash file������ �ּҴ� rn�� �����ϸ�, �̶� hash file�� �־��� �й� Ű����
-// �������� ������ rn�� -1�� �����Ѵ�. (search()�� delete()������ Ȱ���� �� ����)
-// search length�� �Լ��� ���ϰ��̸�, �˻� ����� ������� search length�� �׻� ���Ǿ�� �Ѵ�.
+// ????? ?��? ????? hash file???? ??????.
+// ?? ????? ????? ?��? ????? ??????? hash file?????? ???(????? ???)?? search length???.
+// ????? hash file?????? ???? rn?? ???????, ??? hash file?? ????? ?��? ?????
+// ???????? ?????? rn?? -1?? ???????. (search()?? delete()?????? ????? ?? ????)
+// search length?? ????? ????????, ??? ????? ??????? search length?? ??? ?????? ???.
 //
 int search(const char *sid, int *rn){
 
 	FILE *hsh_fp;
 	struct stat statbuf;
+	int filesize = 4;
 	int search_length = 0;
 	int home_address = 0;
 	int actual_address;
@@ -153,10 +159,10 @@ int search(const char *sid, int *rn){
 
 	hsh_fp = fopen(HASH_FILE_NAME, "r");
 	stat(HASH_FILE_NAME, &statbuf);
-	n = statbuf.st_size / HASH_RECORD_SIZE;
+	n = ( statbuf.st_size - filesize )/ HASH_RECORD_SIZE;
 
 	for (home_address = 0 ; home_address < n ; home_address++) {
-			fseek(hsh_fp , home_address * HASH_RECORD_SIZE, SEEK_SET);
+			fseek(hsh_fp , filesize + (home_address * HASH_RECORD_SIZE), SEEK_SET);
 			fread(recordbuf, SID_FIELD_SIZE , 1, hsh_fp);
 			if (strcmp(sid, recordbuf) == 0) {
 				break;
@@ -185,8 +191,8 @@ int search(const char *sid, int *rn){
 }
 
 //
-// Hash file���� �־��� �й� Ű���� ��ġ�ϴ� ���ڵ带 ã�� �� �ش� ���ڵ带 ���� ó���Ѵ�.
-// �̶� �л� ���ڵ� ���Ͽ��� ���ڵ� ������ �ʿ����� �ʴ�.
+// Hash file???? ????? ?��? ????? ?????? ????? ??? ?? ??? ????? ???? ??????.
+// ??? ?��? ????? ??????? ????? ?????? ??????? ???.
 //
 void delete(const char *sid){
 
@@ -194,20 +200,21 @@ void delete(const char *sid){
 	struct stat statbuf;
 	int i = 0;
 	int n = 0;
+	int filesize = 4;
 	char recordbuf[HASH_RECORD_SIZE];
 	char delete_mark = '*';
 
 	
 	hsh_fp = fopen(HASH_FILE_NAME, "r+");
 	stat(HASH_FILE_NAME, &statbuf);
-	n = statbuf.st_size / HASH_RECORD_SIZE;
+	n = (statbuf.st_size - filesize) / HASH_RECORD_SIZE;
 
 	for (i = 0 ; i < n ; i++) {
-		fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
+		fseek(hsh_fp , filesize + (i * HASH_RECORD_SIZE) , SEEK_SET);
 		fread(recordbuf, SID_FIELD_SIZE, 1 , hsh_fp);
 		
 		if (strcmp(recordbuf, sid) == 0) {
-			fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
+			fseek(hsh_fp , filesize + (i * HASH_RECORD_SIZE) , SEEK_SET);
 			fwrite(&delete_mark, sizeof(char) , 1, hsh_fp);
 			break;
 		}
@@ -219,7 +226,7 @@ void delete(const char *sid){
 }
 
 //
-// rn�� hash file������ ���ڵ� ��ȣ��, sl�� search length�� �ǹ��Ѵ�.
+// rn?? hash file?????? ????? ?????, sl?? search length?? ??????.
 //
 void printSearchResult(int rn, int sl)
 {
@@ -227,7 +234,7 @@ void printSearchResult(int rn, int sl)
 }
 
 
-// student.dat ������ �����.
+// student.dat ?????? ?????.
 
 int main(int argc, char* argv[])
 {
@@ -235,6 +242,7 @@ int main(int argc, char* argv[])
 	FILE *hsh_fp;
 	struct stat statbuf;
     int i, n, dat_record;
+	int filesize = 4;
 
     char packbuf[STUDENT_RECORD_SIZE] = {0, };
     char *ptr = packbuf;
@@ -263,10 +271,10 @@ int main(int argc, char* argv[])
 		hsh_fp = fopen(HASH_FILE_NAME, "r");
 
 		stat(HASH_FILE_NAME, &statbuf);
-		n = statbuf.st_size / HASH_RECORD_SIZE;
+		n = (statbuf.st_size - filesize) / HASH_RECORD_SIZE;
 
 		for(i = 0 ; i < n ; i++) {
-			fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
+			fseek(hsh_fp , filesize + (i * HASH_RECORD_SIZE) , SEEK_SET);
 			fread(sid, SID_FIELD_SIZE, 1 , hsh_fp);
 			fread(&rn, sizeof(int), 1, hsh_fp);
 		
