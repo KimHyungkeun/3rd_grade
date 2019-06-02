@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
 		
 			if (strcmp(sid, input_sid) == 0) {
 				search_length = search(sid, &rn);
-				printSearchResult(rn, search_length);
+				printSearchResult(i, search_length);
 				break;
 			}
 
