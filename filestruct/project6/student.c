@@ -9,28 +9,28 @@
 #include "student.h"
 
 //
-// ÇÐ»ý ·¹ÄÚµå ÆÄÀÏ·ÎºÎÅÍ  ·¹ÄÚµå ¹øÈ£¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå¸¦ ÀÐ¾î ·¹ÄÚµå ¹öÆÛ¿¡ ÀúÀåÇÑ´Ù.
+// ï¿½Ð»ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½Ï·Îºï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£ï¿½ï¿½ ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½Úµå¸¦ ï¿½Ð¾ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 //
 /*void readStudentRec(FILE *fp, char *recordbuf, int rn){
 
 }
 
 //
-// Hash file·ÎºÎÅÍ rnÀÇ ·¹ÄÚµå ¹øÈ£¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå¸¦ ÀÐ¾î ·¹ÄÚµå ¹öÆÛ¿¡ ÀúÀåÇÑ´Ù.
+// Hash fileï¿½Îºï¿½ï¿½ï¿½ rnï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£ï¿½ï¿½ ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½Úµå¸¦ ï¿½Ð¾ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 //
 void readHashRec(FILE *fp, char *recordbuf, int rn){
 
 }
 
 //
-// Hash file¿¡ rnÀÇ ·¹ÄÚµå ¹øÈ£¿¡ ÇØ´çÇÏ´Â À§Ä¡¿¡ ·¹ÄÚµå ¹öÆÛÀÇ ·¹ÄÚµå¸¦ ÀúÀåÇÑ´Ù.
+// Hash fileï¿½ï¿½ rnï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£ï¿½ï¿½ ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Úµå¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 //
 void writeHashRec(FILE *fp, const char *recordbuf, int rn){
 
 }*/
 
 //
-// nÀÇ Å©±â¸¦ °®´Â hash file¿¡¼­ ÁÖ¾îÁø ÇÐ¹ø Å°°ªÀ» hashingÇÏ¿© ÁÖ¼Ò°ª(·¹ÄÚµå ¹øÈ£)¸¦ ¸®ÅÏÇÑ´Ù.
+// nï¿½ï¿½ Å©ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½ hash fileï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ hashingï¿½Ï¿ï¿½ ï¿½Ö¼Ò°ï¿½(ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 //
 int hashFunction(const char *sid, int n){
 
@@ -54,9 +54,9 @@ int hashFunction(const char *sid, int n){
 }
 
 //
-// nÀÇ Å©±â¸¦ °®´Â hash fileÀ» »ý¼ºÇÑ´Ù.
-// Hash fileÀº fixed length record ¹æ½ÄÀ¸·Î ÀúÀåµÇ¸ç, ·¹ÄÚµåÀÇ Å©±â´Â 14 ¹ÙÀÌÆ®ÀÌ´Ù.
-// (student.h ÂüÁ¶)
+// nï¿½ï¿½ Å©ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½ hash fileï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+// Hash fileï¿½ï¿½ fixed length record ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½, ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ Å©ï¿½ï¿½ï¿½ 14 ï¿½ï¿½ï¿½ï¿½Æ®ï¿½Ì´ï¿½.
+// (student.h ï¿½ï¿½ï¿½ï¿½)
 //
 void makeHashfile(int n){
 
@@ -132,11 +132,11 @@ void makeHashfile(int n){
 }
 
 //
-// ÁÖ¾îÁø ÇÐ¹ø Å°°ªÀ» hash file¿¡¼­ °Ë»öÇÑ´Ù.
-// ±× °á°ú´Â ÁÖ¾îÁø ÇÐ¹ø Å°°ªÀÌ Á¸ÀçÇÏ´Â hash file¿¡¼­ÀÇ ÁÖ¼Ò(·¹ÄÚµå ¹øÈ£)¿Í search lengthÀÌ´Ù.
-// °Ë»öÇÑ hash file¿¡¼­ÀÇ ÁÖ¼Ò´Â rn¿¡ ÀúÀåÇÏ¸ç, ÀÌ¶§ hash file¿¡ ÁÖ¾îÁø ÇÐ¹ø Å°°ªÀÌ
-// Á¸ÀçÇÏÁö ¾ÊÀ¸¸é rn¿¡ -1À» ÀúÀåÇÑ´Ù. (search()´Â delete()¿¡¼­µµ È°¿ëÇÒ ¼ö ÀÖÀ½)
-// search length´Â ÇÔ¼öÀÇ ¸®ÅÏ°ªÀÌ¸ç, °Ë»ö °á°ú¿¡ »ó°ü¾øÀÌ search length´Â Ç×»ó °è»êµÇ¾î¾ß ÇÑ´Ù.
+// ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ hash fileï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½ï¿½Ñ´ï¿½.
+// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ hash fileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼ï¿½(ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£)ï¿½ï¿½ search lengthï¿½Ì´ï¿½.
+// ï¿½Ë»ï¿½ï¿½ï¿½ hash fileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼Ò´ï¿½ rnï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½, ï¿½Ì¶ï¿½ hash fileï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ Å°ï¿½ï¿½ï¿½ï¿½
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ rnï¿½ï¿½ -1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. (search()ï¿½ï¿½ delete()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+// search lengthï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï°ï¿½ï¿½Ì¸ï¿½, ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ search lengthï¿½ï¿½ ï¿½×»ï¿½ ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ ï¿½Ñ´ï¿½.
 //
 int search(const char *sid, int *rn){
 
@@ -157,7 +157,7 @@ int search(const char *sid, int *rn){
 
 	for (home_address = 0 ; home_address < n ; home_address++) {
 			fseek(hsh_fp , home_address * HASH_RECORD_SIZE, SEEK_SET);
-			fread(recordbuf, 10 , 1, hsh_fp);
+			fread(recordbuf, SID_FIELD_SIZE , 1, hsh_fp);
 			if (strcmp(sid, recordbuf) == 0) {
 				break;
 			}
@@ -185,8 +185,8 @@ int search(const char *sid, int *rn){
 }
 
 //
-// Hash file¿¡¼­ ÁÖ¾îÁø ÇÐ¹ø Å°°ª°ú ÀÏÄ¡ÇÏ´Â ·¹ÄÚµå¸¦ Ã£Àº ÈÄ ÇØ´ç ·¹ÄÚµå¸¦ »èÁ¦ Ã³¸®ÇÑ´Ù.
-// ÀÌ¶§ ÇÐ»ý ·¹ÄÚµå ÆÄÀÏ¿¡¼­ ·¹ÄÚµå »èÁ¦´Â ÇÊ¿äÇÏÁö ¾Ê´Ù.
+// Hash fileï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½Úµå¸¦ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½Úµå¸¦ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ñ´ï¿½.
+// ï¿½Ì¶ï¿½ ï¿½Ð»ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½.
 //
 void delete(const char *sid){
 
@@ -204,7 +204,7 @@ void delete(const char *sid){
 
 	for (i = 0 ; i < n ; i++) {
 		fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
-		fread(recordbuf, 10, 1 , hsh_fp);
+		fread(recordbuf, SID_FIELD_SIZE, 1 , hsh_fp);
 		
 		if (strcmp(recordbuf, sid) == 0) {
 			fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
@@ -219,7 +219,7 @@ void delete(const char *sid){
 }
 
 //
-// rnÀº hash file¿¡¼­ÀÇ ·¹ÄÚµå ¹øÈ£¸¦, slÀº search length¸¦ ÀÇ¹ÌÇÑ´Ù.
+// rnï¿½ï¿½ hash fileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È£ï¿½ï¿½, slï¿½ï¿½ search lengthï¿½ï¿½ ï¿½Ç¹ï¿½ï¿½Ñ´ï¿½.
 //
 void printSearchResult(int rn, int sl)
 {
@@ -227,7 +227,7 @@ void printSearchResult(int rn, int sl)
 }
 
 
-// student.dat ÆÄÀÏÀ» ¸¸µç´Ù.
+// student.dat ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
 
 int main(int argc, char* argv[])
 {
@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
 
 		for(i = 0 ; i < n ; i++) {
 			fseek(hsh_fp , i * HASH_RECORD_SIZE , SEEK_SET);
-			fread(sid, 10, 1 , hsh_fp);
+			fread(sid, SID_FIELD_SIZE, 1 , hsh_fp);
 			fread(&rn, sizeof(int), 1, hsh_fp);
 		
 			if (strcmp(sid, input_sid) == 0) {

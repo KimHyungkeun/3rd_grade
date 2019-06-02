@@ -1,4 +1,11 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #ifndef _STUDENT_H_
 #define _STUDENT_H_
@@ -7,6 +14,8 @@
 #define HASH_FILE_NAME     "student.hsh"
 #define STUDENT_RECORD_SIZE     120
 #define HASH_RECORD_SIZE    14      //학번키값(10)+학생레코드번호(4)
+#define SID_FIELD_SIZE 10
+
 
 typedef struct _Student
 {
