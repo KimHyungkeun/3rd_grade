@@ -428,7 +428,7 @@ Backup_list* remove_function(Backup_list* head) {
             fprintf(stderr, "No more files in backup list\n");
             return listhead;
         }
-        
+
         curr = listhead -> next;
         while (curr != NULL) { 
             time(&now);
@@ -452,6 +452,11 @@ Backup_list* remove_function(Backup_list* head) {
     }
 
     else {
+        if(listhead -> next == NULL) {
+            fprintf(stderr, "No more files in backup list\n"); //remove할것이 아무것도 없으면 에러처리후 프롬프트로 돌아감
+            return listhead;
+        }
+
         curr = listhead -> next;
         while (curr != NULL) {
             time(&now);

@@ -1,0 +1,8 @@
+[190603 215936] add is executed
+[190603 215936] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190603215936 added
+[190603 215939] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h deleted
+[190603 215939] remove is executed
+[190603 215952] add is executed
+[190603 215952] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190603215952 added
+[190603 215956] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h deleted
+[190603 215956] recover is executed
