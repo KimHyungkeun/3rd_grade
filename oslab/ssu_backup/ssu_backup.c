@@ -423,6 +423,12 @@ Backup_list* remove_function(Backup_list* head) {
     
 
     if(strcmp(command_token[1], "-a") == 0) { //옵션 a를 넣었을때
+
+        if(listhead -> next == NULL) {
+            fprintf(stderr, "No more files in backup list\n");
+            return listhead;
+        }
+        
         curr = listhead -> next;
         while (curr != NULL) { 
             time(&now);
@@ -749,6 +755,18 @@ Backup_list* recover_function(Backup_list* head) {
     }
   
     else if (strcmp(command_token[2], "-n") == 0) {
+        if (i == 3) {
+            fprintf(stderr,"You did not input any FILENAME\n"); //n옵션을 두고 파일이름을 입력하지 않으면 프롬프트로 돌아감
+            curr = head;
+            while(curr != NULL) { //리스트를 가리키는 포인터가 맨 마지막 리스트를 가리킬수 있도록 설정한다.
+
+                if(curr -> next == NULL)
+                break;
+                
+                curr = curr -> next;
+            }
+            return curr;
+        }
     
         for(int count = 1 ; count <= select_num-1 ; count++) {
             strtok_ptr = strtok(NULL,"\n");
