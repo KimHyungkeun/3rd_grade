@@ -480,8 +480,18 @@ Backup_list* remove_function(Backup_list* head) {
                 return curr; //삭제완료되었다는 기록을 레코드파일에 기록한다.
             }
 
-            else 
+            else {
+
+                if (curr -> next == NULL) {
+                fprintf(stderr,"%s is not exist in backup list\n", filename_local);
+                return curr;
+                }
+
                 curr = curr -> next;
+                
+            }
+
+            
 
         }
 
@@ -653,9 +663,12 @@ Backup_list* recover_function(Backup_list* head) {
     
     char tmp_buf[tmp_statbuf.st_size];
     char tmp_buf_final[tmp_statbuf.st_size];
+    
 
-    fread(&tmp_buf, sizeof(tmp_buf), 1, tmp_fp); // 임시파일에 기록된 모든 모든 리스트들을 tmp_buf에 넣는다
+    fseek(tmp_fp, 0 , SEEK_SET);
+    fread(&tmp_buf, tmp_statbuf.st_size, 1, tmp_fp); // 임시파일에 기록된 모든 모든 리스트들을 tmp_buf에 넣는다
     strcpy(tmp_buf_final, tmp_buf); 
+    
     
     
     recover_flag = 1;
