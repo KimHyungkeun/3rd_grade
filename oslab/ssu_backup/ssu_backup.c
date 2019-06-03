@@ -396,6 +396,20 @@ Backup_list* remove_function(Backup_list* head) {
         ptr = strtok(NULL, " ");      // 다음 문자열을 잘라서 포인터를 반환
     }
 
+    if (i >= 3) {
+        fprintf(stderr, "Too many arguments. You can input max 2 arguments\n");
+        curr = listhead; //remove는 반드시 인자가 2개밖에 들어가지 않는 기능을 가진다.
+                while(curr != NULL) {
+                    
+                    if(curr -> next == NULL) {
+                    break;
+                    }
+
+                    curr = curr -> next;
+                }
+        return curr;
+    }
+
     strcpy(filename_local, command_token[1]);
     
     strrchr_ptr = strrchr(filename_local, '/'); //파일의 절대경로에서 파일이름만을 추출한다.
