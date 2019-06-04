@@ -163,7 +163,7 @@ int search(const char *sid, int *rn){
 	n = ( statbuf.st_size - filesize )/ HASH_RECORD_SIZE;
 
 	home_address = hashFunction(sid, n);
-	printf("home_address : %d\n", home_address);
+	
 	
 	for (actual_address = 0 ; actual_address < n ; actual_address++) {
 			fseek(hsh_fp , filesize + (actual_address * HASH_RECORD_SIZE), SEEK_SET);
