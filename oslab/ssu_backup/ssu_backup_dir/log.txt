@@ -1,8 +1,20 @@
-[190603 215936] add is executed
-[190603 215936] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190603215936 added
-[190603 215939] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h deleted
-[190603 215939] remove is executed
-[190603 215952] add is executed
-[190603 215952] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190603215952 added
-[190603 215956] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h deleted
-[190603 215956] recover is executed
+[190604 234035] add is executed
+[190604 234035] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234035 added
+[190604 234040] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234040 generated
+[190604 234045] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234045 generated
+[190604 234050] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234050 generated
+[190604 234055] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234055 generated
+[190604 234100] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234100 generated
+[190604 234105] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234105 generated
+[190604 234110] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234110 generated
+[190604 234115] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234115 generated
+[190604 234117] add is executed
+[190604 234117] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/text2.c_190604234117 added
+[190604 234120] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234120 generated
+[190604 234123] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/text2.c_190604234123 generated
+[190604 234125] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234125 generated
+[190604 234129] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/text2.c_190604234129 generated
+[190604 234130] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h_190604234130 generated
+[190604 234135] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/ssu_time.h deleted
+[190604 234135] /home/hkkim/soongsil/oslab/ssu_backup/ssu_backup_dir/text2.c deleted
+[190604 234135] remove is executed
