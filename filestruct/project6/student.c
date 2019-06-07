@@ -300,7 +300,6 @@ int main(int argc, char* argv[])
 
 		if (i == n) {
 			rn = -1;
-			printSearchResult(rn, n);
 		}
 
 		fclose(hsh_fp);
