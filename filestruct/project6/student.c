@@ -48,7 +48,9 @@ int hashFunction(const char *sid, int n){
 	strcpy(letters,ptr);
 
 	multiple_result = letters[0] * letters[1];
+	//printf("%c %c\n", letters[0], letters[1]);
 	home_address = multiple_result % n; 
+	//printf("home_address : %d\n", home_address);
 
 	return home_address;
 }
@@ -95,7 +97,7 @@ void makeHashfile(int n){
 	for (int offset = 0 ; offset < statbuf.st_size ; offset += 120) {
 		
 		fseek(dat_fp, offset , SEEK_SET);
-		fread(sid, sizeof(sid)-1, 1 , dat_fp);
+		fread(sid, sizeof(sid) , 1 , dat_fp);
 		dat_offset = offset/120;
 		
 		home_address = hashFunction(sid, n);
@@ -103,7 +105,7 @@ void makeHashfile(int n){
 		//printf("home address : %d\n", home_address);
 		
 		while(is_full != n) {
-
+			
 			fseek(hsh_fp, filesize + (actual_address * HASH_RECORD_SIZE) , SEEK_SET);
 			fread(recordbuf, sizeof(recordbuf), 1, hsh_fp);
 			fseek(hsh_fp, filesize + (actual_address * HASH_RECORD_SIZE) , SEEK_SET);
@@ -112,6 +114,7 @@ void makeHashfile(int n){
 				fwrite(sid, strlen(sid) ,1 ,hsh_fp);
 				fseek(hsh_fp, sizeof(sid) - strlen(sid) - 1, SEEK_CUR);
 				fwrite(&dat_offset, sizeof(int) ,1 , hsh_fp);
+				is_full = 0;
 				break;
 			}
 
