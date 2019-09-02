@@ -1,0 +1,1 @@
+(dirp = opendir(argv[1]))
