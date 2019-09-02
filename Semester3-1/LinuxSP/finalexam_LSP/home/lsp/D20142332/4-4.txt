@@ -1,1 +1,0 @@
-sigaddset(&wait_mask, SIGINT)

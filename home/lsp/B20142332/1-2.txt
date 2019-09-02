@@ -1,1 +1,0 @@
-write(fd, buf1, 12)

@@ -1,2 +1,0 @@
-reading 1 bytes
-nwrite = 1, errno = 0

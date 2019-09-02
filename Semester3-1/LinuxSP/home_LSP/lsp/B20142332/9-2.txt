@@ -1,1 +1,0 @@
-execl("/bin/echo", "echo" , "this is" , "message two", (char *) 0)

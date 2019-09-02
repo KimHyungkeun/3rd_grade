@@ -1,5 +1,0 @@
-/tmp/cc8hpSPO.o: In function `main':
-12.c:(.text+0xe8): undefined reference to `pthread_create'
-12.c:(.text+0x103): undefined reference to `pthread_create'
-collect2: error: ld returned 1 exit status
-sh: 1: ./STD_DIR/20190009/12.exe: not found

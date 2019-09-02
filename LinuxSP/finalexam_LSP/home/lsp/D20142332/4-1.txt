@@ -1,1 +1,0 @@
-sigemptyset(&wait_mask)

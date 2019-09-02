@@ -1,7 +1,0 @@
-/tmp/ccpsBGEX.o: In function `main':
-12.c:(.text+0x191): undefined reference to `pthread_create'
-12.c:(.text+0x1ac): undefined reference to `pthread_create'
-12.c:(.text+0x1bd): undefined reference to `pthread_join'
-12.c:(.text+0x1ce): undefined reference to `pthread_join'
-collect2: error: ld returned 1 exit status
-sh: 1: ./STD_DIR/20190018/12.exe: not found

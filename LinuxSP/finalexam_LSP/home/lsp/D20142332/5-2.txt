@@ -1,1 +1,0 @@
-void *ssu_thread(void *arg)

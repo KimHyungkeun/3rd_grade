@@ -1,1 +1,0 @@
-gcc ccl -E collect2.i
