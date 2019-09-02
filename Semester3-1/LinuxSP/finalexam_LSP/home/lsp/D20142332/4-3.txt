@@ -1,0 +1,1 @@
+sigaddset(&new_mask, SIGINT)

@@ -1,0 +1,14 @@
+STD_DIR/20190006/12.c: In function ‘ssu_thread_producer’:
+STD_DIR/20190006/12.c:18:25: error: ‘cond2’ undeclared (first use in this function)
+    pthread_cond_signal(&cond2);
+                         ^
+STD_DIR/20190006/12.c:18:25: note: each undeclared identifier is reported only once for each function it appears in
+STD_DIR/20190006/12.c: In function ‘ssu_thread_consumer’:
+STD_DIR/20190006/12.c:32:23: error: ‘cond2’ undeclared (first use in this function)
+    pthread_cond_wait(&cond2,&mutex);
+                       ^
+STD_DIR/20190006/12.c: In function ‘main’:
+STD_DIR/20190006/12.c:50:24: error: ‘cond2’ undeclared (first use in this function)
+  pthread_cond_destroy(&cond2);
+                        ^
+sh: 1: ./STD_DIR/20190006/12.exe: not found

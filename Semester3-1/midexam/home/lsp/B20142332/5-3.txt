@@ -1,0 +1,1 @@
+strcmp(dentry -> d_name, ".") == 0 || strcmp(dentry -> d_name, "..")

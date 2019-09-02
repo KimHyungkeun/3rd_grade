@@ -1,0 +1,7 @@
+/tmp/ccexCFDj.o: In function `main':
+12.c:(.text+0x138): undefined reference to `pthread_create'
+12.c:(.text+0x153): undefined reference to `pthread_create'
+12.c:(.text+0x164): undefined reference to `pthread_join'
+12.c:(.text+0x175): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+sh: 1: ./STD_DIR/20190011/12.exe: not found

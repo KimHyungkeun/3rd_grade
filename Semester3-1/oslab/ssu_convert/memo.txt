@@ -1,0 +1,40 @@
+// import java.util.Scanner; =>
+// 1) delete all import syntax 
+// 2) #include <stdio.h>\n#include <stdilib.h>\n
+
+// import java.io.File; => delete "import java.io.File"
+// 1) #include <stdio.h>\n#include <stdilib.h>\n#include <unistd.h>\n#include <fcntl.h>
+
+// class ~~{ => delete "class ~~{" and delete last "}"
+
+// public class ~~{ => delete "public class ~~{" and delete last "}"
+
+// public static void main(String[] args) => "int main(void)"
+
+// Scanner scn = new Scanner(); => delete
+
+// num = scn.nextInt() => "scanf("%d",&num);"
+
+// File file = new file("q3java.txt"); => FILE* file = fopen("q3java.txt", "w+");
+
+// FileWriter writer = new FileWriter(file, false); => delete
+
+// writer.write("2019 OSLAB\n"); => fprintf(file, "%s" ,"2019 OSLAB\n");
+
+// writer.write("Linux System Programming\n"); => fprintf(file, "%s" ,"Linux System Programming\n");
+
+// writer.flush(); => fflush(stdin);
+
+// System.out.printf => printf
+
+// if(writer != null) => delete
+
+// writer.close => fclose(file);
+
+// public static final int STACK_SIZE = 10; => #define STACK_SIZE 10
+
+// Stack st = new Stack(); => delete
+
+// st. => "st." delete
+
+// return ; => "exit(0);"

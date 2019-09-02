@@ -1,0 +1,9 @@
+STD_DIR/20190010/12.c: In function ‘ssu_thread_consumer’:
+STD_DIR/20190010/12.c:31:6: error: ‘i’ undeclared (first use in this function)
+  for(i = 1; i <= 300; i++) {
+      ^
+STD_DIR/20190010/12.c:31:6: note: each undeclared identifier is reported only once for each function it appears in
+STD_DIR/20190010/12.c:37:3: error: ‘sum’ undeclared (first use in this function)
+   sum += buf[--length];
+   ^
+sh: 1: ./STD_DIR/20190010/12.exe: not found

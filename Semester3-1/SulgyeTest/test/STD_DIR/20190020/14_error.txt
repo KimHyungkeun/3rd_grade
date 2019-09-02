@@ -1,0 +1,4 @@
+/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o: In function `_start':
+(.text+0x20): undefined reference to `main'
+collect2: error: ld returned 1 exit status
+sh: 1: ./STD_DIR/20190020/14.exe: not found

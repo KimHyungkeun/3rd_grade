@@ -1,0 +1,1 @@
+(fd = open(fname, O_RDWR | O_CREAT | O_TRUNC , CREAT_MODE))
