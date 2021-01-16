@@ -1,4 +1,4 @@
-# 3rd_grade_1st 
+# 3학년 1학기 과정
 - 전공과목
 
 [1. LinuxSP](https://github.com/KimHyungkeun/3rd_grade/tree/master/Semester3-1/LinuxSP) : 리눅스시스템프로그래밍 과목
